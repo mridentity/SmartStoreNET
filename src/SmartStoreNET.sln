@@ -75,6 +75,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStore.AmazonPay", "Plu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStore.DevTools", "Plugins\SmartStore.DevTools\SmartStore.DevTools.csproj", "{542B9C12-E2A1-49BB-9134-0E3484F9D669}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadySignOn.ReadyPay", "Plugins\ReadySignOn.ReadyPay\ReadySignOn.ReadyPay.csproj", "{8601AB38-769F-4EEC-8D3F-A133FEC6465D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -591,6 +593,30 @@ Global
 		{542B9C12-E2A1-49BB-9134-0E3484F9D669}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{542B9C12-E2A1-49BB-9134-0E3484F9D669}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{542B9C12-E2A1-49BB-9134-0E3484F9D669}.Release|x86.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Debug|x86.Build.0 = Debug|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.EFMigrations|Any CPU.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.EFMigrations|Any CPU.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.EFMigrations|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.EFMigrations|Mixed Platforms.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.EFMigrations|x86.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.EFMigrations|x86.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.PluginDev|Any CPU.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.PluginDev|Any CPU.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.PluginDev|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.PluginDev|Mixed Platforms.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.PluginDev|x86.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.PluginDev|x86.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|x86.ActiveCfg = Release|Any CPU
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -615,6 +641,7 @@ Global
 		{ACC1E122-B2C8-4441-BDED-D4A77763331A} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{611E4AC2-CA21-5C81-6B4B-3ABA87B91A25} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{542B9C12-E2A1-49BB-9134-0E3484F9D669} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
+		{8601AB38-769F-4EEC-8D3F-A133FEC6465D} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59B852CE-9608-479C-A92B-7EE2DE161049}

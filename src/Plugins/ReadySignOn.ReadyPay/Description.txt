@@ -1,0 +1,10 @@
+﻿FriendlyName: ReadyPay
+Description: A registration-free, password-free, zero-friction, single-tap, secure remote mobile express payment method.
+SystemName: ReadySignOn.ReadyPay
+Group: Payment
+Version: 1.0.0
+MinAppVersion: 3.2.2
+DisplayOrder: 1
+FileName: ReadySignOn.ReadyPay.dll
+ResourceRootKey: Plugins.ReadySignOn.ReadyPay
+Url: http://www.readysignon.com/readypay
