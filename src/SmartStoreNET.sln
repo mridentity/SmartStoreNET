@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2047
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A340B280-C12B-47E7-90B7-89C650F8AAFC}"
 EndProject
@@ -24,6 +24,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStore.Core", "Libraries\SmartStore.Core\SmartStore.Core.csproj", "{6BDA8332-939F-45B7-A25E-7A797260AE59}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStore.Web", "Presentation\SmartStore.Web\SmartStore.Web.csproj", "{4F1F649C-1020-45BE-A487-F416D9297FF3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{152C761A-DD2E-4C1F-AF89-DFB2547A3BCA} = {152C761A-DD2E-4C1F-AF89-DFB2547A3BCA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStore.Admin", "Presentation\SmartStore.Web\Administration\SmartStore.Admin.csproj", "{152C761A-DD2E-4C1F-AF89-DFB2547A3BCA}"
 EndProject
