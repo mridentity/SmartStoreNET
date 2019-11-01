@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,12 +42,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Description.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\SmartStore.Core\SmartStore.Core.csproj">
+      <Project>{6BDA8332-939F-45B7-A25E-7A797260AE59}</Project>
+      <Name>SmartStore.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\SmartStore.Services\SmartStore.Services.csproj">
+      <Project>{210541AD-F659-47DA-8763-16F36C5CD2F4}</Project>
+      <Name>SmartStore.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Presentation\SmartStore.Web.Framework\SmartStore.Web.Framework.csproj">
+      <Project>{75fd4163-333c-4dd5-854d-2ef294e45d94}</Project>
+      <Name>SmartStore.Web.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Presentation\SmartStore.Web\SmartStore.Web.csproj">
+      <Project>{4f1f649c-1020-45be-a487-f416d9297ff3}</Project>
+      <Name>SmartStore.Web</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
