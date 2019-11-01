@@ -29,16 +29,18 @@ namespace SmartStore.Data.Setup
 		/// <inheritdoc />
 		public override void InitializeDatabase(SmartObjectContext context)
 		{
-			// we don't use DbSeedingMigrator here because we don't care
-			// about Migration seeds during installation.
-			// The installation seeder contains ALL required seed data already.
-			var migrator = new DbMigrator(base.CreateConfiguration());
+            // we don't use DbSeedingMigrator here because we don't care
+            // about Migration seeds during installation.
+            // The installation seeder contains ALL required seed data already.
+            var migrator = new DbSeedingMigrator<SmartObjectContext>(base.CreateConfiguration());
 
-			// Run all migrations including the initial one
-			migrator.Update();
+            migrator.Update();
 
-			// seed install data
-			this.Seed(context);
-		}
-	}
+            // seed install data
+            this.Seed(context); // run install seeders
+
+            // Run all migrations including the initial one
+            migrator.RunAllMigrationSeeds(context); // run migration seeders
+        }
+    }
 }

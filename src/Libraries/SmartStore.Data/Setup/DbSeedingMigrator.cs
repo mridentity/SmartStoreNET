@@ -181,7 +181,77 @@ namespace SmartStore.Data.Setup
 			return result;
 		}
 
-		private void RunSeeders<T>(IEnumerable<SeederEntry> seederEntries, T ctx) where T : DbContext
+        public int RunAllMigrationSeeds(TContext context)
+        {
+            if (_lastSeedException != null)
+            {
+                // This can happen when a previous migration attempt failed with a rollback.
+                throw _lastSeedException;
+            }
+
+            var coreSeeders = new List<SeederEntry>();
+            var isCoreMigration = context is SmartObjectContext;
+            var databaseMigrations = this.GetDatabaseMigrations().ToArray();
+            var initialMigration = databaseMigrations.LastOrDefault() ?? "[Initial]";
+            var lastSuccessfulMigration = databaseMigrations.FirstOrDefault();
+
+            IDataSeeder<SmartObjectContext> coreSeeder = null;
+            IDataSeeder<TContext> externalSeeder = null;
+
+            int result = 0;
+            _isMigrating = true;
+
+            // Apply migrations
+            foreach (var migrationId in databaseMigrations)
+            {
+                if (MigratorUtils.IsAutomaticMigration(migrationId))
+                    continue;
+
+                if (!MigratorUtils.IsValidMigrationId(migrationId))
+                    continue;
+
+                // Resolve and instantiate the DbMigration instance from the assembly
+                var migration = MigratorUtils.CreateMigrationInstanceByMigrationId(migrationId, Configuration);
+
+                // Seeders for the core DbContext must be run in any case 
+                // (e.g. for Resource or Setting updates even from external plugins)
+                coreSeeder = migration as IDataSeeder<SmartObjectContext>;
+
+                if (!isCoreMigration)
+                {
+                    // Context specific seeders should only be resolved
+                    // when origin is external (e.g. a Plugin)
+                    externalSeeder = migration as IDataSeeder<TContext>;
+                }
+
+                if (coreSeeder != null)
+                    coreSeeders.Add(new SeederEntry
+                    {
+                        DataSeeder = coreSeeder,
+                        MigrationId = migrationId,
+                        PreviousMigrationId = lastSuccessfulMigration,
+                    });
+
+                lastSuccessfulMigration = migrationId;
+            }
+
+            // Apply core data seeders first
+            SmartObjectContext coreContext = null;
+            if (coreSeeders.Any())
+            {
+                coreContext = isCoreMigration ? context as SmartObjectContext : new SmartObjectContext();
+                RunSeeders<SmartObjectContext>(coreSeeders, coreContext);
+            }
+
+
+            _isMigrating = false;
+
+            Logger.Info("Migration seeding successful: {0} >> {1}".FormatInvariant(initialMigration, lastSuccessfulMigration));
+
+            return result;
+        }
+
+        private void RunSeeders<T>(IEnumerable<SeederEntry> seederEntries, T ctx) where T : DbContext
 		{
 			foreach (var seederEntry in seederEntries)
 			{
