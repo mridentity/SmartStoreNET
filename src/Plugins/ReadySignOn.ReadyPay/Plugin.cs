@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Routing;
+using SmartStore;
 using SmartStore.Core.Logging;
 using SmartStore.Core.Plugins;
-using ReadySignOn.ReadyPay.Providers;
-using ReadySignOn.ReadyPay.Services;
-using ReadySignOn.ReadyPay.Settings;
 using SmartStore.Services;
 using SmartStore.Services.Cms;
 using SmartStore.Services.Directory;
@@ -15,21 +13,18 @@ using SmartStore.Web.Models.ShoppingCart;
 
 namespace ReadySignOn.ReadyPay
 {
-    [SystemName("Widgets.PayPal")]
+    [SystemName("Widgets.ReadyPay")]
     [FriendlyName("ReadyPay")]
     public class Plugin : BasePlugin, IWidget
     {
         private readonly ICommonServices _services;
-		private readonly Lazy<IPayPalService> _payPalService;
         private readonly Lazy<ICurrencyService> _currencyService;
 
         public Plugin(
             ICommonServices services,
-			Lazy<IPayPalService> payPalService,
             Lazy<ICurrencyService> currencyService)
 		{
             _services = services;
-			_payPalService = payPalService;
             _currencyService = currencyService;
 
 			Logger = NullLogger.Instance;
@@ -41,11 +36,7 @@ namespace ReadySignOn.ReadyPay
 
 		public override void Install()
 		{
-            _services.Settings.SaveSetting(new PayPalExpressPaymentSettings());
-            _services.Settings.SaveSetting(new PayPalDirectPaymentSettings());
-            _services.Settings.SaveSetting(new PayPalStandardPaymentSettings());
-            _services.Settings.SaveSetting(new PayPalPlusPaymentSettings());
-            _services.Settings.SaveSetting(new PayPalInstalmentsSettings());
+            _services.Settings.SaveSetting(new ReadyPaySettings());
 
             _services.Localization.ImportPluginResourcesFromXml(this.PluginDescriptor);
 
@@ -54,14 +45,10 @@ namespace ReadySignOn.ReadyPay
 
 		public override void Uninstall()
 		{
-            DeleteWebhook(_services.Settings.LoadSetting<PayPalPlusPaymentSettings>(), PayPalPlusProvider.SystemName);
-            DeleteWebhook(_services.Settings.LoadSetting<PayPalInstalmentsSettings>(), PayPalInstalmentsProvider.SystemName);
+            //DeleteWebhook(_services.Settings.LoadSetting<PayPalPlusPaymentSettings>(), PayPalPlusProvider.SystemName);
+            //DeleteWebhook(_services.Settings.LoadSetting<PayPalInstalmentsSettings>(), PayPalInstalmentsProvider.SystemName);
 
-            _services.Settings.DeleteSetting<PayPalExpressPaymentSettings>();
-            _services.Settings.DeleteSetting<PayPalDirectPaymentSettings>();
-            _services.Settings.DeleteSetting<PayPalStandardPaymentSettings>();
-            _services.Settings.DeleteSetting<PayPalPlusPaymentSettings>();
-            _services.Settings.DeleteSetting<PayPalInstalmentsSettings>();
+            _services.Settings.DeleteSetting<ReadyPaySettings>();
 
             _services.Localization.DeleteLocaleStringResources(PluginDescriptor.ResourceRootKey);
 
@@ -72,7 +59,9 @@ namespace ReadySignOn.ReadyPay
         {
             return new List<string>
             {
+                "productbox_add_info",
                 "productdetails_add_info",
+                "offcavas_cart_summary",
                 "order_summary_totals_after",
                 "orderdetails_page_aftertotal",
                 "invoice_aftertotal"
@@ -133,32 +122,6 @@ namespace ReadySignOn.ReadyPay
                     routeValues.Add("orderId", viewModel.Id);
                     routeValues.Add("print", widgetZone.IsCaseInsensitiveEqual("invoice_aftertotal"));
                 }
-            }
-        }
-
-        private void DeleteWebhook(PayPalApiSettingsBase settings, string providerSystemName)
-        {
-            try
-            {
-                if (settings?.WebhookId.HasValue() ?? false)
-                {
-                    var session = new PayPalSessionData { ProviderSystemName = providerSystemName };
-                    var result = _payPalService.Value.EnsureAccessToken(session, settings);
-
-                    if (result.Success)
-                    {
-                        result = _payPalService.Value.DeleteWebhook(settings, session);
-                    }
-
-                    if (!result.Success)
-                    {
-                        Logger.Log(LogLevel.Error, null, result.ErrorMessage, null);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Error, ex, null, null);
             }
         }
 	}
