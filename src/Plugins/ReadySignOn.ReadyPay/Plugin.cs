@@ -135,7 +135,7 @@ namespace ReadySignOn.ReadyPay
         {
             actionName = "Configure";
             controllerName = "ReadyPay";
-            routeValues = new RouteValueDictionary { { "Namespaces", "SmartStore.ReadyPay.Controllers" }, { "area", SystemName } };
+            routeValues = new RouteValueDictionary { { "Namespaces", "ReadySignOn.ReadyPay.Controllers" }, { "area", SystemName } };
         }
 
         public override void GetPaymentInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)

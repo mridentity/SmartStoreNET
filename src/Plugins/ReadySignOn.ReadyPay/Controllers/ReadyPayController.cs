@@ -49,7 +49,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 			var model = new ConfigurationModel();
 
 			MiniMapper.Map(settings, model);
-			_apiService.SetupConfiguration(model);
+			//_apiService.SetupConfiguration(model);
 
 			return View(model);
 		}
