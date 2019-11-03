@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ReadySignOn.ReadyPay
 {
-    class ReadyPaySettings : ISettings
+    public class ReadyPaySettings : ISettings
     {
         public ReadyPaySettings()
         {

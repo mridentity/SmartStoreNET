@@ -1,0 +1,57 @@
+﻿using ReadySignOn.ReadyPay.Models;
+using ReadySignOn.ReadyPay.Services;
+using SmartStore.ComponentModel;
+using SmartStore.Web.Framework.Controllers;
+using SmartStore.Web.Framework.Security;
+using SmartStore.Web.Framework.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Mvc;
+
+namespace ReadySignOn.ReadyPay.Controllers
+{
+    public class ReadyPayController : PublicControllerBase
+    {
+        private readonly IReadyPayService _apiService;
+
+        public ReadyPayController(
+            IReadyPayService apiService
+        )
+        {
+            _apiService = apiService;
+        }
+
+		protected ActionResult GetActionResult(ReadyPayViewModel model)
+		{
+			switch (model.Result)
+			{
+				case ReadyPayResultType.None:
+					return new EmptyResult();
+
+				case ReadyPayResultType.PluginView:
+					return View(model);
+
+				case ReadyPayResultType.Unauthorized:
+					return new HttpUnauthorizedResult();
+
+				case ReadyPayResultType.Redirect:
+				default:
+					return RedirectToAction(model.RedirectAction, model.RedirectController, new { area = "" });
+			}
+		}
+
+		[AdminAuthorize, LoadSetting]
+		public ActionResult Configure(ReadyPaySettings settings)
+		{
+			var model = new ConfigurationModel();
+
+			MiniMapper.Map(settings, model);
+			_apiService.SetupConfiguration(model);
+
+			return View(model);
+		}
+    }
+}

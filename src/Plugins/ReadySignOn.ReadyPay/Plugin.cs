@@ -7,6 +7,7 @@ using SmartStore.Core.Plugins;
 using SmartStore.Services;
 using SmartStore.Services.Cms;
 using SmartStore.Services.Directory;
+using SmartStore.Services.Payments;
 using SmartStore.Web.Models.Catalog;
 using SmartStore.Web.Models.Order;
 using SmartStore.Web.Models.ShoppingCart;
@@ -15,7 +16,7 @@ namespace ReadySignOn.ReadyPay
 {
     [SystemName("Widgets.ReadyPay")]
     [FriendlyName("ReadyPay")]
-    public class Plugin : BasePlugin, IWidget
+    public class Plugin : PaymentPluginBase, IWidget, IConfigurable
     {
         private readonly ICommonServices _services;
         private readonly Lazy<ICurrencyService> _currencyService;
@@ -124,5 +125,27 @@ namespace ReadySignOn.ReadyPay
                 }
             }
         }
-	}
+
+        public override ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void GetConfigurationRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
+        {
+            actionName = "Configure";
+            controllerName = "ReadyPay";
+            routeValues = new RouteValueDictionary { { "Namespaces", "SmartStore.ReadyPay.Controllers" }, { "area", SystemName } };
+        }
+
+        public override void GetPaymentInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Type GetControllerType()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
