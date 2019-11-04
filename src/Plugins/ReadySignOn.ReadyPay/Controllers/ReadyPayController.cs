@@ -1,5 +1,6 @@
 ﻿using ReadySignOn.ReadyPay.Models;
 using ReadySignOn.ReadyPay.Services;
+using SmartStore;
 using SmartStore.ComponentModel;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
@@ -52,6 +53,21 @@ namespace ReadySignOn.ReadyPay.Controllers
 			//_apiService.SetupConfiguration(model);
 
 			return View(model);
+		}
+
+		public ActionResult PaymentInfo()
+		{
+			var model = new ReadyPayPaymentInfoModel();
+			model.CurrentPageIsBasket = ControllerContext.ParentActionViewContext.RequestContext.RouteData.IsRouteEqual("ShoppingCart", "Cart");
+
+			if (model.CurrentPageIsBasket)
+			{
+				var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
+
+				model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+			}
+
+			return PartialView(model);
 		}
     }
 }

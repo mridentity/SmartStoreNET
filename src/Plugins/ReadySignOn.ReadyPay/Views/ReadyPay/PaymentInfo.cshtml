@@ -1,0 +1,39 @@
+﻿@model ReadySignOn.ReadyPay.Models.ReadyPayPaymentInfoModel
+@{
+    Layout = "";
+}
+
+@if (Model.CurrentPageIsBasket)
+{
+    <div id="readypay-checkout" class="my-2 ml-3">
+        <a id="readypay-button" href="javascript:void(0)">
+            <img alt="" src="@Url.Content(Model.SubmitButtonImageUrl)" />
+        </a>
+    </div>
+
+    <script>
+		$(function () {
+
+			$('#readypay-button').on('click', function (e) {
+				e.preventDefault();
+
+				$.ajax({
+					type: 'POST',
+					url: '@Url.Action("SaveCartData", "ShoppingCart", new { area = "" })',
+					data: $('#startcheckout').closest('form').serialize(),
+					success: function (response) {
+						if (response.success) {
+							window.location = '@Url.Action("SubmitButton", "ReadyPay", new { area = "ReadySignOn.ReadyPay" })';
+						}
+						else {
+							displayNotification(response.message, 'error');
+						}
+					}
+				});
+
+				return false;
+			});
+
+		});
+    </script>
+}

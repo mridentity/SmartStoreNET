@@ -138,14 +138,27 @@ namespace ReadySignOn.ReadyPay
             routeValues = new RouteValueDictionary { { "Namespaces", "ReadySignOn.ReadyPay.Controllers" }, { "area", SystemName } };
         }
 
-        public override void GetPaymentInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
+        public override Type GetControllerType()
         {
             throw new NotImplementedException();
         }
 
-        public override Type GetControllerType()
+		public override PaymentMethodType PaymentMethodType
+		{
+			get { return PaymentMethodType.StandardAndButton; }
+		}
+
+        /// <summary>
+        /// Gets a route for payment info
+        /// </summary>
+        /// <param name="actionName">Action name</param>
+        /// <param name="controllerName">Controller name</param>
+        /// <param name="routeValues">Route values</param>
+        public override void GetPaymentInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
         {
-            throw new NotImplementedException();
+            actionName = "PaymentInfo";
+            controllerName = "ReadyPay";
+            routeValues = new RouteValueDictionary() { { "area", "ReadySignOn.ReadyPay" } };
         }
     }
 }
