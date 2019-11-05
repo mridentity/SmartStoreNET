@@ -6,6 +6,21 @@
 @if (Model.CurrentPageIsBasket)
 {
     <div id="readypay-checkout" class="my-2 ml-3">
+        <asp:Label ID="lblReadyTicket" runat="server" Text="ReadyTicket"></asp:Label>
+        <input type="text" ID="ReadyTicketTxt" ClientIDMode="Static" Font-Names="txtReadyTicket" runat="server" onserverchange="ReadyPayBtn_Click" />
+        <span>&nbsp</span>
+
+        <input type="image" name="btnReadyPay" id="btnReadyPay"
+               src="~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png" ClientIDMode="Static" value="READYpay"
+               style="background-color:green;border-width:2px;width:50px"
+               runat="server" onserverclick="ReadyPayBtn_Click" />
+
+        <div id="divMsg" style="display: none">
+            <img alt="Please approve on your phone..."
+                 style="width:30px"
+                 src="../images/loader.gif" />
+        </div>
+
         <a id="readypay-button" href="javascript:void(0)">
             <img alt="" src="@Url.Content(Model.SubmitButtonImageUrl)" />
         </a>
