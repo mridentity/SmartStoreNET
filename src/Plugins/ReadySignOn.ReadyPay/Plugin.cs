@@ -108,6 +108,8 @@ namespace ReadySignOn.ReadyPay
 
         public void GetDisplayWidgetRoute(string widgetZone, object model, int storeId, out string actionName, out string controllerName, out RouteValueDictionary routeValues)
         {
+            var settings = _services.Settings.LoadSetting<ReadyPaySettings>(_services.StoreContext.CurrentStore.Id);
+
             actionName = controllerName = null;
             routeValues = new RouteValueDictionary
             {
@@ -115,8 +117,41 @@ namespace ReadySignOn.ReadyPay
                 { "area", SystemName }
             };
 
-            actionName = "MiniShoppingCart";
-            controllerName = "ReadyPay";
+            if(widgetZone == "productbox_add_info" && settings.ShowInPlaceReadyPay_productbox_add_info)
+            {
+                actionName = "InPlaceReadyPay";
+                controllerName = "ReadyPay";
+            }
+
+            if (widgetZone == "productdetails_add_info" && settings.ShowInPlaceReadyPay_productdetails_add_info)
+            {
+                actionName = "InPlaceReadyPay";
+                controllerName = "ReadyPay";
+            }
+
+            if (widgetZone == "offcavas_cart_summary" && settings.ShowInPlaceReadyPay_offcavas_cart_summary)
+            {
+                actionName = "InPlaceReadyPay";
+                controllerName = "ReadyPay";
+            }
+
+            if (widgetZone == "order_summary_totals_after" && settings.ShowInPlaceReadyPay_order_summary_totals_after)
+            {
+                actionName = "InPlaceReadyPay";
+                controllerName = "ReadyPay";
+            }
+
+            if (widgetZone == "orderdetails_page_aftertotal" && settings.ShowInPlaceReadyPay_orderdetails_page_aftertotal)
+            {
+                actionName = "InPlaceReadyPay";
+                controllerName = "ReadyPay";
+            }
+
+            if (widgetZone == "invoice_aftertotal" && settings.ShowInPlaceReadyPay_invoice_aftertotal)
+            {
+                actionName = "InPlaceReadyPay";
+                controllerName = "ReadyPay";
+            }
 
             return;
 

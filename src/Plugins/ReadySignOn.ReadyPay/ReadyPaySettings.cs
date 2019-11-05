@@ -15,6 +15,7 @@ namespace ReadySignOn.ReadyPay
             AddOrderNotes = true;
             TransactMode = TransactMode.Authorize;
             ShowButtonInMiniShoppingCart = true;
+            ShowInPlaceReadyPay_invoice_aftertotal = ShowInPlaceReadyPay_offcavas_cart_summary = ShowInPlaceReadyPay_orderdetails_page_aftertotal = ShowInPlaceReadyPay_order_summary_totals_after = ShowInPlaceReadyPay_productbox_add_info = ShowInPlaceReadyPay_productdetails_add_info = true;
         }
 
         public bool UseSandbox { get; set; }
@@ -39,6 +40,36 @@ namespace ReadySignOn.ReadyPay
         /// Specifies whether to display the checkout button in mini shopping cart
         /// </summary>
         public bool ShowButtonInMiniShoppingCart { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the checkout button in mini shopping cart
+        /// </summary>
+        public bool ShowInPlaceReadyPay_productbox_add_info { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the checkout button in mini shopping cart
+        /// </summary>
+        public bool ShowInPlaceReadyPay_productdetails_add_info { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the checkout button in mini shopping cart
+        /// </summary>
+        public bool ShowInPlaceReadyPay_offcavas_cart_summary { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the checkout button in mini shopping cart
+        /// </summary>
+        public bool ShowInPlaceReadyPay_order_summary_totals_after { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the checkout button in mini shopping cart
+        /// </summary>
+        public bool ShowInPlaceReadyPay_orderdetails_page_aftertotal { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the checkout button in mini shopping cart
+        /// </summary>
+        public bool ShowInPlaceReadyPay_invoice_aftertotal { get; set; }
     }
 
     /// <summary>

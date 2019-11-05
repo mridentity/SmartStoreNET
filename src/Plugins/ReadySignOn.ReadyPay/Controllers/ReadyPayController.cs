@@ -70,20 +70,30 @@ namespace ReadySignOn.ReadyPay.Controllers
 			return PartialView(model);
 		}
 
-		public ActionResult MiniShoppingCart()
-		{
-			var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
+        public ActionResult MiniShoppingCart()
+        {
+            var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
-			if (settings.ShowButtonInMiniShoppingCart)
-			{
-				var model = new ReadyPayPaymentInfoModel();
+            if (settings.ShowButtonInMiniShoppingCart)
+            {
+                var model = new ReadyPayPaymentInfoModel();
                 model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
 
                 return PartialView(model);
-			}
+            }
 
-			return new EmptyResult();
-		}
+            return new EmptyResult();
+        }
+
+        public ActionResult InPlaceReadyPay()
+        {
+            var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
+
+                var model = new ReadyPayPaymentInfoModel();
+                model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+
+                return PartialView(model);
+        }
 
     }
 }
