@@ -69,5 +69,21 @@ namespace ReadySignOn.ReadyPay.Controllers
 
 			return PartialView(model);
 		}
+
+		public ActionResult MiniShoppingCart()
+		{
+			var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
+
+			if (settings.ShowButtonInMiniShoppingCart)
+			{
+				var model = new ReadyPayPaymentInfoModel();
+                model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+
+                return PartialView(model);
+			}
+
+			return new EmptyResult();
+		}
+
     }
 }

@@ -14,7 +14,7 @@ using SmartStore.Web.Models.ShoppingCart;
 
 namespace ReadySignOn.ReadyPay
 {
-    [SystemName("Widgets.ReadyPay")]
+    [SystemName("ReadySignOn.ReadyPay")]
     [FriendlyName("ReadyPay")]
     public class Plugin : PaymentPluginBase, IWidget, IConfigurable
     {
@@ -56,6 +56,43 @@ namespace ReadySignOn.ReadyPay
 			base.Uninstall();
 		}
 
+        public override ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void GetConfigurationRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
+        {
+            actionName = "Configure";
+            controllerName = "ReadyPay";
+            routeValues = new RouteValueDictionary { { "Namespaces", "ReadySignOn.ReadyPay.Controllers" }, { "area", SystemName } };
+        }
+
+        public override Type GetControllerType()
+        {
+            throw new NotImplementedException();
+        }
+
+		public override PaymentMethodType PaymentMethodType
+		{
+			get { return PaymentMethodType.StandardAndButton; }
+		}
+
+        /// <summary>
+        /// Gets a route for payment info
+        /// </summary>
+        /// <param name="actionName">Action name</param>
+        /// <param name="controllerName">Controller name</param>
+        /// <param name="routeValues">Route values</param>
+        public override void GetPaymentInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
+        {
+            actionName = "PaymentInfo";
+            controllerName = "ReadyPay";
+            routeValues = new RouteValueDictionary() { { "area", "ReadySignOn.ReadyPay" } };
+        }
+
+        #region Widget related
+
         public IList<string> GetWidgetZones()
         {
             return new List<string>
@@ -77,6 +114,11 @@ namespace ReadySignOn.ReadyPay
                 { "Namespaces", "ReadySignOn.ReadyPay.Controllers" },
                 { "area", SystemName }
             };
+
+            actionName = "MiniShoppingCart";
+            controllerName = "ReadyPay";
+
+            return;
 
             if (widgetZone == "productdetails_add_info")
             {
@@ -126,39 +168,6 @@ namespace ReadySignOn.ReadyPay
             }
         }
 
-        public override ProcessPaymentResult ProcessPayment(ProcessPaymentRequest processPaymentRequest)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void GetConfigurationRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
-        {
-            actionName = "Configure";
-            controllerName = "ReadyPay";
-            routeValues = new RouteValueDictionary { { "Namespaces", "ReadySignOn.ReadyPay.Controllers" }, { "area", SystemName } };
-        }
-
-        public override Type GetControllerType()
-        {
-            throw new NotImplementedException();
-        }
-
-		public override PaymentMethodType PaymentMethodType
-		{
-			get { return PaymentMethodType.StandardAndButton; }
-		}
-
-        /// <summary>
-        /// Gets a route for payment info
-        /// </summary>
-        /// <param name="actionName">Action name</param>
-        /// <param name="controllerName">Controller name</param>
-        /// <param name="routeValues">Route values</param>
-        public override void GetPaymentInfoRoute(out string actionName, out string controllerName, out RouteValueDictionary routeValues)
-        {
-            actionName = "PaymentInfo";
-            controllerName = "ReadyPay";
-            routeValues = new RouteValueDictionary() { { "area", "ReadySignOn.ReadyPay" } };
-        }
+        #endregion
     }
 }

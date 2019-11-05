@@ -14,6 +14,7 @@ namespace ReadySignOn.ReadyPay
             IpnChangesPaymentStatus = true;
             AddOrderNotes = true;
             TransactMode = TransactMode.Authorize;
+            ShowButtonInMiniShoppingCart = true;
         }
 
         public bool UseSandbox { get; set; }
@@ -33,6 +34,11 @@ namespace ReadySignOn.ReadyPay
         public bool IpnChangesPaymentStatus { get; set; }
 
         public TransactMode TransactMode { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the checkout button in mini shopping cart
+        /// </summary>
+        public bool ShowButtonInMiniShoppingCart { get; set; }
     }
 
     /// <summary>
