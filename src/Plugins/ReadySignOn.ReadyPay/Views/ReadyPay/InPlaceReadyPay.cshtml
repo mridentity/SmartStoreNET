@@ -2,13 +2,14 @@
 
     <div class="external-checkout-button">
         <div id="readypay-checkout" class="my-2 ml-3">
-            <asp:Label ID="lblReadyTicket" runat="server" Text="ReadyTicket"></asp:Label>
-            <input type="text" ID="ReadyTicketTxt" ClientIDMode="Static" Font-Names="txtReadyTicket" runat="server" onserverchange="ReadyPayBtn_Click" />
-            <span>&nbsp</span>
+            <input type="text" ID="ReadyTicketTxt" ClientIDMode="Static" 
+                   Font-Names="txtReadyTicket" size="7" runat="server" 
+                   style="vertical-align:middle;"
+                   onserverchange="ReadyPayBtn_Click" />
 
             <input type="image" name="btnReadyPay" id="btnReadyPay"
                    src="@Url.Content(Model.SubmitButtonImageUrl)" ClientIDMode="Static" value="READYpay"
-                   style="background-color:green;border-width:2px;width:50px"
+                   style="vertical-align:middle;background-color:green;border-width:2px;width:35px"
                    runat="server" onserverclick="ReadyPayBtn_Click" />
 
             <div id="divMsg" style="display: none">
