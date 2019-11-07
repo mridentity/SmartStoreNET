@@ -91,6 +91,26 @@ namespace ReadySignOn.ReadyPay
             routeValues = new RouteValueDictionary() { { "area", "ReadySignOn.ReadyPay" } };
         }
 
+        public override bool SupportCapture
+        {
+            get { return true; }
+        }
+
+        public override bool SupportPartiallyRefund
+        {
+            get { return true; }
+        }
+
+        public override bool SupportRefund
+        {
+            get { return true; }
+        }
+
+        public override bool SupportVoid
+        {
+            get { return true; }
+        }
+
         #region Widget related
 
         public IList<string> GetWidgetZones()
