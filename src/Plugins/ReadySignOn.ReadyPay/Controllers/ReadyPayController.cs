@@ -44,10 +44,10 @@ namespace ReadySignOn.ReadyPay.Controllers
 			}
 		}
 
-		[AdminAuthorize, LoadSetting]
-		public ActionResult Configure(ReadyPaySettings settings)
+        [AdminAuthorize, ChildActionOnly, LoadSetting]
+        public ActionResult Configure(ReadyPaySettings settings, int storeScope)
 		{
-			var model = new ConfigurationModel();
+			var model = new ReadyPayConfigurationModel();
 
 			MiniMapper.Map(settings, model);
 			//_apiService.SetupConfiguration(model);

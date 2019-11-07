@@ -15,7 +15,7 @@ namespace ReadySignOn.ReadyPay.Services
             throw new NotImplementedException();
         }
 
-        public void SetupConfiguration(ConfigurationModel model)
+        public void SetupConfiguration(ReadyPayConfigurationModel model)
         {
             throw new NotImplementedException();
         }
