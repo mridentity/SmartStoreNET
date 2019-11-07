@@ -12,6 +12,9 @@ namespace ReadySignOn.ReadyPay.Models
 {
     public class ReadyPayConfigurationModel : ModelBase
     {
+        public string[] ConfigGroups { get; set; }
+        public string PrimaryStoreCurrencyCode { get; set; }
+
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.UseSandbox")]
         public bool UseSandbox { get; set; }
 
@@ -27,18 +30,6 @@ namespace ReadySignOn.ReadyPay.Models
 
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ClientId")]
         public string ClientId { get; set; }
-
-        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ConfirmedShipment")]
-        public bool ConfirmedShipment { get; set; }
-
-        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.NoShipmentAddress")]
-        public bool NoShipmentAddress { get; set; }
-
-        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.CallbackTimeout")]
-        public int CallbackTimeout { get; set; }
-
-        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.DefaultShippingPrice")]
-        public decimal DefaultShippingPrice { get; set; }
 
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ShowButtonInMiniShoppingCart")]
         public bool ShowButtonInMiniShoppingCart { get; set; }
@@ -60,6 +51,18 @@ namespace ReadySignOn.ReadyPay.Models
 
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ShowInPlaceReadyPay_invoice_aftertotal")]
         public bool ShowInPlaceReadyPay_invoice_aftertotal { get; set; }
+
+        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ConfirmedShipment")]
+        public bool ConfirmedShipment { get; set; }
+
+        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.NoShipmentAddress")]
+        public bool NoShipmentAddress { get; set; }
+
+        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.CallbackTimeout")]
+        public int CallbackTimeout { get; set; }
+
+        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.DefaultShippingPrice")]
+        public decimal DefaultShippingPrice { get; set; }
 
         [SmartResourceDisplayName("Admin.Configuration.Payment.Methods.AdditionalFee")]
         public decimal AdditionalFee { get; set; }
