@@ -40,8 +40,8 @@ namespace ReadySignOn.ReadyPay.Models
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ShowInPlaceReadyPay_productdetails_add_info")]
         public bool ShowInPlaceReadyPay_productdetails_add_info { get; set; }
 
-        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ShowInPlaceReadyPay_offcavas_cart_summary")]
-        public bool ShowInPlaceReadyPay_offcavas_cart_summary { get; set; }
+        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ShowInPlaceReadyPay_offcanvas_cart_summary")]
+        public bool ShowInPlaceReadyPay_offcanvas_cart_summary { get; set; }
 
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ShowInPlaceReadyPay_order_summary_totals_after")]
         public bool ShowInPlaceReadyPay_order_summary_totals_after { get; set; }

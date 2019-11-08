@@ -119,7 +119,7 @@ namespace ReadySignOn.ReadyPay
             {
                 "productbox_add_info",
                 "productdetails_add_info",
-                "offcavas_cart_summary",
+                "offcanvas_cart_summary",
                 "order_summary_totals_after",
                 "orderdetails_page_aftertotal",
                 "invoice_aftertotal"
@@ -149,7 +149,7 @@ namespace ReadySignOn.ReadyPay
                 controllerName = "ReadyPay";
             }
 
-            if (widgetZone == "offcavas_cart_summary" && settings.ShowInPlaceReadyPay_offcavas_cart_summary)
+            if (widgetZone == "offcanvas_cart_summary" && settings.ShowInPlaceReadyPay_offcanvas_cart_summary)
             {
                 actionName = "InPlaceReadyPay";
                 controllerName = "ReadyPay";
