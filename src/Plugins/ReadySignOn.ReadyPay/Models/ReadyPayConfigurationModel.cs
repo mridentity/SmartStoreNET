@@ -12,7 +12,6 @@ namespace ReadySignOn.ReadyPay.Models
 {
     public class ReadyPayConfigurationModel : ModelBase
     {
-        public string[] ConfigGroups { get; set; }
         public string PrimaryStoreCurrencyCode { get; set; }
 
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.UseSandbox")]

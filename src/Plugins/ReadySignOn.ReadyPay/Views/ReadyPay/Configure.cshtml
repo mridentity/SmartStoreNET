@@ -45,6 +45,15 @@
     </tr>
     <tr>
         <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.ClientId)
+        </td>
+        <td class="adminData">
+            @Html.SettingEditorFor(model => model.ClientId)
+            @Html.ValidationMessageFor(model => model.ClientId)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
             @Html.SmartLabelFor(model => model.SellerId)
         </td>
         <td class="adminData">
@@ -68,15 +77,6 @@
         <td class="adminData">
             @Html.SettingEditorFor(model => model.SecretKey, null, new { htmlAttributes = new { autocomplete = "new-password", value = Model.SecretKey } })
             @Html.ValidationMessageFor(model => model.SecretKey)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.ClientId)
-        </td>
-        <td class="adminData">
-            @Html.SettingEditorFor(model => model.ClientId)
-            @Html.ValidationMessageFor(model => model.ClientId)
         </td>
     </tr>
     <tr>

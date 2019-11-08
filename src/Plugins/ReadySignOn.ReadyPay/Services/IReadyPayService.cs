@@ -10,6 +10,6 @@ namespace ReadySignOn.ReadyPay.Services
 {
     public interface IReadyPayService : IExternalProviderAuthorizer
     {
-		void SetupConfiguration(ReadyPayConfigurationModel model);
+		void SetupConfiguration(ReadyPayConfigurationModel model, int storeScope);
     }
 }

@@ -50,12 +50,46 @@ namespace ReadySignOn.ReadyPay.Controllers
 			var model = new ReadyPayConfigurationModel();
 
 			MiniMapper.Map(settings, model);
-			//_apiService.SetupConfiguration(model);
+			_apiService.SetupConfiguration(model, storeScope);
 
 			return View(model);
 		}
 
-		public ActionResult PaymentInfo()
+        [HttpPost, AdminAuthorize]
+        public ActionResult Configure(ReadyPayConfigurationModel model, FormCollection form)
+        {
+            var storeDependingSettingHelper = new StoreDependingSettingHelper(ViewData);
+            var storeScope = this.GetActiveStoreScopeConfiguration(Services.StoreService, Services.WorkContext);
+            var settings = Services.Settings.LoadSetting<ReadyPaySettings>(storeScope);
+
+            if (!ModelState.IsValid)
+                return Configure(settings, storeScope);
+
+            ModelState.Clear();
+
+            model.AccessKey = model.AccessKey.TrimSafe();
+            model.ClientId = model.ClientId.TrimSafe();
+            model.SecretKey = model.SecretKey.TrimSafe();
+            model.SellerId = model.SellerId.TrimSafe();
+
+            MiniMapper.Map(model, settings);
+
+            using (Services.Settings.BeginScope())
+            {
+                storeDependingSettingHelper.UpdateSettings(settings, form, storeScope, Services.Settings);
+            }
+
+            using (Services.Settings.BeginScope())
+            {
+                Services.Settings.SaveSetting(settings, x => x.UseSandbox, 0, false);
+            }
+
+            NotifySuccess(T("Admin.Common.DataSuccessfullySaved"));
+
+            return RedirectToConfiguration(Plugin.SystemName, false);
+        }
+
+        public ActionResult PaymentInfo()
 		{
 			var model = new ReadyPayPaymentInfoModel();
 			model.CurrentPageIsBasket = ControllerContext.ParentActionViewContext.RequestContext.RouteData.IsRouteEqual("ShoppingCart", "Cart");

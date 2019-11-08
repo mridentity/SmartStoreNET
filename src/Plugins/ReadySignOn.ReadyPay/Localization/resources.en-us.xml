@@ -163,7 +163,7 @@ Text suggestions:</div><ul>
 		<Value>Your Secret Access Key</Value>
 	</LocaleResource>
 	<LocaleResource Name="SecretKey.Hint">
-		<Value>You can find the Secret Access Key at Amazon's Seller Central under Integration - MWS Access Key.</Value>
+		<Value>This is your client secret key or API access key. You should obtain this key from your ReadyConnect or ReadyPay service provider.</Value>
 	</LocaleResource>
 	<LocaleResource Name="ClientId">
 		<Value>Your Client ID</Value>
