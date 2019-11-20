@@ -77,6 +77,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStore.DevTools", "Plug
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadySignOn.ReadyPay", "Plugins\ReadySignOn.ReadyPay\ReadySignOn.ReadyPay.csproj", "{8601AB38-769F-4EEC-8D3F-A133FEC6465D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadySignOn.ReadyConnect", "ReadySignOn.ReadyConnect\ReadySignOn.ReadyConnect.csproj", "{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -617,6 +619,30 @@ Global
 		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|x86.ActiveCfg = Release|Any CPU
 		{8601AB38-769F-4EEC-8D3F-A133FEC6465D}.Release|x86.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Debug|x86.Build.0 = Debug|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.EFMigrations|Any CPU.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.EFMigrations|Any CPU.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.EFMigrations|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.EFMigrations|Mixed Platforms.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.EFMigrations|x86.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.EFMigrations|x86.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.PluginDev|Any CPU.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.PluginDev|Any CPU.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.PluginDev|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.PluginDev|Mixed Platforms.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.PluginDev|x86.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.PluginDev|x86.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Release|x86.ActiveCfg = Release|Any CPU
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -642,6 +668,7 @@ Global
 		{611E4AC2-CA21-5C81-6B4B-3ABA87B91A25} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{542B9C12-E2A1-49BB-9134-0E3484F9D669} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{8601AB38-769F-4EEC-8D3F-A133FEC6465D} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
+		{4975542B-0BB2-4E6A-8B9D-C7DFCACCB3F1} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {59B852CE-9608-479C-A92B-7EE2DE161049}
