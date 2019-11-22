@@ -1,0 +1,8 @@
+﻿FriendlyName: ReadyConnect Login
+SystemName: ReadySignOn.ReadyConnect
+Group: Security
+Version: 1.0.0
+MinAppVersion: 3.2.2
+DisplayOrder: 1
+FileName: ReadySignOn.ReadyConnect.dll
+ResourceRootKey: Plugins.ExternalAuth.ReadyConnect
