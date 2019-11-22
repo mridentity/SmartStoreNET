@@ -147,9 +147,11 @@
     <None Include="packages.config" />
     <Content Include="Views\ExternalAuthReadyConnect\Configure.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <BrowseToURL>~/ExternalAuthReadyConnect/Configure</BrowseToURL>
     </Content>
     <Content Include="Views\ExternalAuthReadyConnect\PublicInfo.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <BrowseToURL>~/ExternalAuthReadyConnect/PublicInfo.cshtml</BrowseToURL>
     </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
