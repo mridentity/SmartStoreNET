@@ -8,9 +8,6 @@ using SmartStore.Services;
 using SmartStore.Services.Cms;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Payments;
-using SmartStore.Web.Models.Catalog;
-using SmartStore.Web.Models.Order;
-using SmartStore.Web.Models.ShoppingCart;
 
 namespace ReadySignOn.ReadyPay
 {
@@ -174,53 +171,6 @@ namespace ReadySignOn.ReadyPay
             }
 
             return;
-
-            if (widgetZone == "productdetails_add_info")
-            {
-                var viewModel = model as ProductDetailsModel;
-                if (viewModel != null)
-                {
-                    var price = viewModel.ProductPrice.PriceWithDiscountValue > decimal.Zero
-                        ? viewModel.ProductPrice.PriceWithDiscountValue
-                        : viewModel.ProductPrice.PriceValue;
-
-                    if (price > decimal.Zero)
-                    {
-                        actionName = "Promotion";
-                        controllerName = "PayPalInstalments";
-
-                        // Convert price because it is in working currency.
-                        price = _currencyService.Value.ConvertToPrimaryStoreCurrency(price, _services.WorkContext.WorkingCurrency);
-
-                        routeValues.Add("origin", "productpage");
-                        routeValues.Add("amount", price);
-                    }
-                }
-            }
-            else if (widgetZone == "order_summary_totals_after")
-            {
-                var viewModel = model as ShoppingCartModel;
-                if (viewModel != null && viewModel.IsEditable)
-                {
-                    actionName = "Promotion";
-                    controllerName = "PayPalInstalments";
-
-                    routeValues.Add("origin", "cart");
-                    routeValues.Add("amount", decimal.Zero);
-                }
-            }
-            else if (widgetZone == "orderdetails_page_aftertotal" || widgetZone == "invoice_aftertotal")
-            {
-                var viewModel = model as OrderDetailsModel;
-                if (viewModel != null)
-                {
-                    actionName = "OrderDetails";
-                    controllerName = "PayPalInstalments";
-
-                    routeValues.Add("orderId", viewModel.Id);
-                    routeValues.Add("print", widgetZone.IsCaseInsensitiveEqual("invoice_aftertotal"));
-                }
-            }
         }
 
         #endregion
