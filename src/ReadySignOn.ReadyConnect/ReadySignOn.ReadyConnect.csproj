@@ -126,6 +126,8 @@
   <ItemGroup>
     <Compile Include="Controllers\ExternalAuthReadyConnectController.cs" />
     <Compile Include="Core\IOAuthProviderReadyConnectAuthorizer.cs" />
+    <Compile Include="Core\OAuthAuthenticationParameters.cs" />
+    <Compile Include="Core\ReadyConnectProviderAuthorizer.cs" />
     <Compile Include="Core\ReadyMembersOAuth2Client.cs" />
     <Compile Include="Models\ConfigurationModel.cs" />
     <Compile Include="Models\LoginModel.cs" />

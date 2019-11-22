@@ -146,7 +146,7 @@ namespace ReadySignOn.ReadyConnect.Core
                     var extraData = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
                     var data = extraData.ToDictionary(x => x.Key, x => x.Value.ToString());
 
-                    data.Add("picture", string.Format("https://members.readysignon.com/{0}/picture", data["id"]));
+                    data.Add("picture", string.Format("https://members.readysignon.com/{0}/picture", data["id"]));  //TODO: Update this link
 
                     return data;
                 }
