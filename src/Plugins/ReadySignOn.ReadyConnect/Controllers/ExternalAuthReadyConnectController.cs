@@ -57,6 +57,7 @@ namespace ReadySignOn.ReadyConnect.Controllers
             MiniMapper.Map(model, settings);
             settings.ClientKeyIdentifier = model.ClientKeyIdentifier.TrimSafe();
             settings.ClientSecret = model.ClientSecret.TrimSafe();
+            settings.UseSandbox = model.UseSandbox;
 
             NotifySuccess(T("Admin.Common.DataSuccessfullySaved"));
 

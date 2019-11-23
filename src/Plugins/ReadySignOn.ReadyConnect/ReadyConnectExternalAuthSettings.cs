@@ -8,6 +8,7 @@ namespace ReadySignOn.ReadyConnect
 {
     public class ReadyConnectExternalAuthSettings : ISettings
     {
+        public bool UseSandbox { get; set; }
         public string ClientKeyIdentifier { get; set; }
         public string ClientSecret { get; set; }
     }

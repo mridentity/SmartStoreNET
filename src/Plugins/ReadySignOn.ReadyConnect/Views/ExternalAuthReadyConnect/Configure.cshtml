@@ -24,6 +24,15 @@
     <table class="adminContent">
         <tr>
             <td class="adminTitle">
+                @Html.SmartLabelFor(model => model.UseSandbox)
+            </td>
+            <td class="adminData">
+                @Html.SettingEditorFor(model => model.UseSandbox)
+                @Html.ValidationMessageFor(model => model.UseSandbox)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
                 @Html.SmartLabelFor(model => model.ClientKeyIdentifier)
             </td>
             <td class="adminData">

@@ -4,7 +4,7 @@
 	Layout = "";
 }
 
-    <a class="btn btn-primary btn-icon btn-lg btn-extauth" data-toggle="tooltip" title="@T("Plugins.ExternalAuth.ReadyConnect.Login")"
+    <a class="btn btn-icon btn-lg btn-extauth" data-toggle="tooltip" title="@T("Plugins.ExternalAuth.ReadyConnect.Login")"
        href="@Url.RouteUrl("ReadySignOn.ReadyConnect", new { ReturnUrl = HttpContext.Current.Request.QueryString["returnUrl"], action = "Login" })">
 
         <img src="@Url.Content("~/Plugins/ReadySignOn.ReadyConnect/Content/icon.png")" alt="ReadyConnect" />

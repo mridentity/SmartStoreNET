@@ -5,6 +5,9 @@ namespace ReadySignOn.ReadyConnect.Models
 {
     public class ConfigurationModel : ModelBase
     {
+        [SmartResourceDisplayName("Plugins.ExternalAuth.ReadyConnect.UseSandbox")]
+        public bool UseSandbox { get; set; }
+
         [SmartResourceDisplayName("Plugins.ExternalAuth.ReadyConnect.ClientKeyIdentifier")]
         public string ClientKeyIdentifier { get; set; }
 
