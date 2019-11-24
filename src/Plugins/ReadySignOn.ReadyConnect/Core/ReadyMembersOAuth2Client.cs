@@ -43,7 +43,7 @@ namespace ReadySignOn.ReadyConnect.Core
         private readonly string[] _requestedScopes;
 
         public ReadyMembersOAuth2Client(ReadyConnectExternalAuthSettings settings)
-            : this(settings, new[] { "email" }) { }
+            : this(settings, new[] { "email profile" }) { }
 
         public ReadyMembersOAuth2Client(ReadyConnectExternalAuthSettings settings, params string[] requestedScopes) : base("readymembers")
         {
@@ -126,9 +126,11 @@ namespace ReadySignOn.ReadyConnect.Core
 
         protected override IDictionary<string, string> GetUserData(string accessToken)
         {
-            var uri = BuildUri(_settings.UseSandbox ? UserInfoEndpointQA : UserInfoEndpoint, new NameValueCollection { { "access_token", accessToken } });
+            var webRequest = (HttpWebRequest)WebRequest.Create(_settings.UseSandbox ? UserInfoEndpointQA : UserInfoEndpoint);
 
-            var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+            //https://stackoverflow.com/questions/21158298/how-to-force-webrequest-to-send-authorization-header-during-post
+            webRequest.PreAuthenticate = true;
+            webRequest.Headers.Add("Authorization", "Bearer " + accessToken);
 
             using (var webResponse = webRequest.GetResponse())
             using (var stream = webResponse.GetResponseStream())
@@ -142,7 +144,7 @@ namespace ReadySignOn.ReadyConnect.Core
                     var extraData = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
                     var data = extraData.ToDictionary(x => x.Key, x => x.Value.ToString());
 
-                    data.Add("picture", string.Format("https://members.readysignon.com/{0}/picture", data["id"]));  //TODO: Update this link
+                    data.Add("picture", string.Format("https://members.readysignon.com/{0}/picture", data["sub"]));  //TODO: Update this link
 
                     return data;
                 }
@@ -156,16 +158,36 @@ namespace ReadySignOn.ReadyConnect.Core
 
         protected override string QueryAccessToken(Uri returnUrl, string authorizationCode)
         {
-            var uri = BuildUri(_settings.UseSandbox ? TokenEndpointQA : TokenEndpoint, new NameValueCollection
-            {
-                { "code", authorizationCode },
-                { "client_id", _settings.ClientKeyIdentifier },
-                { "client_secret", _settings.ClientSecret },
-                { "redirect_uri", returnUrl.GetLeftPart(UriPartial.Path) },
-            });
-
-            var webRequest = (HttpWebRequest)WebRequest.Create(uri);
             string accessToken = null;
+
+            //var uri = BuildUri(_settings.UseSandbox ? TokenEndpointQA : TokenEndpoint, new NameValueCollection
+            //{
+            //    { "grant_type", "authorization_code" },
+            //    { "code", authorizationCode },
+            //    { "client_id", _settings.ClientKeyIdentifier },
+            //    { "client_secret", _settings.ClientSecret },
+            //    { "redirect_uri", returnUrl.GetLeftPart(UriPartial.Path) },
+            //});
+
+            //https://stackoverflow.com/questions/43856698/c-sharp-post-to-oauth2-with-formdata
+            var postData = "grant_type=" + HttpUtility.UrlEncode("authorization_code");
+            postData += "&code=" + HttpUtility.UrlEncode(authorizationCode);
+            postData += "&client_id=" + HttpUtility.UrlEncode(_settings.ClientKeyIdentifier);
+            postData += "&client_secret=" + HttpUtility.UrlEncode(_settings.ClientSecret);
+            postData += "&redirect_uri=" + HttpUtility.UrlEncode(returnUrl.GetLeftPart(UriPartial.Path));
+
+            var body = Encoding.ASCII.GetBytes(postData);
+
+            var webRequest = (HttpWebRequest)WebRequest.Create(_settings.UseSandbox ? TokenEndpointQA : TokenEndpoint);
+
+            webRequest.Method = "POST";
+            webRequest.ContentType = "application/x-www-form-urlencoded";
+            webRequest.ContentLength = body.Length;
+
+            using (var stream = webRequest.GetRequestStream())
+            {
+                stream.Write(body, 0, body.Length);
+            }
 
             using (var response = (HttpWebResponse)webRequest.GetResponse())
             {
