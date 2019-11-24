@@ -40,7 +40,7 @@ namespace ReadySignOn.ReadyConnect.Controllers
             MiniMapper.Map(settings, model);
 
             var host = Services.StoreContext.CurrentStore.GetHost(true);
-            model.RedirectUrl = $"{host}Plugins/ReadySignOn.ReadyConnect/logincallback/";
+            model.RedirectUrl = $"{host}Plugins/ReadySignOn.ReadyConnect/logincallback";
 
             return View(model);
         }

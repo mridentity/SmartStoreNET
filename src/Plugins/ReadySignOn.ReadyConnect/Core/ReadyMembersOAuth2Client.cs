@@ -29,11 +29,11 @@ namespace ReadySignOn.ReadyConnect.Core
         /// <summary>
         /// The user info endpoint.
         /// </summary>
-        private const string UserInfoEndpoint = "https://readyconnectsvc.readysignon.com/connect/userinfo";
-        private const string UserInfoEndpointQA = "https://readyconnectsvcqa.readysignon.com/connect/userinfo";
+        private const string UserInfoEndpoint = "https://members.readysignon.com/connect/userinfo";
+        private const string UserInfoEndpointQA = "https://membersqa.readysignon.com/connect/userinfo";
 
-        private const string EndSessionEndpoint = "https://readyconnectsvc.readysignon.com/connect/Logout";
-        private const string EndSessionEndpointQA = "https://readyconnectsvcqa.readysignon.com/connect/Logout";
+        private const string EndSessionEndpoint = "https://members.readysignon.com/connect/Logout";
+        private const string EndSessionEndpointQA = "https://membersqa.readysignon.com/connect/Logout";
 
         private readonly ReadyConnectExternalAuthSettings _settings;
 

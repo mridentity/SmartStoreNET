@@ -193,20 +193,21 @@ namespace ReadySignOn.ReadyConnect.Core
 
         private Uri GenerateLocalCallbackUri()
         {
-            string url = string.Format("{0}Plugins/ReadySignOn.ReadyConnect/logincallback/", _services.WebHelper.GetStoreLocation());
+            string url = string.Format("{0}Plugins/ReadySignOn.ReadyConnect/logincallback", _services.WebHelper.GetStoreLocation());
             return new Uri(url);
         }
 
         private Uri GenerateServiceLoginUrl()
         {
             //code copied from DotNetOpenAuth.AspNet.Clients.FacebookClient file
-            var builder = new UriBuilder("https://members.readysignon.com/dialog/oauth");   //TODO: Update this link
             var args = new Dictionary<string, string>();
             var settings = _services.Settings.LoadSetting<ReadyConnectExternalAuthSettings>(_services.StoreContext.CurrentStore.Id);
+            var builder = new UriBuilder(settings.UseSandbox ? "https://membersqa.readysignon.com/connect/authorize" : "https://members.readysignon.com/connect/authorize");   //TODO: Update this link
 
             args.Add("client_id", settings.ClientKeyIdentifier);
             args.Add("redirect_uri", GenerateLocalCallbackUri().AbsoluteUri);
-            args.Add("scope", "email");
+            args.Add("scope", "openid rso_idp email");
+            args.Add("response_type", "code");
 
             AppendQueryArgs(builder, args);
 
