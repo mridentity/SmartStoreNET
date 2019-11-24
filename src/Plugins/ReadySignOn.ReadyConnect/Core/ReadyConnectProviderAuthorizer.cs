@@ -55,7 +55,7 @@ namespace ReadySignOn.ReadyConnect.Core
                 {
                     var settings = _services.Settings.LoadSetting<ReadyConnectExternalAuthSettings>(_services.StoreContext.CurrentStore.Id);
 
-                    _readymembersApplication = new ReadyMembersOAuth2Client(settings.ClientKeyIdentifier, settings.ClientSecret);
+                    _readymembersApplication = new ReadyMembersOAuth2Client(settings);
                 }
 
                 return _readymembersApplication;

@@ -20,41 +20,38 @@ namespace ReadySignOn.ReadyConnect.Core
         /// The authorization endpoint.
         /// </summary>
         private const string AuthorizationEndpoint = "https://members.readysignon.com/connect/authorize";
+        private const string AuthorizationEndpointQA = "https://membersqa.readysignon.com/connect/authorize";
         /// <summary>
         /// The token endpoint.
         /// </summary>
         private const string TokenEndpoint = "https://members.readysignon.com/connect/token";
+        private const string TokenEndpointQA = "https://membersqa.readysignon.com/connect/token";
         /// <summary>
         /// The user info endpoint.
         /// </summary>
         private const string UserInfoEndpoint = "https://readyconnectsvc.readysignon.com/connect/userinfo";
+        private const string UserInfoEndpointQA = "https://readyconnectsvcqa.readysignon.com/connect/userinfo";
 
         private const string EndSessionEndpoint = "https://readyconnectsvc.readysignon.com/connect/Logout";
+        private const string EndSessionEndpointQA = "https://readyconnectsvcqa.readysignon.com/connect/Logout";
 
-        /// <summary>
-        /// The app id.
-        /// </summary>
-        private readonly string _appId;
-        /// <summary>
-        /// The app secret.
-        /// </summary>
-        private readonly string _appSecret;
+        private readonly ReadyConnectExternalAuthSettings _settings;
 
         /// <summary>
         /// The requested scopes.
         /// </summary>
         private readonly string[] _requestedScopes;
 
-        public ReadyMembersOAuth2Client(string appId, string appSecret)
-            : this(appId, appSecret, new[] { "email" }) { }
+        public ReadyMembersOAuth2Client(ReadyConnectExternalAuthSettings settings)
+            : this(settings, new[] { "email" }) { }
 
-        public ReadyMembersOAuth2Client(string appId, string appSecret, params string[] requestedScopes) : base("readymembers")
+        public ReadyMembersOAuth2Client(ReadyConnectExternalAuthSettings settings, params string[] requestedScopes) : base("readymembers")
         {
-            if (string.IsNullOrWhiteSpace(appId))
+            if (string.IsNullOrWhiteSpace(settings.ClientKeyIdentifier))
                 throw new ArgumentNullException("appId");
 
-            if (string.IsNullOrWhiteSpace(appSecret))
-                throw new ArgumentNullException("appSecret");
+            if (string.IsNullOrWhiteSpace(settings.ClientSecret))
+                throw new ArgumentNullException("ClientSecret");
 
             if (requestedScopes == null)
                 throw new ArgumentNullException("requestedScopes");
@@ -62,8 +59,7 @@ namespace ReadySignOn.ReadyConnect.Core
             if (requestedScopes.Length == 0)
                 throw new ArgumentException("One or more scopes must be requested.", "requestedScopes");
 
-            _appId = appId;
-            _appSecret = appSecret;
+            _settings = settings;
             _requestedScopes = requestedScopes;
         }
 
@@ -119,9 +115,9 @@ namespace ReadySignOn.ReadyConnect.Core
         {
             var state = string.IsNullOrEmpty(returnUrl.Query) ? string.Empty : returnUrl.Query.Substring(1);
 
-            return BuildUri(AuthorizationEndpoint, new NameValueCollection
+            return BuildUri(_settings.UseSandbox ? AuthorizationEndpointQA : AuthorizationEndpoint, new NameValueCollection
             {
-                { "client_id", _appId },
+                { "client_id", _settings.ClientKeyIdentifier },
                 { "scope", string.Join(" ", _requestedScopes) },
                 { "redirect_uri", returnUrl.GetLeftPart(UriPartial.Path) },
                 { "state", state },
@@ -130,7 +126,7 @@ namespace ReadySignOn.ReadyConnect.Core
 
         protected override IDictionary<string, string> GetUserData(string accessToken)
         {
-            var uri = BuildUri(UserInfoEndpoint, new NameValueCollection { { "access_token", accessToken } });
+            var uri = BuildUri(_settings.UseSandbox ? UserInfoEndpointQA : UserInfoEndpoint, new NameValueCollection { { "access_token", accessToken } });
 
             var webRequest = (HttpWebRequest)WebRequest.Create(uri);
 
@@ -160,11 +156,11 @@ namespace ReadySignOn.ReadyConnect.Core
 
         protected override string QueryAccessToken(Uri returnUrl, string authorizationCode)
         {
-            var uri = BuildUri(TokenEndpoint, new NameValueCollection
+            var uri = BuildUri(_settings.UseSandbox ? TokenEndpointQA : TokenEndpoint, new NameValueCollection
             {
                 { "code", authorizationCode },
-                { "client_id", _appId },
-                { "client_secret", _appSecret },
+                { "client_id", _settings.ClientKeyIdentifier },
+                { "client_secret", _settings.ClientSecret },
                 { "redirect_uri", returnUrl.GetLeftPart(UriPartial.Path) },
             });
 
