@@ -8,7 +8,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
 using DotNetOpenAuth.AspNet;
-using Newtonsoft.Json.Linq;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Logging;
 using SmartStore.Services;
@@ -134,9 +133,9 @@ namespace ReadySignOn.ReadyConnect.Core
             var claims = new UserClaims();
             claims.Contact = new ContactClaims();
 
-            if (authenticationResult.ExtraData.ContainsKey("username"))
+            if (authenticationResult.ExtraData.ContainsKey("email"))
             {
-                claims.Contact.Email = authenticationResult.ExtraData["username"];
+                claims.Contact.Email = authenticationResult.ExtraData["email"];
             }
             else
             {
@@ -145,23 +144,17 @@ namespace ReadySignOn.ReadyConnect.Core
 
             claims.Name = new NameClaims();
 
-            if (authenticationResult.ExtraData.ContainsKey("name"))
+            if (authenticationResult.ExtraData.ContainsKey("given_name"))
             {
-                var name = authenticationResult.ExtraData["name"];
-                if (!String.IsNullOrEmpty(name))
-                {
-                    var nameSplit = name.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (nameSplit.Length >= 2)
-                    {
-                        claims.Name.First = nameSplit[0];
-                        claims.Name.Last = nameSplit[1];
-                    }
-                    else
-                    {
-                        claims.Name.Last = nameSplit[0];
-                    }
-                }
+                claims.Name.First = authenticationResult.ExtraData["given_name"];
             }
+
+            if (authenticationResult.ExtraData.ContainsKey("family_name"))
+            {
+                claims.Name.Last = authenticationResult.ExtraData["family_name"];
+                claims.Name.FullName = claims.Name.First + " " + claims.Name.Last;
+            }
+
             parameters.AddClaim(claims);
         }
 
