@@ -186,7 +186,7 @@ namespace ReadySignOn.ReadyConnect.Core
 
             args.Add("client_id", settings.ClientKeyIdentifier);
             args.Add("redirect_uri", GenerateLocalCallbackUri().AbsoluteUri);
-            args.Add("scope", "openid rso_idp email");
+            args.Add("scope", "openid rso_idp email profile");
             args.Add("response_type", "code");
 
             AppendQueryArgs(builder, args);
