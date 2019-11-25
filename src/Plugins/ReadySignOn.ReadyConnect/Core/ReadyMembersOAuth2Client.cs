@@ -1,6 +1,7 @@
 ﻿using DotNetOpenAuth.AspNet;
 using DotNetOpenAuth.AspNet.Clients;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -94,7 +95,7 @@ namespace ReadySignOn.ReadyConnect.Core
                 return AuthenticationResult.Failed;
             }
 
-            string id = userData["id"];
+            string id = userData["sub"];
             string name;
 
             // Some oAuth providers do not return value for the 'username' attribute. 
@@ -149,6 +150,30 @@ namespace ReadySignOn.ReadyConnect.Core
                     return data;
                 }
             }
+        }
+
+        public string GetEmailFromProvider(string accessToken)
+        {
+            var result = "";
+            var webRequest = (HttpWebRequest)WebRequest.Create(_settings.UseSandbox ? UserInfoEndpointQA : UserInfoEndpoint);
+
+            //https://stackoverflow.com/questions/21158298/how-to-force-webrequest-to-send-authorization-header-during-post
+            webRequest.PreAuthenticate = true;
+            webRequest.Headers.Add("Authorization", "Bearer " + accessToken);
+
+            using (var webResponse = webRequest.GetResponse())
+            using (var stream = webResponse.GetResponseStream())
+            using (var reader = new StreamReader(stream))
+            {
+                var strResponse = reader.ReadToEnd();
+                var info = JObject.Parse(strResponse);
+
+                if (info["email"] != null)
+                {
+                    result = info["email"].ToString();
+                }
+            }
+            return result;
         }
 
         public string QueryAccessTokenByCode(Uri returnUrl, string authorizationCode)

@@ -93,7 +93,7 @@ namespace ReadySignOn.ReadyConnect.Core
 
             if (authResult != null && authResult.IsSuccessful)
             {
-                if (!authResult.ExtraData.ContainsKey("id"))
+                if (!authResult.ExtraData.ContainsKey("sub"))
                     throw new Exception("Authentication result does not contain id data");
 
                 if (!authResult.ExtraData.ContainsKey("accesstoken"))
@@ -129,26 +129,6 @@ namespace ReadySignOn.ReadyConnect.Core
             return state;
         }
 
-        private string GetEmailFromProvider(string accessToken)
-        {
-            var result = "";
-            var webRequest = WebRequest.Create("https://members.readysignon.com/me?fields=email&access_token=" + EscapeUriDataStringRfc3986(accessToken));  //TODO: Update this link
-
-            using (var webResponse = webRequest.GetResponse())
-            using (var stream = webResponse.GetResponseStream())
-            using (var reader = new StreamReader(stream))
-            {
-                var strResponse = reader.ReadToEnd();
-                var info = JObject.Parse(strResponse);
-
-                if (info["email"] != null)
-                {
-                    result = info["email"].ToString();
-                }
-            }
-            return result;
-        }
-
         private void ParseClaims(AuthenticationResult authenticationResult, OAuthAuthenticationParameters parameters)
         {
             var claims = new UserClaims();
@@ -160,7 +140,7 @@ namespace ReadySignOn.ReadyConnect.Core
             }
             else
             {
-                claims.Contact.Email = GetEmailFromProvider(authenticationResult.ExtraData["accesstoken"]);
+                claims.Contact.Email = ReadyMembersApplication.GetEmailFromProvider(authenticationResult.ExtraData["accesstoken"]);
             }
 
             claims.Name = new NameClaims();
