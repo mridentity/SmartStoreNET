@@ -175,7 +175,7 @@ namespace ReadySignOn.ReadyConnect.Core
             //code copied from DotNetOpenAuth.AspNet.Clients.FacebookClient file
             var args = new Dictionary<string, string>();
             var settings = _services.Settings.LoadSetting<ReadyConnectExternalAuthSettings>(_services.StoreContext.CurrentStore.Id);
-            var builder = new UriBuilder(settings.UseSandbox ? "https://membersqa.readysignon.com/connect/authorize" : "https://members.readysignon.com/connect/authorize");   //TODO: Update this link
+            var builder = new UriBuilder(settings.UseSandbox ? "https://membersqa.readysignon.com/connect/authorize" : "https://members.readysignon.com/connect/authorize");   
 
             args.Add("client_id", settings.ClientKeyIdentifier);
             args.Add("redirect_uri", GenerateLocalCallbackUri().AbsoluteUri);

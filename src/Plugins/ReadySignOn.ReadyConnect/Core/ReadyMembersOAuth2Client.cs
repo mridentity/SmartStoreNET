@@ -145,7 +145,10 @@ namespace ReadySignOn.ReadyConnect.Core
                     var extraData = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
                     var data = extraData.ToDictionary(x => x.Key, x => x.Value.ToString());
 
-                    data.Add("picture", string.Format("https://members.readysignon.com/{0}/picture", data["sub"]));  //TODO: Update this link
+                    data.Add("picture", string.Format("_settings.UseSandbox ? " +
+                        "                               https://membersqa.readysignon.com/{0}/picture : " +
+                        "                               https://members.readysignon.com/{0}/picture", 
+                                                        data["sub"]));  
 
                     return data;
                 }
@@ -185,15 +188,6 @@ namespace ReadySignOn.ReadyConnect.Core
         {
             string accessToken = null;
 
-            //var uri = BuildUri(_settings.UseSandbox ? TokenEndpointQA : TokenEndpoint, new NameValueCollection
-            //{
-            //    { "grant_type", "authorization_code" },
-            //    { "code", authorizationCode },
-            //    { "client_id", _settings.ClientKeyIdentifier },
-            //    { "client_secret", _settings.ClientSecret },
-            //    { "redirect_uri", returnUrl.GetLeftPart(UriPartial.Path) },
-            //});
-
             //https://stackoverflow.com/questions/43856698/c-sharp-post-to-oauth2-with-formdata
             var postData = "grant_type=" + HttpUtility.UrlEncode("authorization_code");
             postData += "&code=" + HttpUtility.UrlEncode(authorizationCode);
@@ -216,8 +210,6 @@ namespace ReadySignOn.ReadyConnect.Core
 
             using (var response = (HttpWebResponse)webRequest.GetResponse())
             {
-                // handle response from FB 
-                // this will not be a url with params like the first request to get the 'code'
                 Encoding rEncoding = Encoding.GetEncoding(response.CharacterSet);
 
                 using (var sr = new StreamReader(response.GetResponseStream(), rEncoding))
