@@ -89,6 +89,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             return RedirectToConfiguration(Plugin.SystemName, false);
         }
 
+        // This is the payment plugin page for collecting payment information such as credit card info etc.
         public ActionResult PaymentInfo()
 		{
 			var model = new ReadyPayPaymentInfoModel();
@@ -104,6 +105,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 			return PartialView(model);
 		}
 
+        // This payment plugin method for handling mini shopping card specifically
         public ActionResult MiniShoppingCart()
         {
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
@@ -119,6 +121,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             return new EmptyResult();
         }
 
+        //GetDisplayWidgetRoute sets the routes so this method will be used for displaying the wedget at various zones.
         public ActionResult InPlaceReadyPay()
         {
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
