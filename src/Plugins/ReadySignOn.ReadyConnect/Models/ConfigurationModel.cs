@@ -8,8 +8,8 @@ namespace ReadySignOn.ReadyConnect.Models
         [SmartResourceDisplayName("Plugins.ExternalAuth.ReadyConnect.UseSandbox")]
         public bool UseSandbox { get; set; }
 
-        [SmartResourceDisplayName("Plugins.ExternalAuth.ReadyConnect.ClientKeyIdentifier")]
-        public string ClientKeyIdentifier { get; set; }
+        [SmartResourceDisplayName("Plugins.ExternalAuth.ReadyConnect.ClientId")]
+        public string ClientId { get; set; }
 
         [SmartResourceDisplayName("Plugins.ExternalAuth.ReadyConnect.ClientSecret")]
         public string ClientSecret { get; set; }

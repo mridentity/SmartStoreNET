@@ -55,7 +55,7 @@ namespace ReadySignOn.ReadyConnect.Controllers
             }
 
             MiniMapper.Map(model, settings);
-            settings.ClientKeyIdentifier = model.ClientKeyIdentifier.TrimSafe();
+            settings.ClientKeyIdentifier = model.ClientId.TrimSafe();
             settings.ClientSecret = model.ClientSecret.TrimSafe();
             settings.UseSandbox = model.UseSandbox;
 
