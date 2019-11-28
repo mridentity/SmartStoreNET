@@ -121,7 +121,7 @@ namespace ReadySignOn.ReadyPay.Controllers
         }
 
         //GetDisplayWidgetRoute sets the routes so this method will be used for displaying the wedget at various zones.
-        public ActionResult InPlaceReadyPay()
+        public ActionResult InPlaceReadyPay(string product_id, string product_sku, string product_name, string product_price)
         {
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 

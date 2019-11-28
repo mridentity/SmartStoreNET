@@ -8,6 +8,7 @@ using SmartStore.Services;
 using SmartStore.Services.Cms;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Payments;
+using SmartStore.Web.Models.Catalog;
 
 namespace ReadySignOn.ReadyPay
 {
@@ -136,8 +137,28 @@ namespace ReadySignOn.ReadyPay
 
             if(widgetZone == "productbox_add_info" && settings.ShowInPlaceReadyPay_productbox_add_info)
             {
-                actionName = "InPlaceReadyPay";
-                controllerName = "ReadyPay";
+
+                var summaryItem = model as ProductSummaryModel.SummaryItem;
+                var priceModel = summaryItem.Price;
+
+                var product_id = summaryItem.Id;
+                var product_sku = summaryItem.Sku;
+                var product_name = summaryItem.Name;
+                var product_price = priceModel.PriceValue;
+
+                if (product_price > decimal.Zero)
+                {
+                    actionName = "InPlaceReadyPay";
+                    controllerName = "ReadyPay";
+
+                    // Convert price because it is in working currency.
+                    product_price = _currencyService.Value.ConvertToPrimaryStoreCurrency(product_price, _services.WorkContext.WorkingCurrency);
+
+                    routeValues.Add("product_id", product_id);
+                    routeValues.Add("product_sku", product_sku);
+                    routeValues.Add("product_name", product_name);
+                    routeValues.Add("product_price", product_price);
+                }
             }
 
             if (widgetZone == "productdetails_add_info" && settings.ShowInPlaceReadyPay_productdetails_add_info)
