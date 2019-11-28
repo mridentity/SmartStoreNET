@@ -67,7 +67,6 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             ModelState.Clear();
 
-            model.AccessKey = model.AccessKey.TrimSafe();
             model.ClientId = model.ClientId.TrimSafe();
             model.ClientSecret = model.ClientSecret.TrimSafe();
             model.MerchantId = model.MerchantId.TrimSafe();
