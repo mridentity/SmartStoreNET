@@ -93,6 +93,7 @@
     <Compile Include="Controllers\ReadyPayController.cs" />
     <Compile Include="Filters\ReadyPayWidgetZoneFilter.cs" />
     <Compile Include="Models\ReadyPayConfigurationModel.cs" />
+    <Compile Include="Models\ReadyPayment.cs" />
     <Compile Include="Models\ReadyPayPaymentInfoModel.cs" />
     <Compile Include="Models\ReadyPayViewModel.cs" />
     <Compile Include="Plugin.cs" />
