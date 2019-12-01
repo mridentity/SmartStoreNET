@@ -15,9 +15,9 @@ namespace ReadySignOn.ReadyPay.Models
 
         public string Sentinel { get; set; }
         public string ReadyTicket { get; set; }
-
         public bool CurrentPageIsBasket { get; set; }
-
         public string SubmitButtonImageUrl { get; set; }
+        public string LoaderImageUrl { get; set; }
+        public decimal? OrderTotal { get; set; }
     }
 }

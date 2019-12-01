@@ -1,25 +1,59 @@
 ﻿@model ReadySignOn.ReadyPay.Models.ReadyPayPaymentInfoModel
 
-    <div class="external-checkout-button">
-        <div id="readypay-checkout" class="my-2 ml-3">
-            <input type="text" ID="ReadyTicketTxt" ClientIDMode="Static" 
-                   Font-Names="txtReadyTicket" size="7" runat="server" 
-                   style="vertical-align:middle;"
-                   onserverchange="ReadyPayBtn_Click" />
+@using (Html.BeginForm("PaymentMethod", "AmazonPayCheckout", new { area = Model.SystemName }, FormMethod.Post))
+{
+    <div class="buttons mt-3">
+        <a class="btn btn-secondary btn-lg" href="@Url.Action("ShippingMethod", "Checkout", new { area = "" })">
+            <i class="fa fa-angle-left"></i>
+            <span>@T("Common.Back")</span>
+        </a>
 
-            <input type="image" name="btnReadyPay" id="btnReadyPay"
-                   src="@Url.Content(Model.SubmitButtonImageUrl)" ClientIDMode="Static" value="READYpay"
-                   style="vertical-align:middle;background-color:green;border-width:2px;width:35px"
-                   runat="server" onserverclick="ReadyPayBtn_Click" />
+        <button id="AmazonPayNextCheckoutStep" type="submit" disabled="disabled" class="btn btn-warning btn-lg payment-method-next-step-button">
+            <span>@T("Checkout.NextButton")</span>
+            <i class="fa fa-angle-right"></i>
+        </button>
+    </div>
 
-            <div id="divMsg" style="display: none">
-                <img alt="Please approve on your phone..."
-                     style="width:30px"
-                     src="../images/loader.gif" />
-            </div>
+    Html.RenderWidget("checkout_payment_method_bottom");
+}
 
-            @*<a id="readypay-button" href="javascript:void(0)">
-                <img alt="" src="@Url.Content(Model.SubmitButtonImageUrl)" />
-            </a>*@
+
+<div class="external-checkout-button">
+    <div id="readypay-checkout" class="my-2 ml-3">
+        <input type="text" ID="ReadyTicketTxt" ClientIDMode="Static"
+               Font-Names="txtReadyTicket" size="7" runat="server"
+               style="vertical-align:middle;"
+               onserverchange="ReadyPayBtn_Click" />
+
+        <input type="image" name="btnReadyPay" id="btnReadyPay"
+               src="@Url.Content(Model.SubmitButtonImageUrl)" ClientIDMode="Static" value="READYpay"
+               style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
+               runat="server" onserverclick="ReadyPayBtn_Click" />
+
+        <div id="divMsg" style="display: none">
+            <img alt="Please approve on your phone..."
+                 style="width:30px"
+                 src="@Url.Content(Model.LoaderImageUrl)" />
         </div>
     </div>
+</div>
+<script>
+    $('#ReadyTicketTxt').change(function () {
+        $('#btnReadyPay').click();
+    });
+
+    $('#btnReadyPay').click(function () {
+        $('#divMsg').show();
+        //your client side validation here
+        valid = true;
+        if (valid) {
+            $(this).hide();
+            return true;
+        }
+        else {
+            $(this).removeAttr('disabled');
+            $('#divMsg').hide();
+            return false;
+        }
+    });
+</script>

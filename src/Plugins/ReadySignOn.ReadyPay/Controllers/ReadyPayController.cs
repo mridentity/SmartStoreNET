@@ -2,6 +2,10 @@
 using ReadySignOn.ReadyPay.Services;
 using SmartStore;
 using SmartStore.ComponentModel;
+using SmartStore.Core.Domain.Discounts;
+using SmartStore.Core.Domain.Orders;
+using SmartStore.Services.Customers;
+using SmartStore.Services.Orders;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Framework.Settings;
@@ -16,12 +20,14 @@ namespace ReadySignOn.ReadyPay.Controllers
 {
     public class ReadyPayController : PublicControllerBase
     {
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly IReadyPayService _apiService;
 
         public ReadyPayController(
-            IReadyPayService apiService
-        )
+                    IOrderTotalCalculationService orderTotalCalculationService,
+                    IReadyPayService apiService)
         {
+            _orderTotalCalculationService = orderTotalCalculationService;
             _apiService = apiService;
         }
 
@@ -111,9 +117,24 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             if (settings.ShowButtonInMiniShoppingCart)
             {
+                var store = Services.StoreContext.CurrentStore;
+                var customer = Services.WorkContext.CurrentCustomer;
+                var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+
                 var model = new ReadyPayPaymentInfoModel();
                 model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+                model.LoaderImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
 
+                //Get sub-total and discounts that apply to sub-total
+                decimal orderSubTotalDiscountAmountBase = decimal.Zero;
+                Discount orderSubTotalAppliedDiscount = null;
+                decimal subTotalWithoutDiscountBase = decimal.Zero;
+                decimal subTotalWithDiscountBase = decimal.Zero;
+
+                _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
+                    out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
+
+                model.OrderTotal = subTotalWithDiscountBase;
                 return PartialView(model);
             }
 
@@ -121,14 +142,18 @@ namespace ReadySignOn.ReadyPay.Controllers
         }
 
         //GetDisplayWidgetRoute sets the routes so this method will be used for displaying the wedget at various zones.
-        public ActionResult InPlaceReadyPay(string product_id, string product_sku, string product_name, string product_price)
+        public ActionResult InPlaceReadyPay(string product_id, string product_sku, string product_name, decimal product_price)
         {
+            if (product_price <= 0)
+                return new EmptyResult();
+
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
-                var model = new ReadyPayPaymentInfoModel();
-                model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-
-                return PartialView(model);
+            var model = new ReadyPayPaymentInfoModel();
+            model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+            model.LoaderImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+            model.OrderTotal = product_price;
+            return PartialView(model);
         }
 
     }

@@ -109,6 +109,7 @@
     <Content Include="Content\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\loader.gif" />
     <Content Include="Content\ready_button.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
