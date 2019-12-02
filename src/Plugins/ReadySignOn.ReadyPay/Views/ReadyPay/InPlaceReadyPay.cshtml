@@ -5,7 +5,7 @@
         <div class="input-column">
             <input id="idTicket@(Model.ProductId)" type="text" size="7" name="ReadyTicket" placeholder="ReadyTicket" style="vertical-align:middle;">
             <input id="idBtnReady@(Model.ProductId)" type="image" name="ReadyButtonName" style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
-                   src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_update()" value="READYpay">
+                   src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_updatet@(Model.ProductId)fn()" value="READYpay">
         </div>
 
         <div id="idAuthStatus" class="input-column" align="center">
@@ -15,7 +15,7 @@
 </form>
 
 <script>
-    var validate_and_update = function () { };  // Will be re-assigned laster. JS hoisting may take care of this automatically though.
+    var validate_and_updatet@(Model.ProductId)fn = function () { };  // Will be re-assigned laster. JS hoisting may take care of this automatically though.
 
     $(function () {
         $("#idTicket@(Model.ProductId)").keypress(function (event) {
@@ -25,20 +25,20 @@
             }
         });
 
-        validate_and_update = function validateAndUpdate() {
+        validate_and_updatet@(Model.ProductId)fn = function validateAndUpdate() {
             if ($("#idTicket@(Model.ProductId)").val() == '') {
                 // No ticket entered.
                 $("#idTicket@(Model.ProductId)").html('<span class="alert alert-error" style="color: red">Please fill in ReadyTicket.</span>');
                 return false;
             }
             else {
-                doSubmit();
+                dot@(Model.ProductId)Submit();
 
                 return true;
             }
         }
 
-        function doSubmit() {
+        function dot@(Model.ProductId)Submit() {
 
             $("#idAuthStatus@(Model.ProductId)").show();
             //your client side validation here
