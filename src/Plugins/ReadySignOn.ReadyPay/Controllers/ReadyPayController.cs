@@ -134,6 +134,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
                     out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
 
+                model.ProductId = "multiple_products_in_shopping_cart";
                 model.OrderTotal = subTotalWithDiscountBase;
                 return PartialView(model);
             }
@@ -152,9 +153,16 @@ namespace ReadySignOn.ReadyPay.Controllers
             var model = new ReadyPayPaymentInfoModel();
             model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
             model.LoaderImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+            model.ProductId = product_id;
             model.OrderTotal = product_price;
             return PartialView(model);
         }
 
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult ReadyRequestPosted(ReadyPayPaymentInfoModel readypay_request)
+        {
+            throw new NotImplementedException();
+        }
     }
-}

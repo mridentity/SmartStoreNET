@@ -19,5 +19,6 @@ namespace ReadySignOn.ReadyPay.Models
         public string SubmitButtonImageUrl { get; set; }
         public string LoaderImageUrl { get; set; }
         public decimal? OrderTotal { get; set; }
+        public string ProductId { get; set; }
     }
 }

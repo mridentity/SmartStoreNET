@@ -12,11 +12,34 @@
             <span>@T("Checkout.NextButton")</span>
             <i class="fa fa-angle-right"></i>
         </button>
+        <input type="button" runat="server" onserverclick=""
     </div>
 
     Html.RenderWidget("checkout_payment_method_bottom");
 }
 
+<form action="ReadyRequestPosted" enctype="application/x-www-form-urlencoded" method="post" id="idReadyForm">
+    @Html.AntiForgeryToken()
+    <div class="title"><strong>@ViewBag.clientID</strong></div>
+    <div class="form-inputs">
+        <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+        <input type="hidden" name="Sentinel" value="@ViewData["verificationWord"]" />
+        <div id="idSentinel">Sentinel: @ViewData["verificationWord"]</div>
+        <br />
+        <div class="input-column">
+            <input type="text" name="ReadyTicket" id="idTicket" placeholder="enter ReadyTicket here" autofocus="true" style="width:50%;">
+            <input type="text" name="Annex" id="idAnnex" inputmode="numeric" placeholder="Annex" style="width:15%;">
+            <input id="idBtnReady" style="color: #fff;background-color: rgb(71, 164, 71);border-radius: 6px;font-size:18px;padding: 3px 10px;float: right;"
+                    type="button" onclick="return validate_and_update()" name="ReadyButtonName" value="Ready">
+        </div>
+        <div id="idError"></div>
+        <div class="input-column" align="center">
+            <div id="idAuthStatus"></div>
+            <img id="idWaitingImage" src="~/images/loader.gif" alt="" style="width:28px;height:28px;visibility:hidden;margin:auto" />
+        </div>
+
+    </div>
+</form>
 
 <div class="external-checkout-button">
     <div id="readypay-checkout" class="my-2 ml-3">

@@ -1,43 +1,59 @@
 ﻿@model ReadySignOn.ReadyPay.Models.ReadyPayPaymentInfoModel
+<form id="idReadyForm@(Model.ProductId)" action="ReadyRequestPosted" enctype="application/x-www-form-urlencoded" method="post">
+    <div class="form-inputs">
+        <div class="input-column">
+            <input id="idTicket@(Model.ProductId)" type="text" name="ReadyTicket" placeholder="enter ReadyTicket here" style="vertical-align:middle;">
+            <input id="idBtnReady@(Model.ProductId)" type="image" name="ReadyButtonName" style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
+                   src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_update()" value="READYpay">
+        </div>
 
-<div class="external-checkout-button">
-    <div id="readypay-checkout" class="my-2 ml-3">
-        <asp:Label ID="lblReadyTicket" runat="server" Text="ReadyTicket"></asp:Label>
-        <input type="text" ID="ReadyTicketTxt" ClientIDMode="Static"
-               Font-Names="txtReadyTicket"
-               style="vertical-align:middle;"
-               runat="server" onserverchange="ReadyPayBtn_Click" />
-        <span>&nbsp</span>
-
-        <input type="image" name="btnReadyPay" id="btnReadyPay"
-               src="@Url.Content(Model.SubmitButtonImageUrl)" ClientIDMode="Static" value="READYpay"
-               style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
-               runat="server" onserverclick="ReadyPayBtn_Click" />
-
-        <div id="divMsg" style="display: none">
-            <img alt="Please approve on your phone..."
-                 style="width:30px"
-                 src="@Url.Content(Model.LoaderImageUrl)" />
+        <div id="idAuthStatus" class="input-column" align="center">
+            <img id="idWaitingImage" src="@Url.Content(Model.LoaderImageUrl)" style="width:30px" />
         </div>
     </div>
-</div>
-<script>
-    $('#ReadyTicketTxt').change(function () {
-        $('#btnReadyPay').click();
-    });
+</form>
 
-    $('#btnReadyPay').click(function () {
-        $('#divMsg').show();
-        //your client side validation here
-        valid = true;
-        if (valid) {
-            $(this).hide();
-            return true;
+<script>
+    var validate_and_update = function () { };  // Will be re-assigned laster. JS hoisting may take care of this automatically though.
+
+    $(function () {
+        $("#idTicket@(Model.ProductId)").keypress(function (event) {
+            if (event.which == 13)  {   // Enter key pressed.
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);    // Prevent re-submit
+                $("#idBtnReady@(Model.ProductId)").click();
+            }
+        });
+
+        validate_and_update = function validateAndUpdate() {
+            if ($("#idTicket@(Model.ProductId)").val() == '') {
+                // No ticket entered.
+                $("#idTicket@(Model.ProductId)").html('<span class="alert alert-error" style="color: red">Please fill in ReadyTicket.</span>');
+                return false;
+            }
+            else {
+                doSubmit();
+
+                return true;
+            }
         }
-        else {
-            $(this).removeAttr('disabled');
-            $('#divMsg').hide();
-            return false;
+
+        function doSubmit() {
+
+            $("#idAuthStatus@(Model.ProductId)").show();
+            //your client side validation here
+            valid = true;
+            if (valid) {
+                $(this).hide();
+                $("#idReadyForm@(Model.ProductId)").submit();
+                return true;
+            }
+            else {
+                $(this).removeAttr('disabled');
+                $("#idAuthStatus@(Model.ProductId)").hide();
+                return false;
+            }
         }
-    });
+    })
+
 </script>
+
