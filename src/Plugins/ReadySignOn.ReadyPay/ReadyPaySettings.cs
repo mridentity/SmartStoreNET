@@ -38,9 +38,9 @@ namespace ReadySignOn.ReadyPay
 
         public bool UseSandbox { get; set; }
 
-        public string SellerId { get; set; }
+        public string MerchantId { get; set; }
 
-        public string AccessKey { get; set; }
+        public string ClientSecret { get; set; }
 
         public string SecretKey { get; set; }
 

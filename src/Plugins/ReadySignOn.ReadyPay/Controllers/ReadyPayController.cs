@@ -31,35 +31,35 @@ namespace ReadySignOn.ReadyPay.Controllers
             _apiService = apiService;
         }
 
-		protected ActionResult GetActionResult(ReadyPayViewModel model)
-		{
-			switch (model.Result)
-			{
-				case ReadyPayResultType.None:
-					return new EmptyResult();
+        protected ActionResult GetActionResult(ReadyPayViewModel model)
+        {
+            switch (model.Result)
+            {
+                case ReadyPayResultType.None:
+                    return new EmptyResult();
 
-				case ReadyPayResultType.PluginView:
-					return View(model);
+                case ReadyPayResultType.PluginView:
+                    return View(model);
 
-				case ReadyPayResultType.Unauthorized:
-					return new HttpUnauthorizedResult();
+                case ReadyPayResultType.Unauthorized:
+                    return new HttpUnauthorizedResult();
 
-				case ReadyPayResultType.Redirect:
-				default:
-					return RedirectToAction(model.RedirectAction, model.RedirectController, new { area = "" });
-			}
-		}
+                case ReadyPayResultType.Redirect:
+                default:
+                    return RedirectToAction(model.RedirectAction, model.RedirectController, new { area = "" });
+            }
+        }
 
         [AdminAuthorize, ChildActionOnly, LoadSetting]
         public ActionResult Configure(ReadyPaySettings settings, int storeScope)
-		{
-			var model = new ReadyPayConfigurationModel();
+        {
+            var model = new ReadyPayConfigurationModel();
 
-			MiniMapper.Map(settings, model);
-			_apiService.SetupConfiguration(model, storeScope);
+            MiniMapper.Map(settings, model);
+            _apiService.SetupConfiguration(model, storeScope);
 
-			return View(model);
-		}
+            return View(model);
+        }
 
         [HttpPost, AdminAuthorize]
         public ActionResult Configure(ReadyPayConfigurationModel model, FormCollection form)
@@ -96,19 +96,19 @@ namespace ReadySignOn.ReadyPay.Controllers
 
         // This is the payment plugin page for collecting payment information such as credit card info etc.
         public ActionResult PaymentInfo()
-		{
-			var model = new ReadyPayPaymentInfoModel();
-			model.CurrentPageIsBasket = ControllerContext.ParentActionViewContext.RequestContext.RouteData.IsRouteEqual("ShoppingCart", "Cart");
+        {
+            var model = new ReadyPayPaymentInfoModel();
+            model.CurrentPageIsBasket = ControllerContext.ParentActionViewContext.RequestContext.RouteData.IsRouteEqual("ShoppingCart", "Cart");
 
-			if (model.CurrentPageIsBasket)
-			{
-				var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
+            if (model.CurrentPageIsBasket)
+            {
+                var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
-				model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-			}
+                model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+            }
 
-			return PartialView(model);
-		}
+            return PartialView(model);
+        }
 
         // This payment plugin method for handling mini shopping card specifically
         public ActionResult MiniShoppingCart()
@@ -166,3 +166,4 @@ namespace ReadySignOn.ReadyPay.Controllers
             throw new NotImplementedException();
         }
     }
+}
