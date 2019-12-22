@@ -12,6 +12,7 @@ using SmartStore.Web.Framework.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -160,10 +161,10 @@ namespace ReadySignOn.ReadyPay.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult ReadyRequestPosted(ReadyPayPaymentInfoModel readypay_request)
         {
-            throw new NotImplementedException();
+            return new HttpStatusCodeResult(HttpStatusCode.ServiceUnavailable, "Service not implemented yet.");
         }
     }
 }
