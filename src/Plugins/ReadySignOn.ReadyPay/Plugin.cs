@@ -116,11 +116,7 @@ namespace ReadySignOn.ReadyPay
             return new List<string>
             {
                 "productbox_add_info",
-                "productdetails_add_info",
-                "offcanvas_cart_summary",
-                "order_summary_totals_after",
-                "orderdetails_page_aftertotal",
-                "invoice_aftertotal"
+                "productdetails_add_info"
             };
         }
 
@@ -146,52 +142,39 @@ namespace ReadySignOn.ReadyPay
                 var product_name = summaryItem.Name;
                 var product_price = priceModel.PriceValue;
 
-                if (product_price > decimal.Zero)
-                {
-                    actionName = "InPlaceReadyPay";
-                    controllerName = "ReadyPay";
-
-                    // Convert price because it is in working currency.
-                    product_price = _currencyService.Value.ConvertToPrimaryStoreCurrency(product_price, _services.WorkContext.WorkingCurrency);
-
-                    routeValues.Add("product_id", product_id);
-                    routeValues.Add("product_sku", product_sku);
-                    routeValues.Add("product_name", product_name);
-                    routeValues.Add("product_price", product_price);
-                }
+                CallInPlaceReadyPay(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
             }
 
             if (widgetZone == "productdetails_add_info" && settings.ShowInPlaceReadyPay_productdetails_add_info)
             {
-                actionName = "InPlaceReadyPay";
-                controllerName = "ReadyPay";
-            }
+                var product_detail = model as ProductDetailsModel;
 
-            if (widgetZone == "offcanvas_cart_summary" && settings.ShowInPlaceReadyPay_offcanvas_cart_summary)
-            {
-                actionName = "InPlaceReadyPay";
-                controllerName = "ReadyPay";
-            }
+                var product_id = product_detail.Id;
+                var product_sku = product_detail.Sku;
+                var product_name = product_detail.Name;
+                var product_price = product_detail.ProductPrice.PriceValue;
 
-            if (widgetZone == "order_summary_totals_after" && settings.ShowInPlaceReadyPay_order_summary_totals_after)
-            {
-                actionName = "InPlaceReadyPay";
-                controllerName = "ReadyPay";
-            }
-
-            if (widgetZone == "orderdetails_page_aftertotal" && settings.ShowInPlaceReadyPay_orderdetails_page_aftertotal)
-            {
-                actionName = "InPlaceReadyPay";
-                controllerName = "ReadyPay";
-            }
-
-            if (widgetZone == "invoice_aftertotal" && settings.ShowInPlaceReadyPay_invoice_aftertotal)
-            {
-                actionName = "InPlaceReadyPay";
-                controllerName = "ReadyPay";
+                CallInPlaceReadyPay(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
             }
 
             return;
+        }
+
+        private void CallInPlaceReadyPay(ref string actionName, ref string controllerName, RouteValueDictionary routeValues, int product_id, string product_sku, SmartStore.Services.Localization.LocalizedValue<string> product_name, ref decimal product_price)
+        {
+            if (product_price > decimal.Zero)
+            {
+                actionName = "InPlaceReadyPay";
+                controllerName = "ReadyPay";
+
+                // Convert price because it is in working currency.
+                product_price = _currencyService.Value.ConvertToPrimaryStoreCurrency(product_price, _services.WorkContext.WorkingCurrency);
+
+                routeValues.Add("product_id", product_id);
+                routeValues.Add("product_sku", product_sku);
+                routeValues.Add("product_name", product_name);
+                routeValues.Add("product_price", product_price);
+            }
         }
 
         #endregion
