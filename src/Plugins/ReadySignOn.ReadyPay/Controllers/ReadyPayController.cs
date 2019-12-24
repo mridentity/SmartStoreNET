@@ -164,7 +164,15 @@ namespace ReadySignOn.ReadyPay.Controllers
         //[ValidateAntiForgeryToken]
         public ActionResult ReadyRequestPosted(ReadyPayPaymentInfoModel readypay_request)
         {
-            return new HttpStatusCodeResult(HttpStatusCode.ServiceUnavailable, "Service not implemented yet.");
+            try
+            {
+                ReadyPayment rpayment = _apiService.ProcessReadyPay(readypay_request);
+                return new HttpStatusCodeResult(HttpStatusCode.Accepted);
+            }
+            catch
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.ServiceUnavailable, "Service not implemented yet.");
+            }
         }
     }
 }
