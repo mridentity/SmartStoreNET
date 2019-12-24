@@ -12,7 +12,7 @@ const btnReadyPay = "button";
 const txtReadyTicket = "input[data-readyticket]";
 
 // destination url to post the ready ticket
-const destUrl = "https://reqres.in/api/users";
+const destUrl = "Plugins/ReadySignOn.ReadyPay/ReadyPay/ReadyRequestPosted";
 
 // -----------------
 // Function
@@ -33,7 +33,8 @@ const getSInP = (p, s) => p.querySelector(s);
 getElementsBy(divReadyPay).map(div => {
     const elemReadyPay = getSInP(div, btnReadyPay);
     const elemReadyTicket = getSInP(div, txtReadyTicket);
-    const id = div.dataset.id;
+    const productid = div.dataset.productid;
+    const ordertotal = div.dataset.ordertotal;
 
     // `bindReadyTicket` consumes an event: `e`;
     // it sets the `readyticket` attribute of `e.target`
@@ -51,10 +52,11 @@ getElementsBy(divReadyPay).map(div => {
 
     const bindReadyPay = (e) => {
         // construct data to be posted
-        readyTicket = elemReadyTicket.dataset.readyticket;
+        const readyticket = elemReadyTicket.dataset.readyticket;
         const jsonData = {
-            id: id,
-            readyTicket: readyTicket
+            ProductId: productid,
+            OrderTotal: ordertotal,
+            ReadyTicket: readyticket
         };
 
         // construct settings for the request
@@ -64,7 +66,7 @@ getElementsBy(divReadyPay).map(div => {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }
+        };
 
         // make the request; process the response: `res` if it succeeds;
         // otherwise, logs errors to the console.
@@ -73,7 +75,7 @@ getElementsBy(divReadyPay).map(div => {
                 if (res.ok) {
                     return res.json();
                 } else {
-                    return Promise.reject(res.status);
+                    return Promise.reject(res.statusText);
                 }
             })
             .then(res => console.log(res))

@@ -164,6 +164,21 @@ namespace ReadySignOn.ReadyPay.Controllers
         //[ValidateAntiForgeryToken]
         public ActionResult ReadyRequestPosted(ReadyPayPaymentInfoModel readypay_request)
         {
+            if (String.IsNullOrWhiteSpace(readypay_request.ReadyTicket))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ReadyTicket.");
+            }
+
+            if (String.IsNullOrWhiteSpace(readypay_request.ProductId))
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ProductId.");
+            }
+
+            if (readypay_request.OrderTotal <= 0)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid OrderTotal.");
+            }
+
             try
             {
                 ReadyPayment rpayment = _apiService.ProcessReadyPay(readypay_request);
