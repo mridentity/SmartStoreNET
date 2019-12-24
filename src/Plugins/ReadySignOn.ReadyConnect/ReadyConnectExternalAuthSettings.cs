@@ -13,7 +13,7 @@ namespace ReadySignOn.ReadyConnect
             UseSandbox = true;
         }
         public bool UseSandbox { get; set; }
-        public string ClientKeyIdentifier { get; set; }
+        public string ClientId { get; set; }
         public string ClientSecret { get; set; }
     }
 }

@@ -55,7 +55,7 @@ namespace ReadySignOn.ReadyConnect.Controllers
             }
 
             MiniMapper.Map(model, settings);
-            settings.ClientKeyIdentifier = model.ClientId.TrimSafe();
+            settings.ClientId = model.ClientId.TrimSafe();
             settings.ClientSecret = model.ClientSecret.TrimSafe();
             settings.UseSandbox = model.UseSandbox;
 
@@ -69,7 +69,7 @@ namespace ReadySignOn.ReadyConnect.Controllers
         {
             var settings = Services.Settings.LoadSetting<ReadyConnectExternalAuthSettings>(Services.StoreContext.CurrentStore.Id);
 
-            if (settings.ClientKeyIdentifier.HasValue() && settings.ClientSecret.HasValue())
+            if (settings.ClientId.HasValue() && settings.ClientSecret.HasValue())
             {
                 return View();
             }

@@ -167,11 +167,14 @@ namespace ReadySignOn.ReadyPay.Controllers
             try
             {
                 ReadyPayment rpayment = _apiService.ProcessReadyPay(readypay_request);
+                //TODO: rpayment contains authorized payment and tx information that can
+                // be used to create an order in the SmartStore and/or tracking info to
+                // be sent to the end user.
                 return new HttpStatusCodeResult(HttpStatusCode.Accepted);
             }
-            catch
+            catch (Exception ex)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.ServiceUnavailable, "Service not implemented yet.");
+                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

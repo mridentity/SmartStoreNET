@@ -45,23 +45,22 @@ namespace ReadySignOn.ReadyPay.Services
             string url_paymentupdate = settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
                                                             : "https://iosiap.readysignon.com/PaymentUpdate/";
             url_str += rp_request.ReadyTicket;
-            string client_secret = settings.ClientSecret;
 
             //https://stackoverflow.com/questions/9145667/how-to-post-json-to-a-server-using-c
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(url_str);
             httpWebRequest.ContentType = "application/x-www-form-urlencoded";
             httpWebRequest.Method = "POST";
-            httpWebRequest.Headers.Add("client_id", "wingtiptoys");
-            httpWebRequest.Headers.Add("client_name", "WingTipToys");
-            httpWebRequest.Headers.Add("client_secret", client_secret);
+            httpWebRequest.Headers.Add("client_id", settings.ClientId);
+            httpWebRequest.Headers.Add("client_name", Plugin.SystemName);
+            httpWebRequest.Headers.Add("client_secret", settings.ClientSecret);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
                 string json = "{\"user\":\"test\"," +
                               "\"password\":\"bla\"}";
 
-                json = "{\"MerchantIdentifier\":\"merchant.com.adyen.readypay.test\"," +
-                          "\"ApplicationDataBase64\":\"" + application_data_b64 + "\"," +
+                json = "{\"MerchantIdentifier\":\"" + settings.MerchantId + "\"," +         // ReadyPay merchant id to be used for a particular PSP (e.g. merchant.com.adyen.readypay.test) which is registered at the PSP and the RSO app manifest.
+                          "\"ApplicationDataBase64\":\"" + application_data_b64 + "\"," +   // Application data that is to be carried and preserved by ReadyPay as it which can be used to validate or match a specific tx.
                           "\"ReadyPayUpdateUrl\":\"" + url_paymentupdate + "\"," +
                           "\"CountryCode\":\"US\"," +
                           "\"CurrencyCode\":\"USD\"," +
@@ -121,7 +120,7 @@ namespace ReadySignOn.ReadyPay.Services
             }
             catch (Exception ex)
             {
-                //throw ex;
+                throw ex;
             }
 
             return null;

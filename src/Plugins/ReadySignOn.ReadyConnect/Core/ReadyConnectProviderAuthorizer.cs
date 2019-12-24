@@ -177,7 +177,7 @@ namespace ReadySignOn.ReadyConnect.Core
             var settings = _services.Settings.LoadSetting<ReadyConnectExternalAuthSettings>(_services.StoreContext.CurrentStore.Id);
             var builder = new UriBuilder(settings.UseSandbox ? "https://membersqa.readysignon.com/connect/authorize" : "https://members.readysignon.com/connect/authorize");   
 
-            args.Add("client_id", settings.ClientKeyIdentifier);
+            args.Add("client_id", settings.ClientId);
             args.Add("redirect_uri", GenerateLocalCallbackUri().AbsoluteUri);
             args.Add("scope", "openid rso_idp email profile");
             args.Add("response_type", "code");

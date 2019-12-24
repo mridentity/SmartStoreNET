@@ -48,7 +48,7 @@ namespace ReadySignOn.ReadyConnect.Core
 
         public ReadyMembersOAuth2Client(ReadyConnectExternalAuthSettings settings, params string[] requestedScopes) : base("readymembers")
         {
-            if (string.IsNullOrWhiteSpace(settings.ClientKeyIdentifier))
+            if (string.IsNullOrWhiteSpace(settings.ClientId))
                 throw new ArgumentNullException("appId");
 
             if (string.IsNullOrWhiteSpace(settings.ClientSecret))
@@ -118,7 +118,7 @@ namespace ReadySignOn.ReadyConnect.Core
 
             return BuildUri(_settings.UseSandbox ? AuthorizationEndpointQA : AuthorizationEndpoint, new NameValueCollection
             {
-                { "client_id", _settings.ClientKeyIdentifier },
+                { "client_id", _settings.ClientId },
                 { "scope", string.Join(" ", _requestedScopes) },
                 { "redirect_uri", returnUrl.GetLeftPart(UriPartial.Path) },
                 { "state", state },
@@ -191,7 +191,7 @@ namespace ReadySignOn.ReadyConnect.Core
             //https://stackoverflow.com/questions/43856698/c-sharp-post-to-oauth2-with-formdata
             var postData = "grant_type=" + HttpUtility.UrlEncode("authorization_code");
             postData += "&code=" + HttpUtility.UrlEncode(authorizationCode);
-            postData += "&client_id=" + HttpUtility.UrlEncode(_settings.ClientKeyIdentifier);
+            postData += "&client_id=" + HttpUtility.UrlEncode(_settings.ClientId);
             postData += "&client_secret=" + HttpUtility.UrlEncode(_settings.ClientSecret);
             postData += "&redirect_uri=" + HttpUtility.UrlEncode(returnUrl.GetLeftPart(UriPartial.Path));
 
