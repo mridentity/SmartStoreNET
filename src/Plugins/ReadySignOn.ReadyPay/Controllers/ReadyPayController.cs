@@ -185,7 +185,9 @@ namespace ReadySignOn.ReadyPay.Controllers
                 //TODO: rpayment contains authorized payment and tx information that can
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
-                return new HttpStatusCodeResult(HttpStatusCode.Accepted);
+                return Json(rpayment, JsonRequestBehavior.AllowGet);
+                //Note: Json result returned from here may contain type name handling info described here: https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_TypeNameHandling.htm
+                //This is because the JsonNetAttribute filter is applied on the SmartController base class.
             }
             catch (Exception ex)
             {
