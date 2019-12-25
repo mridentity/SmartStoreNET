@@ -1,4 +1,5 @@
-﻿using ReadySignOn.ReadyPay.Models;
+﻿using Newtonsoft.Json;
+using ReadySignOn.ReadyPay.Models;
 using ReadySignOn.ReadyPay.Services;
 using SmartStore;
 using SmartStore.ComponentModel;
@@ -10,11 +11,8 @@ using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Framework.Settings;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace ReadySignOn.ReadyPay.Controllers
@@ -185,9 +183,35 @@ namespace ReadySignOn.ReadyPay.Controllers
                 //TODO: rpayment contains authorized payment and tx information that can
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
-                return Json(rpayment, JsonRequestBehavior.AllowGet);
-                //Note: Json result returned from here may contain type name handling info described here: https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_TypeNameHandling.htm
+
+                //https://stackoverflow.com/questions/9777731/mvc-how-to-return-a-string-as-json
+                //https://exceptionshub.com/return-a-json-string-explicitly-from-asp-net-webapi-4.html
+                //https://stackoverflow.com/questions/2422983/returning-json-object-from-an-asp-net-page
+                //https://stackoverflow.com/questions/1428585/how-can-i-exclude-some-public-properties-from-being-serialized-into-a-jsonresult
+
+                var result = new
+                {
+                    tx_id = rpayment.transactionIdentifier,
+                    charged_total = rpayment.grandTotalCharged,
+                    payment_method = rpayment.paymentMethod.displayName,
+                    shipping_method = rpayment.shippingMethod.detail,
+                    shipping_address = $"{rpayment.shippingContact.givenName} {rpayment.shippingContact.familyName}, {rpayment.shippingContact.street}, {rpayment.shippingContact.city}, {rpayment.shippingContact.state} {rpayment.shippingContact.postalCode}, {rpayment.shippingContact.country}",
+                    email_address = rpayment.shippingContact.emailAddress,
+                    phone_number = rpayment.shippingContact.phoneNumber
+                };
+
+                //Note: Json result returned from this.Json() may contain type name handling info described 
+                //here: https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_TypeNameHandling.htm
                 //This is because the JsonNetAttribute filter is applied on the SmartController base class.
+                //We therefore serialize the result to json string manually to avoid the $type inclusion. 
+                string json = JsonConvert.SerializeObject(result);
+
+                return new ContentResult
+                {
+                    Content = json,
+                    ContentType = "application/json",
+                    ContentEncoding = Encoding.UTF8
+                };
             }
             catch (Exception ex)
             {

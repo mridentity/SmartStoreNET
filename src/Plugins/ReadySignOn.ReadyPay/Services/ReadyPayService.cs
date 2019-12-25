@@ -65,8 +65,11 @@ namespace ReadySignOn.ReadyPay.Services
                           "\"CountryCode\":\"US\"," +
                           "\"CurrencyCode\":\"USD\"," +
                           "\"RequireBillingPostalAddress\":true," +
+                          //"\"RequireBillingEmailAddress\":true," +
+                          //"\"RequireBillingPhoneNumber\":true," +
                           "\"RequireShippingPostalAddress\":true," +
                           "\"RequireShippingEmailAddress\":true," +
+                          "\"RequireShippingPhoneNumber\":true," +
                           "\"SupportedNetworks\" : [" +
                               "\"Visa\"," +
                               "\"MasterCard\"," +
@@ -92,7 +95,7 @@ namespace ReadySignOn.ReadyPay.Services
                           "\"SummaryItems\" : [" +
                               "{\"Label\": \"Cart Price\", \"Amount\": " + rp_request.OrderTotal.ToString() + ", \"IsFinal\": true}," +
                               "{\"Label\": \"Tax\", \"Amount\": 0.05, \"IsFinal\": true}," +
-                              "{\"Label\": \"WingTip Toys\", \"Amount\":" + (rp_request.OrderTotal + (decimal)0.05).ToString() + ", \"IsFinal\": true}" +
+                              "{\"Label\": \"Total\", \"Amount\":" + (rp_request.OrderTotal + (decimal)0.05).ToString() + ", \"IsFinal\": true}" +
                           "]" +
                        "}";
 
