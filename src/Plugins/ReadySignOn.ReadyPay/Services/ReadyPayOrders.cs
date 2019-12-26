@@ -79,6 +79,86 @@ namespace ReadySignOn.ReadyPay.Services
         public Localizer T { get; set; }
         public ILogger Logger { get; set; }
 
+        public ReadyPayOrders(
+                                IOrderService orderService,
+                                IWebHelper webHelper,
+                                ILocalizationService localizationService,
+                                ILanguageService languageService,
+                                IProductService productService,
+                                IPaymentService paymentService,
+                                IOrderTotalCalculationService orderTotalCalculationService,
+                                IPriceCalculationService priceCalculationService,
+                                IPriceFormatter priceFormatter,
+                                IProductAttributeParser productAttributeParser,
+                                IProductAttributeFormatter productAttributeFormatter,
+                                IGiftCardService giftCardService,
+                                IShoppingCartService shoppingCartService,
+                                ICheckoutAttributeFormatter checkoutAttributeFormatter,
+                                IShippingService shippingService,
+                                IShipmentService shipmentService,
+                                ITaxService taxService,
+                                ICustomerService customerService,
+                                IDiscountService discountService,
+                                IEncryptionService encryptionService,
+                                IWorkContext workContext,
+                                IStoreContext storeContext,
+                                IMessageFactory messageFactory,
+                                ICustomerActivityService customerActivityService,
+                                ICurrencyService currencyService,
+                                IAffiliateService affiliateService,
+                                IEventPublisher eventPublisher,
+                                IGenericAttributeService genericAttributeService,
+                                INewsLetterSubscriptionService newsLetterSubscriptionService,
+                                PaymentSettings paymentSettings,
+                                RewardPointsSettings rewardPointsSettings,
+                                OrderSettings orderSettings,
+                                TaxSettings taxSettings,
+                                LocalizationSettings localizationSettings,
+                                CurrencySettings currencySettings,
+                                ShoppingCartSettings shoppingCartSettings,
+                                CatalogSettings catalogSettings)
+        {
+            _orderService = orderService;
+            _webHelper = webHelper;
+            _localizationService = localizationService;
+            _languageService = languageService;
+            _productService = productService;
+            _paymentService = paymentService;
+            _orderTotalCalculationService = orderTotalCalculationService;
+            _priceCalculationService = priceCalculationService;
+            _priceFormatter = priceFormatter;
+            _productAttributeParser = productAttributeParser;
+            _productAttributeFormatter = productAttributeFormatter;
+            _giftCardService = giftCardService;
+            _shoppingCartService = shoppingCartService;
+            _checkoutAttributeFormatter = checkoutAttributeFormatter;
+            _workContext = workContext;
+            _storeContext = storeContext;
+            _messageFactory = messageFactory;
+            _shippingService = shippingService;
+            _shipmentService = shipmentService;
+            _taxService = taxService;
+            _customerService = customerService;
+            _discountService = discountService;
+            _encryptionService = encryptionService;
+            _customerActivityService = customerActivityService;
+            _currencyService = currencyService;
+            _affiliateService = affiliateService;
+            _eventPublisher = eventPublisher;
+            _genericAttributeService = genericAttributeService;
+            _newsLetterSubscriptionService = newsLetterSubscriptionService;
+            _paymentSettings = paymentSettings;
+            _rewardPointsSettings = rewardPointsSettings;
+            _orderSettings = orderSettings;
+            _taxSettings = taxSettings;
+            _localizationSettings = localizationSettings;
+            _currencySettings = currencySettings;
+            _shoppingCartSettings = shoppingCartSettings;
+            _catalogSettings = catalogSettings;
+
+            T = NullLocalizer.Instance;
+            Logger = NullLogger.Instance;
+        }
         public virtual IList<string> GetOrderPlacementWarnings(ProcessPaymentRequest processPaymentRequest)
         {
             Guard.NotNull(processPaymentRequest, nameof(processPaymentRequest));
