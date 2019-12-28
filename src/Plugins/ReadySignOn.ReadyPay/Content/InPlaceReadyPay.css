@@ -6,3 +6,11 @@
     border: none;
     outline: none;
 }
+
+    .art-ready-pay > button.normal {
+        background-image: url(ready_button.png);
+    }
+
+    .art-ready-pay > button.waiting {
+        background-image: url(loading.gif);
+    }

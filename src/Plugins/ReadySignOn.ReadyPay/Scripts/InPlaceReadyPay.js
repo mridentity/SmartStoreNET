@@ -12,7 +12,8 @@ const btnReadyPay = "button";
 const txtReadyTicket = "input[data-readyticket]";
 
 // destination url to post the ready ticket
-const destUrl = "Plugins/ReadySignOn.ReadyPay/ReadyPay/ReadyRequestPosted";
+ const destUrl = "Plugins/ReadySignOn.ReadyPay/ReadyPay/ReadyRequestPosted";
+// const destUrl = "https://reqres.in/api/users";
 
 // -----------------
 // Function
@@ -68,22 +69,45 @@ getElementsBy(divReadyPay).map(div => {
             }
         };
 
+        const freeze = () => {
+            elemReadyTicket.disabled = true;
+            elemReadyPay.setAttribute('class', `waiting`);
+            elemReadyPay.disabled = true;
+        }
+
+        const unFreeze = () => {
+            elemReadyTicket.disabled = false;
+            elemReadyPay.setAttribute('class', `normal`);
+            elemReadyPay.disabled = false;
+        }
+
+        // disable textbox for readyticket;
+        // change the background image for the ready pay button
+        freeze();
+
         // make the request; process the response: `res` if it succeeds;
         // otherwise, logs errors to the console.
         fetch(destUrl, options)
             .then(res => {
+                unFreeze();
                 if (res.ok) {
                     return res.json();
                 } else {
                     return Promise.reject(res.statusText);
                 }
             })
-            .then(res => console.log(res))
+            .then(res => {
+                console.log(res);
+                displayConfirmation(res);
+            })
             .catch(err => console.log(`Error when making request. ${err}`));
     }
 
     // disable ReadyPay button on load
     elemReadyPay.disabled = true;
+
+    // initial button background image
+    elemReadyPay.setAttribute('class', `normal`);
 
     // set `data-readyticket` attribute each time users change the ready ticket number 
     elemReadyTicket.addEventListener("input", bindReadyTicket);
@@ -91,6 +115,50 @@ getElementsBy(divReadyPay).map(div => {
     // run `bindReadyPay` when users click readypay button 
     elemReadyPay.addEventListener("click", bindReadyPay);
 
+    const displayConfirmation = (res) => {
+        var notice = PNotify.success({
+            title: 'Order created bla bla bla...',
+            text: 'Here is your order information:<br> <b> xx </b>bla bla bla...',
+            textTrusted: true,
+            icon: 'fas fa-question-circle',
+            hide: true,
+            delay: 8000,
+            modules: {
+                Confirm: {
+                    confirm: true,
+                    focus: true,
+                    buttons: [
+                        {
+                            text: 'OK',
+                            textTrusted: false,
+                            addClass: '',
+                            primary: true,
+                            // Whether to trigger this button when the user hits enter in a single line
+                            // prompt. Also, focus the button if it is a modal prompt.
+                            promptTrigger: true,
+                            click: (notice, value) => {
+                                notice.close();
+                            }
+                        },
+                        {
+                            text: '<a href="http://www.yahoo.com" target="_blank">Order Detail</a>',
+                            textTrusted: true,
+                            addClass: '',
+                            click: (notice) => {
+                                notice.close();
+                                notice.fire('pnotify.cancel', { notice });
+                            }
+                        }
+                    ],
+                },
+                Buttons: {
+                    closer: true,
+                    sticker: false
+                },
+                History: {
+                    history: true
+                }
+            }
+        });
+    };
 });
-
-
