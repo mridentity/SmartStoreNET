@@ -115,6 +115,7 @@
     <Compile Include="ReadyPaySettings.cs" />
     <Compile Include="RouteProvider.cs" />
     <Compile Include="DependencyRegistrar.cs" />
+    <Compile Include="Services\IReadyPayOrders.cs" />
     <Compile Include="Services\IReadyPayService.cs" />
     <Compile Include="Services\ReadyPayEnums.cs" />
     <Compile Include="Services\ReadyPayOrders.cs" />

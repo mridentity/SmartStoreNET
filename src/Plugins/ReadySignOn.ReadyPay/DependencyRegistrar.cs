@@ -12,7 +12,9 @@ namespace ReadySignOn.ReadyPay
 	{
 		public virtual void Register(ContainerBuilder builder, ITypeFinder typeFinder, bool isActiveModule)
 		{
-			builder.RegisterType<ReadyPayService>().As<IReadyPayService>().InstancePerRequest();
+            builder.RegisterType<ReadyPayOrders>().As<IReadyPayOrders>().InstancePerRequest();
+
+            builder.RegisterType<ReadyPayService>().As<IReadyPayService>().InstancePerRequest();
 				
             builder.RegisterType<ReadyPayWidgetZoneFilter>().AsActionFilterFor<ShoppingCartController>(x => x.OffCanvasShoppingCart()).InstancePerRequest();
 		}

@@ -20,13 +20,16 @@ namespace ReadySignOn.ReadyPay.Controllers
     public class ReadyPayController : PublicControllerBase
     {
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly IReadyPayOrders _readyPayOrders;
         private readonly IReadyPayService _apiService;
 
         public ReadyPayController(
                     IOrderTotalCalculationService orderTotalCalculationService,
+                    IReadyPayOrders readyPayOrders,
                     IReadyPayService apiService)
         {
             _orderTotalCalculationService = orderTotalCalculationService;
+            _readyPayOrders = readyPayOrders;
             _apiService = apiService;
         }
 
@@ -183,6 +186,10 @@ namespace ReadySignOn.ReadyPay.Controllers
                 //TODO: rpayment contains authorized payment and tx information that can
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
+
+                var order_request = new ReadyOrderRequest();
+
+                var order = _readyPayOrders.PlaceOrder(order_request, null);
 
                 //https://stackoverflow.com/questions/9777731/mvc-how-to-return-a-string-as-json
                 //https://exceptionshub.com/return-a-json-string-explicitly-from-asp-net-webapi-4.html

@@ -36,7 +36,7 @@ using System.Web;
 
 namespace ReadySignOn.ReadyPay.Services
 {
-    public class ReadyPayOrders
+    public class ReadyPayOrders : IReadyPayOrders
     {
         private readonly IOrderService _orderService;
         private readonly IWebHelper _webHelper;
@@ -249,7 +249,7 @@ namespace ReadySignOn.ReadyPay.Services
                 // Customer currency.
                 var customerCurrencyCode = string.Empty;
                 var customerCurrencyRate = decimal.Zero;
-                
+
                 {
                     var currencyTmp = _currencyService.GetCurrencyById(customer.GetAttribute<int>(SystemCustomerAttributeNames.CurrencyId, processPaymentRequest.StoreId));
                     var customerCurrency = (currencyTmp != null && currencyTmp.Published) ? currencyTmp : _workContext.WorkingCurrency;
@@ -258,7 +258,7 @@ namespace ReadySignOn.ReadyPay.Services
                     var primaryStoreCurrency = _storeContext.CurrentStore.PrimaryStoreCurrency;
                     customerCurrencyRate = customerCurrency.Rate / primaryStoreCurrency.Rate;
                 }
-                
+
                 // Customer language.
                 Language customerLanguage = null;
                 {
@@ -287,7 +287,7 @@ namespace ReadySignOn.ReadyPay.Services
                 var appliedDiscounts = new List<Discount>();
                 decimal orderSubTotalInclTax, orderSubTotalExclTax;
                 decimal orderSubTotalDiscountInclTax = 0, orderSubTotalDiscountExclTax = 0;
-                
+
                 #endregion
 
                 #region Payment workflow
