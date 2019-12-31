@@ -12,5 +12,5 @@
     }
 
     .art-ready-pay > button.waiting {
-        background-image: url(loading.gif);
+        background-image: url(loader.gif);
     }

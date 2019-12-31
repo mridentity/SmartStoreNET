@@ -11,6 +11,7 @@ using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Framework.Settings;
 using System;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Mvc;
@@ -188,8 +189,20 @@ namespace ReadySignOn.ReadyPay.Controllers
                 // be sent to the end user.
 
                 var order_request = new ReadyOrderRequest();
+                order_request.StoreId = Services.StoreContext.CurrentStore.Id;
+                order_request.CustomerId = Services.WorkContext.CurrentCustomer.Id;
 
-                var order = _readyPayOrders.PlaceOrder(order_request, null);
+                var order_result = _readyPayOrders.PlaceOrder(order_request, null);
+
+                if (!order_result.Success)
+                {
+                    string statusDescription = string.Empty;
+                    if (order_result.Errors.Any())
+                    {
+                        statusDescription = string.Join(" ", order_result.Errors);
+                    }
+                    return new HttpStatusCodeResult(HttpStatusCode.NotFound, statusDescription);
+                }
 
                 //https://stackoverflow.com/questions/9777731/mvc-how-to-return-a-string-as-json
                 //https://exceptionshub.com/return-a-json-string-explicitly-from-asp-net-webapi-4.html
@@ -199,6 +212,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 var result = new
                 {
                     tx_id = rpayment.transactionIdentifier,
+                    order_id = order_result.PlacedOrder.Id,
                     charged_total = rpayment.grandTotalCharged,
                     payment_method = rpayment.paymentMethod.displayName,
                     shipping_method = rpayment.shippingMethod.detail,
