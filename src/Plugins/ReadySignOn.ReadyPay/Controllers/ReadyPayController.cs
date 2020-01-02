@@ -3,6 +3,7 @@ using ReadySignOn.ReadyPay.Models;
 using ReadySignOn.ReadyPay.Services;
 using SmartStore;
 using SmartStore.ComponentModel;
+using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Services.Customers;
@@ -11,6 +12,7 @@ using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Framework.Settings;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -192,7 +194,30 @@ namespace ReadySignOn.ReadyPay.Controllers
                 order_request.StoreId = Services.StoreContext.CurrentStore.Id;
                 order_request.CustomerId = Services.WorkContext.CurrentCustomer.Id;
 
-                var order_result = _readyPayOrders.PlaceOrder(order_request, null);
+                var billing_address = new Address();
+                billing_address.Address1 = rpayment.billingContact.street;
+                billing_address.City = rpayment.billingContact.city;
+                billing_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
+                billing_address.StateProvince.Name = rpayment.billingContact.state;
+                billing_address.ZipPostalCode = rpayment.billingContact.postalCode;
+                billing_address.Country = new SmartStore.Core.Domain.Directory.Country();
+                billing_address.Country.Name = rpayment.billingContact.country;
+
+                order_request.BillingAddress = billing_address;
+
+                var shipping_address = new Address();
+                shipping_address.Address1 = rpayment.shippingContact.street;
+                shipping_address.City = rpayment.shippingContact.city;
+                shipping_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
+                shipping_address.StateProvince.Name = rpayment.shippingContact.state;
+                shipping_address.ZipPostalCode = rpayment.shippingContact.postalCode;
+                shipping_address.Country = new SmartStore.Core.Domain.Directory.Country();
+                shipping_address.Country.Name = rpayment.shippingContact.country;
+
+                order_request.ShippingAddress = shipping_address;
+                order_request.ShippingMethod = rpayment.shippingMethod.identifier;
+
+                var order_result = _readyPayOrders.PlaceOrder(order_request, new Dictionary<string, string>());
 
                 if (!order_result.Success)
                 {
