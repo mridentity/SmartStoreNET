@@ -65,8 +65,8 @@ namespace ReadySignOn.ReadyPay.Services
                           "\"CountryCode\":\"US\"," +
                           "\"CurrencyCode\":\"USD\"," +
                           "\"RequireBillingPostalAddress\":true," +
-                          //"\"RequireBillingEmailAddress\":true," +
-                          //"\"RequireBillingPhoneNumber\":true," +
+                          "\"RequireBillingEmailAddress\":true," +
+                          "\"RequireBillingPhoneNumber\":true," +
                           "\"RequireShippingPostalAddress\":true," +
                           "\"RequireShippingEmailAddress\":true," +
                           "\"RequireShippingPhoneNumber\":true," +

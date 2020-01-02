@@ -195,24 +195,32 @@ namespace ReadySignOn.ReadyPay.Controllers
                 order_request.CustomerId = Services.WorkContext.CurrentCustomer.Id;
 
                 var billing_address = new Address();
+                billing_address.FirstName = rpayment.billingContact.givenName;
+                billing_address.LastName = rpayment.billingContact.familyName;
                 billing_address.Address1 = rpayment.billingContact.street;
                 billing_address.City = rpayment.billingContact.city;
                 billing_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
+                billing_address.StateProvince.Abbreviation = rpayment.billingContact.state;
                 billing_address.StateProvince.Name = rpayment.billingContact.state;
                 billing_address.ZipPostalCode = rpayment.billingContact.postalCode;
                 billing_address.Country = new SmartStore.Core.Domain.Directory.Country();
                 billing_address.Country.Name = rpayment.billingContact.country;
+                billing_address.StateProvince.Country = billing_address.Country;
 
                 order_request.BillingAddress = billing_address;
 
                 var shipping_address = new Address();
+                shipping_address.FirstName = rpayment.shippingContact.givenName;
+                shipping_address.LastName = rpayment.shippingContact.familyName;
                 shipping_address.Address1 = rpayment.shippingContact.street;
                 shipping_address.City = rpayment.shippingContact.city;
                 shipping_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
+                shipping_address.StateProvince.Abbreviation = rpayment.shippingContact.state;
                 shipping_address.StateProvince.Name = rpayment.shippingContact.state;
                 shipping_address.ZipPostalCode = rpayment.shippingContact.postalCode;
                 shipping_address.Country = new SmartStore.Core.Domain.Directory.Country();
                 shipping_address.Country.Name = rpayment.shippingContact.country;
+                shipping_address.StateProvince.Country = shipping_address.Country;
 
                 order_request.ShippingAddress = shipping_address;
                 order_request.ShippingMethod = rpayment.shippingMethod.identifier;
