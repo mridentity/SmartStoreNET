@@ -117,8 +117,8 @@ getElementsBy(divReadyPay).map(div => {
 
     const displayConfirmation = (res) => {
         var notice = PNotify.success({
-            title: `Thank you for placing your order! Your transaction ID is ${res.tx_id}.`,
-            text: `The total amount ${res.charged_total} will be charged to ${res.payment_method}.<br> Your order confimration will be sent to <b> ${res.email_address} </b>`,
+            title: `Thank you for placing your order! `,
+            text: `Your transaction ID is ${res.tx_id}. <br> The total amount of USD ${res.charged_total} will be charged to ${res.payment_method}.<br> Your order confimration will be sent to <b> ${res.email_address} </b>`,
             textTrusted: true,
             icon: 'fas fa-question-circle',
             hide: true,

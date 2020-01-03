@@ -193,6 +193,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 var order_request = new ReadyOrderRequest();
                 order_request.StoreId = Services.StoreContext.CurrentStore.Id;
                 order_request.CustomerId = Services.WorkContext.CurrentCustomer.Id;
+                order_request.OrderTotal = rpayment.grandTotalCharged;
 
                 var billing_address = new Address();
                 billing_address.FirstName = rpayment.billingContact.givenName;
@@ -227,7 +228,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 shipping_address.Email = rpayment.shippingContact.emailAddress;
 
                 order_request.ShippingAddress = shipping_address;
-                order_request.ShippingMethod = rpayment.shippingMethod.identifier;
+                order_request.ShippingMethod = rpayment.shippingMethod.detail;
 
                 var order_result = _readyPayOrders.PlaceOrder(order_request, new Dictionary<string, string>());
 
