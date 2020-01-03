@@ -258,11 +258,11 @@ namespace ReadySignOn.ReadyPay.Services
                 var orderShippingTotalInclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, true, out var orderShippingTaxRate, out var shippingTotalDiscount);
                 var orderShippingTotalExclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, false);
 
-                if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
-                {
-                    warnings.Add(T("Order.CannotCalculateShippingTotal"));
-                    return warnings;
-                }
+                //if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
+                //{
+                //    warnings.Add(T("Order.CannotCalculateShippingTotal"));
+                //    return warnings;
+                //}
 
                 var cartTotal = _orderTotalCalculationService.GetShoppingCartTotal(cart);
                 if (!cartTotal.TotalAmount.HasValue)

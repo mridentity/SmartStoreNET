@@ -265,7 +265,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             billing_address.Country.Name = rpayment.billingContact.country;
             billing_address.StateProvince.Country = billing_address.Country;
             billing_address.CreatedOnUtc = DateTime.UtcNow;
-            billing_address.Email = rpayment.billingContact.emailAddress;
+            billing_address.Email = rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress;
 
             order_request.BillingAddress = billing_address;
 
