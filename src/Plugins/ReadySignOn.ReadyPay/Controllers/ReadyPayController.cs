@@ -206,6 +206,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                 billing_address.Country = new SmartStore.Core.Domain.Directory.Country();
                 billing_address.Country.Name = rpayment.billingContact.country;
                 billing_address.StateProvince.Country = billing_address.Country;
+                billing_address.CreatedOnUtc = DateTime.UtcNow;
+                billing_address.Email = rpayment.billingContact.emailAddress;
 
                 order_request.BillingAddress = billing_address;
 
@@ -221,6 +223,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                 shipping_address.Country = new SmartStore.Core.Domain.Directory.Country();
                 shipping_address.Country.Name = rpayment.shippingContact.country;
                 shipping_address.StateProvince.Country = shipping_address.Country;
+                shipping_address.CreatedOnUtc = DateTime.UtcNow;
+                shipping_address.Email = rpayment.shippingContact.emailAddress;
 
                 order_request.ShippingAddress = shipping_address;
                 order_request.ShippingMethod = rpayment.shippingMethod.identifier;
