@@ -117,8 +117,8 @@ getElementsBy(divReadyPay).map(div => {
 
     const displayConfirmation = (res) => {
         var notice = PNotify.success({
-            title: 'Order created bla bla bla...',
-            text: 'Here is your order information:<br> <b> xx </b>bla bla bla...',
+            title: `Thank you for placing your order! Your transaction ID is ${res.tx_id}.`,
+            text: `The total amount ${res.charged_total} will be charged to ${res.payment_method}.<br> Your order confimration will be sent to <b> ${res.email_address} </b>`,
             textTrusted: true,
             icon: 'fas fa-question-circle',
             hide: true,
@@ -141,7 +141,7 @@ getElementsBy(divReadyPay).map(div => {
                             }
                         },
                         {
-                            text: '<a href="http://www.yahoo.com" target="_blank">Order Detail</a>',
+                            text: `<a href="Order/Details/${res.order_id}" target="_blank">View Order Detail</a>`,
                             textTrusted: true,
                             addClass: '',
                             click: (notice) => {
