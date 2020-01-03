@@ -179,6 +179,9 @@ namespace ReadySignOn.ReadyPay.Services
             cart = null;
 
             var warnings = new List<string>();
+            var skipPaymentWorkflow = false;
+            var isRecurringShoppingCart = false;
+            var paymentMethodSystemName = processPaymentRequest.PaymentMethodSystemName;
 
             if (customer == null)
             {
@@ -191,6 +194,115 @@ namespace ReadySignOn.ReadyPay.Services
             {
                 warnings.Add(T("Checkout.AnonymousNotAllowed"));
                 return warnings;
+            }
+
+            if(!processPaymentRequest.IsInPlaceReadyPayOrder)
+            {
+                if (processPaymentRequest.ShoppingCartItemIds.Any())
+                {
+                    cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, processPaymentRequest.StoreId)
+                        .Where(x => processPaymentRequest.ShoppingCartItemIds.Contains(x.Item.Id))
+                        .ToList();
+                }
+                else
+                {
+                    cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, processPaymentRequest.StoreId);
+                }
+
+                if (!cart.Any())
+                {
+                    warnings.Add(T("ShoppingCart.CartIsEmpty"));
+                    return warnings;
+                }
+
+                // Validate the entire shopping cart.
+                var cartWarnings = _shoppingCartService.GetShoppingCartWarnings(cart, customer.GetAttribute<string>(SystemCustomerAttributeNames.CheckoutAttributes), true);
+                if (cartWarnings.Any())
+                {
+                    warnings.AddRange(cartWarnings);
+                    return warnings;
+                }
+
+                // Validate individual cart items.
+                foreach (var sci in cart)
+                {
+                    var sciWarnings = _shoppingCartService.GetShoppingCartItemWarnings(customer, sci.Item.ShoppingCartType,
+                        sci.Item.Product, processPaymentRequest.StoreId, sci.Item.AttributesXml,
+                        sci.Item.CustomerEnteredPrice, sci.Item.Quantity, false, childItems: sci.ChildItems);
+
+                    if (sciWarnings.Any())
+                    {
+                        warnings.AddRange(sciWarnings);
+                        return warnings;
+                    }
+                }
+
+                // Min totals validation.
+                var minOrderSubtotalAmountOk = ValidateMinOrderSubtotalAmount(cart);
+                if (!minOrderSubtotalAmountOk)
+                {
+                    var minOrderSubtotalAmount = _currencyService.ConvertFromPrimaryStoreCurrency(_orderSettings.MinOrderSubtotalAmount, _workContext.WorkingCurrency);
+                    warnings.Add(T("Checkout.MinOrderSubtotalAmount", _priceFormatter.FormatPrice(minOrderSubtotalAmount, true, false)));
+                    return warnings;
+                }
+
+                var minOrderTotalAmountOk = ValidateMinOrderTotalAmount(cart);
+                if (!minOrderTotalAmountOk)
+                {
+                    var minOrderTotalAmount = _currencyService.ConvertFromPrimaryStoreCurrency(_orderSettings.MinOrderTotalAmount, _workContext.WorkingCurrency);
+                    warnings.Add(T("Checkout.MinOrderTotalAmount", _priceFormatter.FormatPrice(minOrderTotalAmount, true, false)));
+                    return warnings;
+                }
+
+                // Total validations.
+                var orderShippingTotalInclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, true, out var orderShippingTaxRate, out var shippingTotalDiscount);
+                var orderShippingTotalExclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, false);
+
+                if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
+                {
+                    warnings.Add(T("Order.CannotCalculateShippingTotal"));
+                    return warnings;
+                }
+
+                var cartTotal = _orderTotalCalculationService.GetShoppingCartTotal(cart);
+                if (!cartTotal.TotalAmount.HasValue)
+                {
+                    warnings.Add(T("Order.CannotCalculateOrderTotal"));
+                    return warnings;
+                }
+
+                skipPaymentWorkflow = cartTotal.TotalAmount.Value == decimal.Zero;
+
+                // Address validations.
+                if (customer.BillingAddress == null)
+                {
+                    warnings.Add(T("Order.BillingAddressMissing"));
+                }
+                else if (!customer.BillingAddress.Email.IsEmail())
+                {
+                    warnings.Add(T("Common.Error.InvalidEmail"));
+                }
+                else if (customer.BillingAddress.Country != null && !customer.BillingAddress.Country.AllowsBilling)
+                {
+                    warnings.Add(T("Order.CountryNotAllowedForBilling", customer.BillingAddress.Country.Name));
+                }
+
+                if (cart.RequiresShipping())
+                {
+                    if (customer.ShippingAddress == null)
+                    {
+                        warnings.Add(T("Order.ShippingAddressMissing"));
+                        throw new SmartException();
+                    }
+                    else if (!customer.ShippingAddress.Email.IsEmail())
+                    {
+                        warnings.Add(T("Common.Error.InvalidEmail"));
+                    }
+                    else if (customer.ShippingAddress.Country != null && !customer.ShippingAddress.Country.AllowsShipping)
+                    {
+                        warnings.Add(T("Order.CountryNotAllowedForShipping", customer.ShippingAddress.Country.Name));
+                    }
+                }
             }
 
             return warnings;
@@ -227,6 +339,21 @@ namespace ReadySignOn.ReadyPay.Services
             try
             {
                 var customer = _customerService.GetCustomerById(processPaymentRequest.CustomerId);
+                
+                if (customer.BillingAddress == null)
+                {
+                    customer.BillingAddress = processPaymentRequest.BillingAddress;
+                }
+
+                if (customer.ShippingAddress == null)
+                {
+                    customer.ShippingAddress = processPaymentRequest.ShippingAddress;
+                }
+
+                if (customer.Email == null)
+                {
+                    customer.Email = processPaymentRequest.ShippingAddress.Email;
+                }
 
                 var warnings = GetOrderPlacementWarnings(processPaymentRequest, customer, out var cart);
                 if (warnings.Any())
@@ -401,141 +528,142 @@ namespace ReadySignOn.ReadyPay.Services
 
                         result.PlacedOrder = order;
 
-                        //{
-                        //    // Move shopping cart items to order products.
-                        //    foreach (var sc in cart)
-                        //    {
-                        //        sc.Item.Product.MergeWithCombination(sc.Item.AttributesXml);
+                        if(cart != null && cart.Count() > 0)
+                        {
+                            // Move shopping cart items to order products.
+                            foreach (var sc in cart)
+                            {
+                                sc.Item.Product.MergeWithCombination(sc.Item.AttributesXml);
 
-                        //        // Prices.
-                        //        decimal taxRate = decimal.Zero;
-                        //        decimal unitPriceTaxRate = decimal.Zero;
-                        //        decimal scUnitPrice = _priceCalculationService.GetUnitPrice(sc, true);
-                        //        decimal scSubTotal = _priceCalculationService.GetSubTotal(sc, true);
-                        //        decimal scUnitPriceInclTax = _taxService.GetProductPrice(sc.Item.Product, scUnitPrice, true, customer, out unitPriceTaxRate);
-                        //        decimal scUnitPriceExclTax = _taxService.GetProductPrice(sc.Item.Product, scUnitPrice, false, customer, out taxRate);
-                        //        decimal scSubTotalInclTax = _taxService.GetProductPrice(sc.Item.Product, scSubTotal, true, customer, out taxRate);
-                        //        decimal scSubTotalExclTax = _taxService.GetProductPrice(sc.Item.Product, scSubTotal, false, customer, out taxRate);
+                                // Prices.
+                                decimal taxRate = decimal.Zero;
+                                decimal unitPriceTaxRate = decimal.Zero;
+                                decimal scUnitPrice = _priceCalculationService.GetUnitPrice(sc, true);
+                                decimal scSubTotal = _priceCalculationService.GetSubTotal(sc, true);
+                                decimal scUnitPriceInclTax = _taxService.GetProductPrice(sc.Item.Product, scUnitPrice, true, customer, out unitPriceTaxRate);
+                                decimal scUnitPriceExclTax = _taxService.GetProductPrice(sc.Item.Product, scUnitPrice, false, customer, out taxRate);
+                                decimal scSubTotalInclTax = _taxService.GetProductPrice(sc.Item.Product, scSubTotal, true, customer, out taxRate);
+                                decimal scSubTotalExclTax = _taxService.GetProductPrice(sc.Item.Product, scSubTotal, false, customer, out taxRate);
 
-                        //        // Discounts.
-                        //        Discount scDiscount = null;
-                        //        decimal discountAmount = _priceCalculationService.GetDiscountAmount(sc, out scDiscount);
-                        //        decimal discountAmountInclTax = _taxService.GetProductPrice(sc.Item.Product, discountAmount, true, customer, out taxRate);
-                        //        decimal discountAmountExclTax = _taxService.GetProductPrice(sc.Item.Product, discountAmount, false, customer, out taxRate);
+                                // Discounts.
+                                Discount scDiscount = null;
+                                decimal discountAmount = _priceCalculationService.GetDiscountAmount(sc, out scDiscount);
+                                decimal discountAmountInclTax = _taxService.GetProductPrice(sc.Item.Product, discountAmount, true, customer, out taxRate);
+                                decimal discountAmountExclTax = _taxService.GetProductPrice(sc.Item.Product, discountAmount, false, customer, out taxRate);
 
-                        //        if (scDiscount != null && !appliedDiscounts.Any(x => x.Id == scDiscount.Id))
-                        //        {
-                        //            appliedDiscounts.Add(scDiscount);
-                        //        }
+                                if (scDiscount != null && !appliedDiscounts.Any(x => x.Id == scDiscount.Id))
+                                {
+                                    appliedDiscounts.Add(scDiscount);
+                                }
 
-                        //        var attributeDescription = _productAttributeFormatter.FormatAttributes(sc.Item.Product, sc.Item.AttributesXml, customer);
-                        //        var itemWeight = _shippingService.GetShoppingCartItemWeight(sc);
-                        //        var displayDeliveryTime =
-                        //            _shoppingCartSettings.ShowDeliveryTimes &&
-                        //            sc.Item.Product.DeliveryTimeId.HasValue &&
-                        //            sc.Item.Product.IsShipEnabled &&
-                        //            sc.Item.Product.DisplayDeliveryTimeAccordingToStock(_catalogSettings);
+                                var attributeDescription = _productAttributeFormatter.FormatAttributes(sc.Item.Product, sc.Item.AttributesXml, customer);
+                                var itemWeight = _shippingService.GetShoppingCartItemWeight(sc);
+                                var displayDeliveryTime =
+                                    _shoppingCartSettings.ShowDeliveryTimes &&
+                                    sc.Item.Product.DeliveryTimeId.HasValue &&
+                                    sc.Item.Product.IsShipEnabled &&
+                                    sc.Item.Product.DisplayDeliveryTimeAccordingToStock(_catalogSettings);
 
-                        //        // Save order item.
-                        //        var orderItem = new OrderItem
-                        //        {
-                        //            OrderItemGuid = Guid.NewGuid(),
-                        //            Order = order,
-                        //            ProductId = sc.Item.ProductId,
-                        //            UnitPriceInclTax = scUnitPriceInclTax,
-                        //            UnitPriceExclTax = scUnitPriceExclTax,
-                        //            PriceInclTax = scSubTotalInclTax,
-                        //            PriceExclTax = scSubTotalExclTax,
-                        //            TaxRate = unitPriceTaxRate,
-                        //            AttributeDescription = attributeDescription,
-                        //            AttributesXml = sc.Item.AttributesXml,
-                        //            Quantity = sc.Item.Quantity,
-                        //            DiscountAmountInclTax = discountAmountInclTax,
-                        //            DiscountAmountExclTax = discountAmountExclTax,
-                        //            DownloadCount = 0,
-                        //            IsDownloadActivated = false,
-                        //            LicenseDownloadId = 0,
-                        //            ItemWeight = itemWeight,
-                        //            ProductCost = _priceCalculationService.GetProductCost(sc.Item.Product, sc.Item.AttributesXml),
-                        //            DeliveryTimeId = sc.Item.Product.GetDeliveryTimeIdAccordingToStock(_catalogSettings),
-                        //            DisplayDeliveryTime = displayDeliveryTime
-                        //        };
+                                // Save order item.
+                                var orderItem = new OrderItem
+                                {
+                                    OrderItemGuid = Guid.NewGuid(),
+                                    Order = order,
+                                    ProductId = sc.Item.ProductId,
+                                    UnitPriceInclTax = scUnitPriceInclTax,
+                                    UnitPriceExclTax = scUnitPriceExclTax,
+                                    PriceInclTax = scSubTotalInclTax,
+                                    PriceExclTax = scSubTotalExclTax,
+                                    TaxRate = unitPriceTaxRate,
+                                    AttributeDescription = attributeDescription,
+                                    AttributesXml = sc.Item.AttributesXml,
+                                    Quantity = sc.Item.Quantity,
+                                    DiscountAmountInclTax = discountAmountInclTax,
+                                    DiscountAmountExclTax = discountAmountExclTax,
+                                    DownloadCount = 0,
+                                    IsDownloadActivated = false,
+                                    LicenseDownloadId = 0,
+                                    ItemWeight = itemWeight,
+                                    ProductCost = _priceCalculationService.GetProductCost(sc.Item.Product, sc.Item.AttributesXml),
+                                    DeliveryTimeId = sc.Item.Product.GetDeliveryTimeIdAccordingToStock(_catalogSettings),
+                                    DisplayDeliveryTime = displayDeliveryTime
+                                };
 
-                        //        if (sc.Item.Product.ProductType == ProductType.BundledProduct && sc.ChildItems != null)
-                        //        {
-                        //            var listBundleData = new List<ProductBundleItemOrderData>();
+                                if (sc.Item.Product.ProductType == ProductType.BundledProduct && sc.ChildItems != null)
+                                {
+                                    var listBundleData = new List<ProductBundleItemOrderData>();
 
-                        //            foreach (var childItem in sc.ChildItems)
-                        //            {
-                        //                var bundleItemSubTotal = _taxService.GetProductPrice(childItem.Item.Product, _priceCalculationService.GetSubTotal(childItem, true), out taxRate);
+                                    foreach (var childItem in sc.ChildItems)
+                                    {
+                                        var bundleItemSubTotal = _taxService.GetProductPrice(childItem.Item.Product, _priceCalculationService.GetSubTotal(childItem, true), out taxRate);
 
-                        //                var attributesInfo = _productAttributeFormatter.FormatAttributes(childItem.Item.Product, childItem.Item.AttributesXml, order.Customer,
-                        //                    renderPrices: false, allowHyperlinks: true);
+                                        var attributesInfo = _productAttributeFormatter.FormatAttributes(childItem.Item.Product, childItem.Item.AttributesXml, order.Customer,
+                                            renderPrices: false, allowHyperlinks: true);
 
-                        //                childItem.BundleItemData.ToOrderData(listBundleData, bundleItemSubTotal, childItem.Item.AttributesXml, attributesInfo);
-                        //            }
+                                        childItem.BundleItemData.ToOrderData(listBundleData, bundleItemSubTotal, childItem.Item.AttributesXml, attributesInfo);
+                                    }
 
-                        //            orderItem.SetBundleData(listBundleData);
-                        //        }
+                                    orderItem.SetBundleData(listBundleData);
+                                }
 
-                        //        order.OrderItems.Add(orderItem);
-                        //        _orderService.UpdateOrder(order);
+                                order.OrderItems.Add(orderItem);
+                                _orderService.UpdateOrder(order);
 
-                        //        // Gift cards.
-                        //        if (sc.Item.Product.IsGiftCard)
-                        //        {
-                        //            _productAttributeParser.GetGiftCardAttribute(
-                        //                sc.Item.AttributesXml,
-                        //                out var giftCardRecipientName,
-                        //                out var giftCardRecipientEmail,
-                        //                out var giftCardSenderName,
-                        //                out var giftCardSenderEmail,
-                        //                out var giftCardMessage);
+                                // Gift cards.
+                                if (sc.Item.Product.IsGiftCard)
+                                {
+                                    _productAttributeParser.GetGiftCardAttribute(
+                                        sc.Item.AttributesXml,
+                                        out var giftCardRecipientName,
+                                        out var giftCardRecipientEmail,
+                                        out var giftCardSenderName,
+                                        out var giftCardSenderEmail,
+                                        out var giftCardMessage);
 
-                        //            for (int i = 0; i < sc.Item.Quantity; i++)
-                        //            {
-                        //                var gc = new GiftCard
-                        //                {
-                        //                    GiftCardType = sc.Item.Product.GiftCardType,
-                        //                    PurchasedWithOrderItem = orderItem,
-                        //                    Amount = scUnitPriceExclTax,
-                        //                    IsGiftCardActivated = false,
-                        //                    GiftCardCouponCode = _giftCardService.GenerateGiftCardCode(),
-                        //                    RecipientName = giftCardRecipientName,
-                        //                    RecipientEmail = giftCardRecipientEmail,
-                        //                    SenderName = giftCardSenderName,
-                        //                    SenderEmail = giftCardSenderEmail,
-                        //                    Message = giftCardMessage,
-                        //                    IsRecipientNotified = false,
-                        //                    CreatedOnUtc = utcNow
-                        //                };
-                        //                _giftCardService.InsertGiftCard(gc);
-                        //            }
-                        //        }
+                                    for (int i = 0; i < sc.Item.Quantity; i++)
+                                    {
+                                        var gc = new GiftCard
+                                        {
+                                            GiftCardType = sc.Item.Product.GiftCardType,
+                                            PurchasedWithOrderItem = orderItem,
+                                            Amount = scUnitPriceExclTax,
+                                            IsGiftCardActivated = false,
+                                            GiftCardCouponCode = _giftCardService.GenerateGiftCardCode(),
+                                            RecipientName = giftCardRecipientName,
+                                            RecipientEmail = giftCardRecipientEmail,
+                                            SenderName = giftCardSenderName,
+                                            SenderEmail = giftCardSenderEmail,
+                                            Message = giftCardMessage,
+                                            IsRecipientNotified = false,
+                                            CreatedOnUtc = utcNow
+                                        };
+                                        _giftCardService.InsertGiftCard(gc);
+                                    }
+                                }
 
-                        //        _productService.AdjustInventory(sc, true);
-                        //    }
+                                _productService.AdjustInventory(sc, true);
+                            }
 
-                        //    // Clear shopping cart.
-                        //    if (!processPaymentRequest.IsMultiOrder)
-                        //    {
-                        //        cart.ToList().ForEach(sci => _shoppingCartService.DeleteShoppingCartItem(sci.Item, false));
-                        //    }
-                        //}
+                            // Clear shopping cart.
+                            if (!processPaymentRequest.IsMultiOrder)
+                            {
+                                cart.ToList().ForEach(sci => _shoppingCartService.DeleteShoppingCartItem(sci.Item, false));
+                            }
+                        }
 
-                        //// Discount usage history.
-                        //{
-                        //    foreach (var discount in appliedDiscounts)
-                        //    {
-                        //        var duh = new DiscountUsageHistory
-                        //        {
-                        //            Discount = discount,
-                        //            Order = order,
-                        //            CreatedOnUtc = utcNow
-                        //        };
-                        //        _discountService.InsertDiscountUsageHistory(duh);
-                        //    }
-                        //}
+                        // Discount usage history.
+                        {
+                            foreach (var discount in appliedDiscounts)
+                            {
+                                var duh = new DiscountUsageHistory
+                                {
+                                    Discount = discount,
+                                    Order = order,
+                                    CreatedOnUtc = utcNow
+                                };
+                                _discountService.InsertDiscountUsageHistory(duh);
+                            }
+                        }
 
                         #endregion
 
@@ -720,6 +848,55 @@ namespace ReadySignOn.ReadyPay.Services
                     _orderService.AddOrderNote(order, T("Admin.OrderNotice.CustomerCancelledEmailQueued", msg.Email.Id));
                 }
             }
+        }
+
+        /// <summary>
+        /// Valdiate minimum order sub-total amount
+        /// </summary>
+        /// <param name="cart">Shopping cart</param>
+        /// <returns>true - OK; false - minimum order sub-total amount is not reached</returns>
+        public virtual bool ValidateMinOrderSubtotalAmount(IList<OrganizedShoppingCartItem> cart)
+        {
+            if (cart == null)
+                throw new ArgumentNullException("cart");
+
+            //min order amount sub-total validation
+            if (cart.Count > 0 && _orderSettings.MinOrderSubtotalAmount > decimal.Zero)
+            {
+                decimal orderSubTotalDiscountAmountBase = decimal.Zero;
+                Discount orderSubTotalAppliedDiscount = null;
+                decimal subTotalWithoutDiscountBase = decimal.Zero;
+                decimal subTotalWithDiscountBase = decimal.Zero;
+
+                _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
+                    out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
+
+                if (subTotalWithoutDiscountBase < _orderSettings.MinOrderSubtotalAmount)
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Valdiate minimum order total amount
+        /// </summary>
+        /// <param name="cart">Shopping cart</param>
+        /// <returns>true - OK; false - minimum order total amount is not reached</returns>
+		public virtual bool ValidateMinOrderTotalAmount(IList<OrganizedShoppingCartItem> cart)
+        {
+            if (cart == null)
+                throw new ArgumentNullException("cart");
+
+            if (cart.Count > 0 && _orderSettings.MinOrderTotalAmount > decimal.Zero)
+            {
+                decimal? shoppingCartTotalBase = _orderTotalCalculationService.GetShoppingCartTotal(cart);
+
+                if (shoppingCartTotalBase.HasValue && shoppingCartTotalBase.Value < _orderSettings.MinOrderTotalAmount)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

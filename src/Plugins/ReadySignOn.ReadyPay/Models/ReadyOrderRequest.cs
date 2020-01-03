@@ -21,6 +21,7 @@ namespace ReadySignOn.ReadyPay.Models
         }
 
         #region ReadyPay related
+        public bool IsInPlaceReadyPayOrder { get; set; }
         public decimal OrderSubtotalInclTax { get; set; }
         public decimal OrderSubtotalExclTax { get; set; }
         public decimal OrderShippingInclTax { get; set; }

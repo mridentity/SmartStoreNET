@@ -12,7 +12,7 @@ const btnReadyPay = "button";
 const txtReadyTicket = "input[data-readyticket]";
 
 // destination url to post the ready ticket
- const destUrl = "Plugins/ReadySignOn.ReadyPay/ReadyPay/ReadyRequestPosted";
+const destUrl = "Plugins/ReadySignOn.ReadyPay/ReadyPay/InPlaceReadyPayPosted";
 // const destUrl = "https://reqres.in/api/users";
 
 // -----------------
