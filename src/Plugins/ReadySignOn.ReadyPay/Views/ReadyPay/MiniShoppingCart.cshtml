@@ -11,7 +11,7 @@
         </div>
 
         <div id="idAuthStatus" class="input-column" align="center">
-            <img id="idWaitingImage" src="@Url.Content(Model.LoaderImageUrl)" style="display:none;width:30px" />
+            <img id="idWaitingImage" src="@Url.Content(Model.LoaderImageUrl)" style="visibility:hidden;width:30px" />
         </div>
     </div>
 </form>
@@ -45,14 +45,16 @@
             $("#idAuthStatus").show();
             //your client side validation here
             valid = true;
-            if (valid) {
-                $(this).hide();
+            if (valid) { // all client side validation passed, ReadyTicket is valid...
+                $("#idBtnReadyPay").hide();
+                document.getElementById('idWaitingImage').style.visibility = 'visible';
+                $('#idWaitingImage').show();
                 $("#idReadyPayForm").submit();
                 return true;
             }
-            else {
-                $(this).removeAttr('disabled');
-                $("#idAuthStatus").hide();
+            else {  // Fail client side validation
+                $(this).removeAttr('disabled'); // Renable the Ready button
+                $("#idAuthStatus").hide();      // Hide the status and the loader image.
                 return false;
             }
         }

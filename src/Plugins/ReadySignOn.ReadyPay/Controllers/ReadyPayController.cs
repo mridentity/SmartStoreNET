@@ -110,8 +110,6 @@ namespace ReadySignOn.ReadyPay.Controllers
         // This is the payment plugin page for collecting payment information such as credit card info etc.
         public ActionResult PaymentInfo()
         {
-            throw new NotImplementedException();
-
             var model = new ReadyPayPaymentInfoModel();
             model.CurrentPageIsBasket = ControllerContext.ParentActionViewContext.RequestContext.RouteData.IsRouteEqual("ShoppingCart", "Cart");
 
@@ -119,7 +117,27 @@ namespace ReadySignOn.ReadyPay.Controllers
             {
                 var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
+                var store = Services.StoreContext.CurrentStore;
+                var customer = Services.WorkContext.CurrentCustomer;
+                var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+
                 model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+                model.LoaderImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+
+                //Get sub-total and discounts that apply to sub-total
+                decimal orderSubTotalDiscountAmountBase = decimal.Zero;
+                Discount orderSubTotalAppliedDiscount = null;
+                decimal subTotalWithoutDiscountBase = decimal.Zero;
+                decimal subTotalWithDiscountBase = decimal.Zero;
+
+                _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
+                    out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
+
+                model.ProductId = "multiple_products_in_shopping_cart";
+                model.OrderTotal = subTotalWithDiscountBase;
+                model.CurrentPageIsBasket = true;
+                model.Sentinel = "ReadyPay";
+                return PartialView(model);
             }
 
             return PartialView(model);
@@ -152,7 +170,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 model.ProductId = "multiple_products_in_shopping_cart";
                 model.OrderTotal = subTotalWithDiscountBase;
                 model.CurrentPageIsBasket = true;
-                model.Sentinel = "abcdEFGH";
+                model.Sentinel = "ReadyPay";
                 return PartialView(model);
             }
 
@@ -341,22 +359,6 @@ namespace ReadySignOn.ReadyPay.Controllers
             var order_request = new ReadyOrderRequest();
             order_request.StoreId = Services.StoreContext.CurrentStore.Id;
             order_request.CustomerId = Services.WorkContext.CurrentCustomer.Id;
-            order_request.OrderTotal = rpayment.grandTotalCharged;
-
-            //var billing_address = new Address();
-            //billing_address.FirstName = rpayment.billingContact.givenName;
-            //billing_address.LastName = rpayment.billingContact.familyName;
-            //billing_address.Address1 = rpayment.billingContact.street;
-            //billing_address.City = rpayment.billingContact.city;
-            //billing_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
-            //billing_address.StateProvince.Abbreviation = rpayment.billingContact.state;
-            //billing_address.StateProvince.Name = rpayment.billingContact.state;
-            //billing_address.ZipPostalCode = rpayment.billingContact.postalCode;
-            //billing_address.Country = new SmartStore.Core.Domain.Directory.Country();
-            //billing_address.Country.Name = rpayment.billingContact.country;
-            //billing_address.StateProvince.Country = billing_address.Country;
-            //billing_address.CreatedOnUtc = DateTime.UtcNow;
-            //billing_address.Email = rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress;
 
             var billing_address = CreateAddress(rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress,
                                             rpayment.billingContact.givenName,
@@ -367,7 +369,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                                             rpayment.billingContact.city,
                                             rpayment.billingContact.postalCode,
                                             rpayment.billingContact.phoneNumber,
-                                            rpayment.billingContact.isoCountryCode,
+                                            rpayment.billingContact.isoCountryCode ?? "US",
                                             rpayment.billingContact.state,
                                             rpayment.billingContact.country,
                                             null,
@@ -375,21 +377,6 @@ namespace ReadySignOn.ReadyPay.Controllers
                                             out countryAllowsBilling);
 
             order_request.BillingAddress = billing_address;
-
-            //var shipping_address = new Address();
-            //shipping_address.FirstName = rpayment.shippingContact.givenName;
-            //shipping_address.LastName = rpayment.shippingContact.familyName;
-            //shipping_address.Address1 = rpayment.shippingContact.street;
-            //shipping_address.City = rpayment.shippingContact.city;
-            //shipping_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
-            //shipping_address.StateProvince.Abbreviation = rpayment.shippingContact.state;
-            //shipping_address.StateProvince.Name = rpayment.shippingContact.state;
-            //shipping_address.ZipPostalCode = rpayment.shippingContact.postalCode;
-            //shipping_address.Country = new SmartStore.Core.Domain.Directory.Country();
-            //shipping_address.Country.Name = rpayment.shippingContact.country;
-            //shipping_address.StateProvince.Country = shipping_address.Country;
-            //shipping_address.CreatedOnUtc = DateTime.UtcNow;
-            //shipping_address.Email = rpayment.shippingContact.emailAddress;
 
             var shipping_address = CreateAddress(rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress,
                                             rpayment.shippingContact.givenName,
@@ -400,7 +387,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                                             rpayment.shippingContact.city,
                                             rpayment.shippingContact.postalCode,
                                             rpayment.shippingContact.phoneNumber,
-                                            rpayment.shippingContact.isoCountryCode,
+                                            rpayment.shippingContact.isoCountryCode ?? "US",
                                             rpayment.shippingContact.state,
                                             rpayment.shippingContact.country,
                                             null,
@@ -409,6 +396,14 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             order_request.ShippingAddress = shipping_address;
             order_request.ShippingMethod = rpayment.shippingMethod.detail;
+            order_request.IsShippingMethodSet = true;
+            order_request.OrderShippingExclTax = rpayment.shippingMethod.amount;
+            order_request.OrderShippingInclTax = rpayment.shippingMethod.amount;
+            order_request.ShippingRateComputationMethodSystemName = Plugin.SystemName;
+            order_request.OrderTotal = rpayment.grandTotalCharged;
+            order_request.OrderTax = (decimal)0.05;
+            order_request.OrderSubtotalExclTax = order_request.OrderTotal - order_request.OrderTax - order_request.OrderShippingExclTax;
+            order_request.OrderSubtotalInclTax = order_request.OrderTotal - order_request.OrderTax - order_request.OrderShippingInclTax;
             return order_request;
         }
 
@@ -439,7 +434,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             address.Address1 = addressLine1.EmptyNull().Trim().Truncate(4000);
             address.Address2 = addressLine2.EmptyNull().Trim().Truncate(4000);
             address.Address2 = address.Address2.Grow(addressLine3.EmptyNull().Trim(), ", ").Truncate(4000);
-            address.City = county.Grow(destrict, " ").Grow(city, " ").EmptyNull().Trim().Truncate(4000);
+            address.City = city.EmptyNull().Trim().Truncate(4000);
             address.ZipPostalCode = postalCode.EmptyNull().Trim().Truncate(4000);
             address.PhoneNumber = phone.EmptyNull().Trim().Truncate(4000);
 
