@@ -118,6 +118,7 @@
     <Compile Include="Services\IReadyPayOrders.cs" />
     <Compile Include="Services\IReadyPayService.cs" />
     <Compile Include="Services\ReadyPayEnums.cs" />
+    <Compile Include="Services\ReadyPayExtensions.cs" />
     <Compile Include="Services\ReadyPayOrders.cs" />
     <Compile Include="Services\ReadyPayService.cs" />
   </ItemGroup>

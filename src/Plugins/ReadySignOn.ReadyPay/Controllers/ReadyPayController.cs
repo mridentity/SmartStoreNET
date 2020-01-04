@@ -6,7 +6,9 @@ using SmartStore.ComponentModel;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
+using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
@@ -25,12 +27,18 @@ namespace ReadySignOn.ReadyPay.Controllers
         private readonly IOrderTotalCalculationService _orderTotalCalculationService;
         private readonly IReadyPayOrders _readyPayOrders;
         private readonly IReadyPayService _apiService;
+        private readonly ICountryService _countryService;
+        private readonly IStateProvinceService _stateProvinceService;
 
         public ReadyPayController(
+                    ICountryService countryService,
+                    IStateProvinceService stateProvinceService,
                     IOrderTotalCalculationService orderTotalCalculationService,
                     IReadyPayOrders readyPayOrders,
                     IReadyPayService apiService)
         {
+            _countryService = countryService;
+            _stateProvinceService = stateProvinceService;
             _orderTotalCalculationService = orderTotalCalculationService;
             _readyPayOrders = readyPayOrders;
             _apiService = apiService;
@@ -245,50 +253,6 @@ namespace ReadySignOn.ReadyPay.Controllers
             }
         }
 
-        private ReadyOrderRequest PrepareOrderRequest(ReadyPayment rpayment)
-        {
-            var order_request = new ReadyOrderRequest();
-            order_request.StoreId = Services.StoreContext.CurrentStore.Id;
-            order_request.CustomerId = Services.WorkContext.CurrentCustomer.Id;
-            order_request.OrderTotal = rpayment.grandTotalCharged;
-
-            var billing_address = new Address();
-            billing_address.FirstName = rpayment.billingContact.givenName;
-            billing_address.LastName = rpayment.billingContact.familyName;
-            billing_address.Address1 = rpayment.billingContact.street;
-            billing_address.City = rpayment.billingContact.city;
-            billing_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
-            billing_address.StateProvince.Abbreviation = rpayment.billingContact.state;
-            billing_address.StateProvince.Name = rpayment.billingContact.state;
-            billing_address.ZipPostalCode = rpayment.billingContact.postalCode;
-            billing_address.Country = new SmartStore.Core.Domain.Directory.Country();
-            billing_address.Country.Name = rpayment.billingContact.country;
-            billing_address.StateProvince.Country = billing_address.Country;
-            billing_address.CreatedOnUtc = DateTime.UtcNow;
-            billing_address.Email = rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress;
-
-            order_request.BillingAddress = billing_address;
-
-            var shipping_address = new Address();
-            shipping_address.FirstName = rpayment.shippingContact.givenName;
-            shipping_address.LastName = rpayment.shippingContact.familyName;
-            shipping_address.Address1 = rpayment.shippingContact.street;
-            shipping_address.City = rpayment.shippingContact.city;
-            shipping_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
-            shipping_address.StateProvince.Abbreviation = rpayment.shippingContact.state;
-            shipping_address.StateProvince.Name = rpayment.shippingContact.state;
-            shipping_address.ZipPostalCode = rpayment.shippingContact.postalCode;
-            shipping_address.Country = new SmartStore.Core.Domain.Directory.Country();
-            shipping_address.Country.Name = rpayment.shippingContact.country;
-            shipping_address.StateProvince.Country = shipping_address.Country;
-            shipping_address.CreatedOnUtc = DateTime.UtcNow;
-            shipping_address.Email = rpayment.shippingContact.emailAddress;
-
-            order_request.ShippingAddress = shipping_address;
-            order_request.ShippingMethod = rpayment.shippingMethod.detail;
-            return order_request;
-        }
-
         [HttpPost]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
@@ -367,6 +331,160 @@ namespace ReadySignOn.ReadyPay.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+        private ReadyOrderRequest PrepareOrderRequest(ReadyPayment rpayment)
+        {
+            var countryAllowsShipping = true;
+            var countryAllowsBilling = true;
+
+            var order_request = new ReadyOrderRequest();
+            order_request.StoreId = Services.StoreContext.CurrentStore.Id;
+            order_request.CustomerId = Services.WorkContext.CurrentCustomer.Id;
+            order_request.OrderTotal = rpayment.grandTotalCharged;
+
+            //var billing_address = new Address();
+            //billing_address.FirstName = rpayment.billingContact.givenName;
+            //billing_address.LastName = rpayment.billingContact.familyName;
+            //billing_address.Address1 = rpayment.billingContact.street;
+            //billing_address.City = rpayment.billingContact.city;
+            //billing_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
+            //billing_address.StateProvince.Abbreviation = rpayment.billingContact.state;
+            //billing_address.StateProvince.Name = rpayment.billingContact.state;
+            //billing_address.ZipPostalCode = rpayment.billingContact.postalCode;
+            //billing_address.Country = new SmartStore.Core.Domain.Directory.Country();
+            //billing_address.Country.Name = rpayment.billingContact.country;
+            //billing_address.StateProvince.Country = billing_address.Country;
+            //billing_address.CreatedOnUtc = DateTime.UtcNow;
+            //billing_address.Email = rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress;
+
+            var billing_address = CreateAddress(rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress,
+                                            rpayment.billingContact.givenName,
+                                            rpayment.billingContact.familyName,
+                                            rpayment.billingContact.street,
+                                            null,
+                                            null,
+                                            rpayment.billingContact.city,
+                                            rpayment.billingContact.postalCode,
+                                            rpayment.billingContact.phoneNumber,
+                                            rpayment.billingContact.isoCountryCode,
+                                            rpayment.billingContact.state,
+                                            rpayment.billingContact.country,
+                                            null,
+                                            out countryAllowsShipping,
+                                            out countryAllowsBilling);
+
+            order_request.BillingAddress = billing_address;
+
+            //var shipping_address = new Address();
+            //shipping_address.FirstName = rpayment.shippingContact.givenName;
+            //shipping_address.LastName = rpayment.shippingContact.familyName;
+            //shipping_address.Address1 = rpayment.shippingContact.street;
+            //shipping_address.City = rpayment.shippingContact.city;
+            //shipping_address.StateProvince = new SmartStore.Core.Domain.Directory.StateProvince();
+            //shipping_address.StateProvince.Abbreviation = rpayment.shippingContact.state;
+            //shipping_address.StateProvince.Name = rpayment.shippingContact.state;
+            //shipping_address.ZipPostalCode = rpayment.shippingContact.postalCode;
+            //shipping_address.Country = new SmartStore.Core.Domain.Directory.Country();
+            //shipping_address.Country.Name = rpayment.shippingContact.country;
+            //shipping_address.StateProvince.Country = shipping_address.Country;
+            //shipping_address.CreatedOnUtc = DateTime.UtcNow;
+            //shipping_address.Email = rpayment.shippingContact.emailAddress;
+
+            var shipping_address = CreateAddress(rpayment.billingContact.emailAddress ?? rpayment.shippingContact.emailAddress,
+                                            rpayment.shippingContact.givenName,
+                                            rpayment.shippingContact.familyName,
+                                            rpayment.shippingContact.street,
+                                            null,
+                                            null,
+                                            rpayment.shippingContact.city,
+                                            rpayment.shippingContact.postalCode,
+                                            rpayment.shippingContact.phoneNumber,
+                                            rpayment.shippingContact.isoCountryCode,
+                                            rpayment.shippingContact.state,
+                                            rpayment.shippingContact.country,
+                                            null,
+                                            out countryAllowsShipping,
+                                            out countryAllowsBilling);
+
+            order_request.ShippingAddress = shipping_address;
+            order_request.ShippingMethod = rpayment.shippingMethod.detail;
+            return order_request;
+        }
+
+        private Address CreateAddress(
+            string email,
+            string firstName,
+            string lastName,
+            string addressLine1,
+            string addressLine2,
+            string addressLine3,
+            string city,
+            string postalCode,
+            string phone,
+            string countryCode,
+            string stateRegion,
+            string county,
+            string destrict,
+            out bool countryAllowsShipping,
+            out bool countryAllowsBilling)
+        {
+            countryAllowsShipping = countryAllowsBilling = true;
+
+            var address = new Address();
+            address.CreatedOnUtc = DateTime.UtcNow;
+            address.Email = email;
+            address.FirstName = firstName;
+            address.LastName = lastName;
+            address.Address1 = addressLine1.EmptyNull().Trim().Truncate(4000);
+            address.Address2 = addressLine2.EmptyNull().Trim().Truncate(4000);
+            address.Address2 = address.Address2.Grow(addressLine3.EmptyNull().Trim(), ", ").Truncate(4000);
+            address.City = county.Grow(destrict, " ").Grow(city, " ").EmptyNull().Trim().Truncate(4000);
+            address.ZipPostalCode = postalCode.EmptyNull().Trim().Truncate(4000);
+            address.PhoneNumber = phone.EmptyNull().Trim().Truncate(4000);
+
+            if (countryCode.HasValue())
+            {
+                var country = _countryService.GetCountryByTwoOrThreeLetterIsoCode(countryCode);
+                if (country != null)
+                {
+                    address.CountryId = country.Id;
+                    countryAllowsShipping = country.AllowsShipping;
+                    countryAllowsBilling = country.AllowsBilling;
+                }
+            }
+
+            if (stateRegion.HasValue())
+            {
+                var stateProvince = _stateProvinceService.GetStateProvinceByAbbreviation(stateRegion);
+                if (stateProvince != null)
+                {
+                    address.StateProvinceId = stateProvince.Id;
+                }
+            }
+
+            // Normalize.
+            if (address.Address1.IsEmpty() && address.Address2.HasValue())
+            {
+                address.Address1 = address.Address2;
+                address.Address2 = null;
+            }
+            else if (address.Address1.HasValue() && address.Address1 == address.Address2)
+            {
+                address.Address2 = null;
+            }
+
+            if (address.CountryId == 0)
+            {
+                address.CountryId = null;
+            }
+
+            if (address.StateProvinceId == 0)
+            {
+                address.StateProvinceId = null;
+            }
+
+            return address;
         }
     }
 }
