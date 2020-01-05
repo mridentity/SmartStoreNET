@@ -140,7 +140,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 return PartialView(model);
             }
 
-            return PartialView(model);
+            return new EmptyResult();
         }
 
         // This payment plugin method for handling mini shopping card specifically

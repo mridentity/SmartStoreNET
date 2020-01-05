@@ -1,67 +1,44 @@
 ﻿@model ReadySignOn.ReadyPay.Models.ReadyPayPaymentInfoModel
+@{
+    Layout = "";
+}
+
 @if (Model.CurrentPageIsBasket)
 {
-    <form id="idReadyPayInfoForm" action="Plugins/ReadySignOn.ReadyPay/ReadyPay/MiniCartReadyPayPosted" enctype="application/x-www-form-urlencoded" method="post">
-        <div class="form-inputs">
-            <div class="input-column">
-                <input type="hidden" name="Sentinel" value="@(Model.Sentinel)" />
-                <input type="hidden" name="ProductId" value="@(Model.ProductId)" />
-                <input type="hidden" name="OrderTotal" value="@(Model.OrderTotal)" />
-                <input id="idReadyTicket" type="text" name="ReadyTicket" placeholder="enter ReadyTicket here" style="vertical-align:middle;">
-                <input id="idBtnReadyPay" type="image" name="ReayPayButton" style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
-                       src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_update()" value="READYpay">
-            </div>
-
-            <div id="idAuthStatus" class="input-column" align="center">
-                <img id="idWaitingImage" src="@Url.Content(Model.LoaderImageUrl)" style="visibility:hidden;width:30px" />
-            </div>
-        </div>
-    </form>
+    <div id="readypay-checkout" class="my-2 ml-3">
+        <a id="readypay-button" href="javascript:void(0)">
+            <img alt="" src="@Url.Content(Model.SubmitButtonImageUrl)" />
+        </a>
+    </div>
 
     <script>
-        var validate_and_update = function () { };  // Will be re-assigned laster. JS hoisting may take care of this automatically though.
-
         $(function () {
-            $("#idReadyTicket").keypress(function (event) {
-                if (event.which == 13) {   // Enter key pressed.
-                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);    // Prevent re-submit
-                    $("#idBtnReadyPay").click();
-                }
+            $('#readypay-button').on('click', function (e) {
+                e.preventDefault();
+
+                console.log("/// trying to setup ajax call");
+
+                $.ajax({
+                    type: 'POST',
+                    url: "Plugins/ReadySignOn.ReadyPay/ReadyPay/MiniCartReadyPayPosted",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: { "orderReferenceId": "asdf" },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("///Ajax call succeeded.");
+                        }
+                        else {
+                            console.log("///Ajax call failed.");
+                            displayNotification(response.message, 'error');
+                        }
+                    }
+                });
+
+                return false;
             });
 
-            validate_and_update = function validateAndUpdate() {
-                if ($("#idReadyTicket").val() == '') {
-                    // No ticket entered.
-                    $("#idReadyTicket").html('<span class="alert alert-error" style="color: red">Please fill in ReadyTicket.</span>');
-                    return false;
-                }
-                else {
-                    doSubmit();
-
-                    return true;
-                }
-            }
-
-            function doSubmit() {
-
-                $("#idAuthStatus").show();
-                //your client side validation here
-                valid = true;
-                if (valid) { // all client side validation passed, ReadyTicket is valid...
-                    $("#idBtnReadyPay").hide();
-                    document.getElementById('idWaitingImage').style.visibility = 'visible';
-                    $('#idWaitingImage').show();
-                    $("#idReadyPayInfoForm").submit();
-                    return true;
-                }
-                else {  // Fail client side validation
-                    $(this).removeAttr('disabled'); // Renable the Ready button
-                    $("#idAuthStatus").hide();      // Hide the status and the loader image.
-                    return false;
-                }
-            }
-        })
-
+});
     </script>
-
 }
