@@ -18,13 +18,23 @@
 
                 console.log("/// trying to setup ajax call");
 
+                var model = {
+                    "Sentinel": "@Model.Sentinel",
+                    "ReadyTicket": "1234567",
+                    "CurrentPageIsBasket": "@Model.CurrentPageIsBasket",
+                    "OrderTotal": @Model.OrderTotal,
+                    "ProductId": "@Model.ProductId",
+                    "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl",
+                    "LoaderImageUrl": "@Model.LoaderImageUrl"
+                };
+
                 $.ajax({
                     type: 'POST',
-                    url: "Plugins/ReadySignOn.ReadyPay/ReadyPay/MiniCartReadyPayPosted",
+                    url: "@Url.Action("MiniCartReadyPayPosted","ReadyPay")",
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: { "orderReferenceId": "asdf" },
+                    data: JSON.stringify(model),
                     success: function (response) {
                         if (response.success) {
                             console.log("///Ajax call succeeded.");
