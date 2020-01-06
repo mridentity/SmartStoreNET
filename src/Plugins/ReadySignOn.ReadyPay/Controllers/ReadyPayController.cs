@@ -388,9 +388,9 @@ namespace ReadySignOn.ReadyPay.Controllers
             order_request.OrderShippingInclTax = rpayment.shippingMethod.amount;
             order_request.ShippingRateComputationMethodSystemName = Plugin.SystemName;
             order_request.OrderTotal = rpayment.grandTotalCharged;
-            order_request.OrderTax = (decimal)0.05;
-            order_request.OrderSubtotalExclTax = order_request.OrderTotal - order_request.OrderTax - order_request.OrderShippingExclTax;
-            order_request.OrderSubtotalInclTax = order_request.OrderTotal - order_request.OrderTax - order_request.OrderShippingInclTax;
+            order_request.OrderSubtotalExclTax = (order_request.OrderTotal - order_request.OrderShippingExclTax) / (1 + Plugin.FlatPercentTaxRate);
+            order_request.OrderSubtotalInclTax = (order_request.OrderTotal - order_request.OrderShippingInclTax);
+            order_request.OrderTax = order_request.OrderTotal - rpayment.shippingMethod.amount - order_request.OrderSubtotalExclTax;
             return order_request;
         }
 

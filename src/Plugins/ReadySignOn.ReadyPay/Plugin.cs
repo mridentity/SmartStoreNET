@@ -32,6 +32,7 @@ namespace ReadySignOn.ReadyPay
 		public ILogger Logger { get; set; }
 
 		public static string SystemName => "ReadySignOn.ReadyPay";
+        public static decimal FlatPercentTaxRate = (decimal)0.05;     // 5% flat sales tax for ReadyPay
 
 		public override void Install()
 		{

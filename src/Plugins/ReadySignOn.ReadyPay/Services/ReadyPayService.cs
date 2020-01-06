@@ -56,6 +56,8 @@ namespace ReadySignOn.ReadyPay.Services
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
+                decimal? order_tax = rp_request.OrderTotal * Plugin.FlatPercentTaxRate;
+
                 string json = "{\"user\":\"test\"," +
                               "\"password\":\"bla\"}";
 
@@ -94,8 +96,8 @@ namespace ReadySignOn.ReadyPay.Services
                           "]," +
                           "\"SummaryItems\" : [" +
                               "{\"Label\": \"Cart Price\", \"Amount\": " + rp_request.OrderTotal.ToString() + ", \"IsFinal\": true}," +
-                              "{\"Label\": \"Tax\", \"Amount\": 0.05, \"IsFinal\": true}," +
-                              "{\"Label\": \"Total\", \"Amount\":" + (rp_request.OrderTotal + (decimal)0.05).ToString() + ", \"IsFinal\": true}" +
+                              "{\"Label\": \"Tax\", \"Amount\": " + order_tax.ToString() + ", \"IsFinal\": true}," +
+                              "{\"Label\": \"Total\", \"Amount\":" + (rp_request.OrderTotal + order_tax).ToString() + ", \"IsFinal\": true}" +
                           "]" +
                        "}";
 
