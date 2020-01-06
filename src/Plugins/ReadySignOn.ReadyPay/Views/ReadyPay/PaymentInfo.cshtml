@@ -5,50 +5,86 @@
 
 @if (Model.CurrentPageIsBasket)
 {
-    <div id="readypay-checkout" class="my-2 ml-3">
-        <a id="readypay-button" href="javascript:void(0)">
-            <img alt="" src="@Url.Content(Model.SubmitButtonImageUrl)" />
-        </a>
+    <input id="idReadyTicket" type="text" name="ReadyTicket" placeholder="enter ReadyTicket here" style="vertical-align:middle;">
+    <input id="idBtnReadyPay" type="image" name="ReayPayButton" style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
+           src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_update()" value="READYpay">
+    <div id="idAuthStatus" class="input-column" align="center">
+        <img id="idWaitingImage" src="@Url.Content(Model.LoaderImageUrl)" style="visibility:hidden;width:30px" />
     </div>
 
     <script>
+        var validate_and_update = function () { };  // Will be re-assigned laster. JS hoisting may take care of this automatically though.
+
         $(function () {
-            $('#readypay-button').on('click', function (e) {
-                e.preventDefault();
+            $("#idReadyTicket").keypress(function (event) {
+                if (event.which == 13)  {   // Enter key pressed.
+                    event.preventDefault ? event.preventDefault() : (event.returnValue = false);    // Prevent re-submit
+                    $("#idBtnReadyPay").click();
+                }
+            });
 
-                console.log("/// trying to setup ajax call");
+            validate_and_update = function validateAndUpdate() {
+                if ($("#idReadyTicket").val() == '') {
+                    // No ticket entered.
+                    $("#idReadyTicket").html('<span class="alert alert-error" style="color: red">Please fill in ReadyTicket.</span>');
+                    return false;
+                }
+                else {
+                    doSubmit();
 
-                var model = {
-                    "Sentinel": "@Model.Sentinel",
-                    "ReadyTicket": "1234567",
-                    "CurrentPageIsBasket": "@Model.CurrentPageIsBasket",
-                    "OrderTotal": @Model.OrderTotal,
-                    "ProductId": "@Model.ProductId",
-                    "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl",
-                    "LoaderImageUrl": "@Model.LoaderImageUrl"
-                };
+                    return true;
+                }
+            }
 
-                $.ajax({
-                    type: 'POST',
-                    url: "@Url.Action("MiniCartReadyPayPosted","ReadyPay")",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    data: JSON.stringify(model),
-                    success: function (response) {
-                        if (response.success) {
-                            console.log("///Ajax call succeeded.");
-                        }
-                        else {
+            function doSubmit() {
+
+                $("#idAuthStatus").show();
+                //your client side validation here
+                valid = true;
+                if (valid) { // all client side validation passed, ReadyTicket is valid...
+                    $("#idBtnReadyPay").hide();
+                    document.getElementById('idWaitingImage').style.visibility = 'visible';
+                    $('#idWaitingImage').show();
+
+                    console.log("/// trying to setup ajax call to submit");
+
+                    var model = {
+                        "Sentinel": "@Model.Sentinel",
+                        "ReadyTicket": $('#idReadyTicket').val(),
+                        "CurrentPageIsBasket": "@Model.CurrentPageIsBasket",
+                        "OrderTotal": @Model.OrderTotal,
+                        "ProductId": "@Model.ProductId",
+                        "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl",
+                        "LoaderImageUrl": "@Model.LoaderImageUrl"
+                    };
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "@Url.Action("MiniCartReadyPayPosted","ReadyPay")",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        contentType: false,
+                        processData: false,
+                        dataType: 'html',
+                        data: JSON.stringify(model),
+                        success: function (response) {
+                            window.location = "@Url.Action("Completed","Checkout", new { area = "" })";
+                        },
+                        error: function (response){
                             console.log("///Ajax call failed.");
                             displayNotification(response.message, 'error');
                         }
-                    }
-                });
+                    });
 
-                return false;
-            });
-
-});
+                    return true;
+                }
+                else {  // Fail client side validation
+                    $(this).removeAttr('disabled'); // Renable the Ready button
+                    $("#idAuthStatus").hide();      // Hide the status and the loader image.
+                    return false;
+                }
+            }
+        })
     </script>
 }

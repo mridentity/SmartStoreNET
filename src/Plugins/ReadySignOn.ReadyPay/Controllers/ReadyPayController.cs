@@ -331,19 +331,6 @@ namespace ReadySignOn.ReadyPay.Controllers
                 };
 
                 return RedirectToAction("Completed", "Checkout", new { area = "" });
-
-                //Note: Json result returned from this.Json() may contain type name handling info described 
-                //here: https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_TypeNameHandling.htm
-                //This is because the JsonNetAttribute filter is applied on the SmartController base class.
-                //We therefore serialize the result to json string manually to avoid the $type inclusion. 
-                string json = JsonConvert.SerializeObject(result);
-
-                return new ContentResult
-                {
-                    Content = json,
-                    ContentType = "application/json",
-                    ContentEncoding = Encoding.UTF8
-                };
             }
             catch (Exception ex)
             {
