@@ -121,8 +121,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                 var customer = Services.WorkContext.CurrentCustomer;
                 var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
 
-                model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-                model.LoaderImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+                model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+                model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
 
                 //Get sub-total and discounts that apply to sub-total
                 decimal orderSubTotalDiscountAmountBase = decimal.Zero;
@@ -155,8 +155,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                 var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
 
                 var model = new ReadyPayPaymentInfoModel();
-                model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-                model.LoaderImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+                model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+                model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
 
                 //Get sub-total and discounts that apply to sub-total
                 decimal orderSubTotalDiscountAmountBase = decimal.Zero;
@@ -186,8 +186,8 @@ namespace ReadySignOn.ReadyPay.Controllers
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
             var model = new ReadyPayPaymentInfoModel();
-            model.SubmitButtonImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-            model.LoaderImageUrl = "~/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+            model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+            model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
             model.ProductId = product_id;
             model.OrderTotal = product_price;
             return PartialView(model);
