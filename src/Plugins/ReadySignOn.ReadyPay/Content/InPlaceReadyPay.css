@@ -1,4 +1,5 @@
-﻿.art-ready-pay > button {
+﻿@import url('InPlaceReadyPay.css');
+.art-ready-pay > button {
     background-repeat: no-repeat;
     background-position: center;
     vertical-align:middle;
