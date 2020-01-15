@@ -1,4 +1,4 @@
-﻿<Language Name="English" IsDefault="false" IsRightToLeft="false">
+﻿<Language Name="English" IsDefault="true" IsRightToLeft="false">
 	<LocaleResource Name="Plugins.FriendlyName.ReadySignOn.ReadyPay" AppendRootKey="false">
 		<Value>ReadyPay</Value>
 	</LocaleResource>
@@ -8,17 +8,11 @@
 
 	<LocaleResource Name="AdminInstruction">
 		<Value>
-			<![CDATA[<div class="mb-1">How to set up <b>Login and Pay with Amazon</b>:</div><ul>
-<li>Create a <b>Login with Amazon</b> application in your <a href="https://sellercentral-europe.amazon.com" target="_blank">Amazon Seller Central</a> account. For this, use <b>Allowed JavaScript Origins</b> and <b>Allowed Return URLs</b> listed below (SSL required!).</li>
-<li>Enter your Amazon credentials in the fields provided below.
-You can find these credentials in your <a href="https://sellercentral-europe.amazon.com" target="_blank">Amazon Seller Central</a> account at <b>Integration > MWS Access Key</b>.</li>
-<li>If you would like to receive instant payment notifications (SSL required!) enter the IPN URL listed bewlow under <b>Settings > Integration Settings > Instant Notification Settings > Merchant URL</b>.</li>
-</ul>
-<div class="mb-1">Please add information about <b>Login and Pay with Amazon</b> on your payment page (see <b>CMS > Topics</b>). You will find picture material <a href="https://payments.amazon.de/resources#marks">here</a>.
-Text suggestions:</div><ul>
-<li>Option 1: Amazon Pay: Pay now with the payment and shipping information from your Amazon account.</li>
-<li>Option 2: Already Amazon customer? Pay now with the payment and shipping information from your Amazon account.</li>
-<li>Option 3: Already Amazon customer? Pay now with the data from your Amazon account.</li>
+			<![CDATA[<div class="mb-1">How to set up <b>Login with ReadySignOn</b>:</div>
+<ul>
+<li>Create a <b>confidential</b> application in your <a href="https://members.readysignon.com" target="_blank">ReadyMember</a> account.</li>
+<li>Enter your ReadyConnect information in the fields provided below.
+You can find these information in your <a href="https://members.readysignon.com" target="_blank">ReadyMembers</a> account at <b>Applications</b>.</li>
 </ul>]]>
 		</Value>
 	</LocaleResource>
@@ -29,26 +23,26 @@ Text suggestions:</div><ul>
 		<Value>There was no order reference ID transmitted by Amazon.</Value>
 	</LocaleResource>
 	<LocaleResource Name="MissingAddressConsentToken">
-		<Value>There was no access token transmitted by Amazon.</Value>
+		<Value>There was no access token transmitted by ReadySignOn.</Value>
 	</LocaleResource>
 	<LocaleResource Name="IncompleteProfileDetails">
-		<Value>Incomplete Amazon profile data!</Value>
+		<Value>Incomplete ReadySignOn profile data!</Value>
 	</LocaleResource>
 	<LocaleResource Name="PaymentMethodNotActive">
-		<Value>Payment method "Login and Pay with Amazon" is not available for store "{0}".</Value>
+		<Value>Payment method "readyPay" is not available for store "{0}".</Value>
 	</LocaleResource>
 	<LocaleResource Name="MissingCheckoutSessionState">
-		<Value>Missing checkout session state for "Login and Pay with Amazon". Your payment cannot be processed. Please go to your shopping cart and checkout again.</Value>
+		<Value>Missing checkout session state for "readyPay". Your payment cannot be processed. Please go to your shopping cart and checkout again.</Value>
 	</LocaleResource>
 	<LocaleResource Name="OrderNotFound">
-		<Value>Cannot find an order with the payment method "Login and Pay with Amazon" and the identification '{0}'.</Value>
+		<Value>Cannot find an order with the payment method "readyPay" and the identification '{0}'.</Value>
 	</LocaleResource>
 	<LocaleResource Name="AuthorizationSoftDeclineMessage">
-		<Value>Unfortunately Amazon Pay declined the payment for your order in our online shop. Please choose another payment method.</Value>
+		<Value>Unfortunately readyPay declined the payment for your order in our online shop. Please choose another payment method.</Value>
 	</LocaleResource>
 	<LocaleResource Name="AuthorizationHardDeclineMessage">
 		<Value>
-			<![CDATA[<p>Unfortunately Amazon Pay declined the payment for your order in our online shop. Please contact us.</p>]]>
+			<![CDATA[<p>Unfortunately readyPay declined the payment for your order in our online shop. Please contact us.</p>]]>
 		</Value>
 	</LocaleResource>
     <LocaleResource Name="AuthenticationStatusFailureMessage">
@@ -57,9 +51,6 @@ Text suggestions:</div><ul>
     <LocaleResource Name="AuthenticationStatusAbandonedMessage">
         <Value>Something's wrong with your payment method. To place your order, try another.</Value>
     </LocaleResource>
-    <LocaleResource Name="AmazonPaymentsReports">
-		<Value>Amazon Pay reports</Value>
-	</LocaleResource>
 	<LocaleResource Name="ShippingToCountryNotAllowed">
 		<Value>Shipping to the selected country is not allowed. Please choose an other shipping address.</Value>
 	</LocaleResource>
@@ -67,17 +58,17 @@ Text suggestions:</div><ul>
 		<Value>The settings were successfully saved. Please restart the application if "Updating the payment status" has been changed.</Value>
 	</LocaleResource>
 	<LocaleResource Name="AuthenticationNotActive">
-		<Value>Amazon authentication is not active!</Value>
+		<Value>ReadySignOn authentication is not active!</Value>
 	</LocaleResource>
 	<LocaleResource Name="AsyncPaymentAuthrizationNote">
-		<Value>Your transaction with Amazon Pay is currently being validated. Please be aware that we will inform you shortly as needed.</Value>
+		<Value>Your transaction with readyPay is currently being validated. Please be aware that we will inform you shortly as needed.</Value>
 	</LocaleResource>
 	<LocaleResource Name="RegisterNow">
 		<Value>Register now</Value>
 	</LocaleResource>
 	<LocaleResource Name="RegisterNote">
 		<Value>
-			<![CDATA[Click <b>Register now</b> if you don't have an account yet. Amazon Pay will provide you with a set of new access data, which you can enter in the <b>Paste access data</b> dialog.]]>
+			<![CDATA[Click <b>Register now</b> if you don't have an account yet. readyPay will provide you with a set of new access data, which you can enter in the <b>Paste access data</b> dialog.]]>
 		</Value>
 	</LocaleResource>
 	<LocaleResource Name="SaveAccessData">
@@ -92,9 +83,6 @@ Text suggestions:</div><ul>
 	<LocaleResource Name="MissingAccessToken">
 		<Value>Missing access token!</Value>
 	</LocaleResource>
-	<LocaleResource Name="TaskName">
-		<Value>Amazon data polling</Value>
-	</LocaleResource>
 	<LocaleResource Name="SaveAccessDataSucceeded">
 		<Value>The access data has been saved successfully.</Value>
 	</LocaleResource>
@@ -105,10 +93,7 @@ Text suggestions:</div><ul>
 		<Value>Encryption of access data is not supported.</Value>
 	</LocaleResource>
 	<LocaleResource Name="MissingBillingAddress">
-		<Value>Missing Amazon billing address of the customer. Please enter a billing address at Amazon or choose another payment method.</Value>
-	</LocaleResource>
-	<LocaleResource Name="AmazonDataProcessed">
-		<Value>Data from Amazon has been processed</Value>
+		<Value>Missing billing address of the customer. Please enter a billing address at Amazon or choose another payment method.</Value>
 	</LocaleResource>
 	<LocaleResource Name="ConfigGroups">
 		<Value>Access data;Data exchange;Layout;Miscellaneous</Value>

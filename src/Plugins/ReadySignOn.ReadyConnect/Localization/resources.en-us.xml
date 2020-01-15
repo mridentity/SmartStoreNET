@@ -1,12 +1,12 @@
-﻿<Language Name="English" IsDefault="false" IsRightToLeft="false">
+﻿<Language Name="English" IsDefault="true" IsRightToLeft="false">
 	<LocaleResource Name="Plugins.FriendlyName.ReadySignOn.ReadyConnect" AppendRootKey="false">
 		<Value>ReadyConnect Login</Value>
 	</LocaleResource>
 	<LocaleResource Name="AdminInstruction">
 		<Value>
-			<![CDATA[<p>How to set up Facebook authentication: </p><ul>
-	<li>Create a new app on Facebook of type <b>Facebook Login</b>. Please enter their access data in the form below.</li>
-	<li>Enter the URL listed below under <b>Facebook Login &gt; Settings &gt; Valid OAuth Redirect URIs</b>.</li>
+			<![CDATA[<p>How to set up ReadySignOn authentication: </p><ul>
+	<li>Create a new app on ReadyMembers  <a href="https://members.readysignon.com" target="_blank"> of type <b>confidential application</b>. Please enter their access data in the form below.</li>
+	<li>Enter the URL listed below under <b>ReadySignOn Login &gt; Settings &gt; Valid OAuth Redirect URIs</b>.</li>
 	<li>Activate automatic registration in the shop's customer settings if you want to register externally authorized visitors automatically.</li>
 	</ul>]]>
 		</Value>
