@@ -5,7 +5,7 @@
 
 @if (Model.CurrentPageIsBasket)
 {
-    <input id="idReadyTicket" type="text" name="ReadyTicket" placeholder="enter ReadyTicket here" style="vertical-align:middle;">
+    <input id="idReadyTicket" type="text" pattern="\d*" name="ReadyTicket" placeholder="enter ReadyTicket here" style="vertical-align:middle;">
     <input id="idBtnReadyPay" type="image" name="ReayPayButton" style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
            src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_update()" value="READYpay">
     <div id="idAuthStatus" class="input-column" align="center">

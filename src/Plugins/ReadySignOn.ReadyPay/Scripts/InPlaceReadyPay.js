@@ -42,6 +42,13 @@ getElementsBy(divReadyPay).map(div => {
     const bindReadyTicket = (e) => {
         const elem = e.target;
         const isValid = elem.value.length !== 0;
+
+        // if Enter key is detected.
+        if (e.which === 13) {
+            e.preventDefault ? e.preventDefault() : (e.returnValue = false);    // Prevent re-submit
+            $('#btnReadyPay').click();
+        }
+
         if (isValid && elemReadyPay.disabled) {
             elemReadyPay.disabled = false;
         } else if (!isValid && !elemReadyPay.disabled) {
@@ -111,6 +118,14 @@ getElementsBy(divReadyPay).map(div => {
 
     // set `data-readyticket` attribute each time users change the ready ticket number 
     elemReadyTicket.addEventListener("input", bindReadyTicket);
+
+    // simulates the readypay button client the user changes the readyTicket text by pressing the enter key 
+    elemReadyTicket.addEventListener("keypress", function (event) {
+        if (event.which === 13) {   // Enter key pressed.
+            event.preventDefault ? event.preventDefault() : (event.returnValue = false);    // Prevent re-submit
+            elemReadyPay.click();
+        }
+    });
 
     // run `bindReadyPay` when users click readypay button 
     elemReadyPay.addEventListener("click", bindReadyPay);

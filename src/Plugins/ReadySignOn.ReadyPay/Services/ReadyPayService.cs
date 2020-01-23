@@ -18,32 +18,33 @@ namespace ReadySignOn.ReadyPay.Services
             _services = services;
         }
 
-        public ReadyPayment ProcessReadyPay(ReadyPayPaymentInfoModel rp_request)
+        public ReadyPayment ProcessReadyPay(ReadyPayPaymentInfoModel rp_info_model)
         {
             var settings = _services.Settings.LoadSetting<ReadyPaySettings>(_services.StoreContext.CurrentStore.Id);
-            string url_str = settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
+            string ep_create_rp_request = settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
                                                  : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
 
-            string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(rp_request.ProductId));
+            string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(rp_info_model.ProductId));
 
 
             string items_json = "\"SummaryItems\" : [";
 
             string url_paymentupdate = settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
                                                             : "https://iosiap.readysignon.com/PaymentUpdate/";
-            url_str += rp_request.ReadyTicket;
+            ep_create_rp_request += rp_info_model.ReadyTicket;
 
             //https://stackoverflow.com/questions/9145667/how-to-post-json-to-a-server-using-c
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url_str);
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(ep_create_rp_request);
             httpWebRequest.ContentType = "application/x-www-form-urlencoded";
             httpWebRequest.Method = "POST";
             httpWebRequest.Headers.Add("client_id", settings.ClientId);
             httpWebRequest.Headers.Add("client_name", Plugin.SystemName);
             httpWebRequest.Headers.Add("client_secret", settings.ClientSecret);
+            httpWebRequest.Headers.Add("sentinel", string.Format("${0:C}", rp_info_model.OrderTotal));
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-                decimal? order_tax = rp_request.OrderTotal * Plugin.FlatPercentTaxRate;
+                decimal? order_tax = rp_info_model.OrderTotal * Plugin.FlatPercentTaxRate;
 
                 string json = "{\"user\":\"test\"," +
                               "\"password\":\"bla\"}";
@@ -82,9 +83,9 @@ namespace ReadySignOn.ReadyPay.Services
                               "\"IsFinal\": true}" +
                           "]," +
                           "\"SummaryItems\" : [" +
-                              "{\"Label\": \"Cart Price\", \"Amount\": " + rp_request.OrderTotal.ToString() + ", \"IsFinal\": true}," +
+                              "{\"Label\": \"Cart Price\", \"Amount\": " + rp_info_model.OrderTotal.ToString() + ", \"IsFinal\": true}," +
                               "{\"Label\": \"Tax\", \"Amount\": " + order_tax.ToString() + ", \"IsFinal\": true}," +
-                              "{\"Label\": \"Total\", \"Amount\":" + (rp_request.OrderTotal + order_tax).ToString() + ", \"IsFinal\": true}" +
+                              "{\"Label\": \"Total\", \"Amount\":" + (rp_info_model.OrderTotal + order_tax).ToString() + ", \"IsFinal\": true}" +
                           "]" +
                        "}";
 
