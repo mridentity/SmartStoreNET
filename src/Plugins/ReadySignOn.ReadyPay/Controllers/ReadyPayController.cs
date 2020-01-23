@@ -65,8 +65,6 @@ namespace ReadySignOn.ReadyPay.Controllers
                     return RedirectToAction(model.RedirectAction, model.RedirectController, new { area = "" });
             }
         }
-
-
         public void SetupConfiguration(ReadyPayConfigurationModel model, int storeScope)
         {
             var store = storeScope == 0
@@ -81,7 +79,7 @@ namespace ReadySignOn.ReadyPay.Controllers
         {
             var model = new ReadyPayConfigurationModel();
 
-            MiniMapper.Map(settings, model);
+            MiniMapper.Map(settings, model);    // Populate the ReadyPaySettings with system settings
             
             SetupConfiguration(model, storeScope);
 
@@ -121,37 +119,42 @@ namespace ReadySignOn.ReadyPay.Controllers
             return RedirectToConfiguration(Plugin.SystemName, false);
         }
 
-        // This is the payment plugin page for collecting payment information such as credit card info etc.
+        private void PrepareReadyPaymentInfoModel(ReadyPayPaymentInfoModel rp_payment_info)
+        {
+            var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
+
+            var store = Services.StoreContext.CurrentStore;
+            var customer = Services.WorkContext.CurrentCustomer;
+            var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+
+            rp_payment_info.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+            rp_payment_info.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+
+            //Get sub-total and discounts that apply to sub-total
+            decimal orderSubTotalDiscountAmountBase = decimal.Zero;
+            Discount orderSubTotalAppliedDiscount = null;
+            decimal subTotalWithoutDiscountBase = decimal.Zero;
+            decimal subTotalWithDiscountBase = decimal.Zero;
+
+            _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
+                out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
+
+            rp_payment_info.ProductId = "multiple_products_in_shopping_cart";
+            rp_payment_info.OrderTotal = subTotalWithDiscountBase;
+            rp_payment_info.CurrentPageIsBasket = true;
+            rp_payment_info.Sentinel = "ReadyPay";
+        }
+
+        // This action will be called as part of the checkout process.
         public ActionResult PaymentInfo()
         {
-            var model = new ReadyPayPaymentInfoModel();
-            model.CurrentPageIsBasket = ControllerContext.ParentActionViewContext.RequestContext.RouteData.IsRouteEqual("ShoppingCart", "Cart");
+            var rp_payment_info_model = new ReadyPayPaymentInfoModel();
+            rp_payment_info_model.CurrentPageIsBasket = ControllerContext.ParentActionViewContext.RequestContext.RouteData.IsRouteEqual("ShoppingCart", "Cart");
 
-            if (model.CurrentPageIsBasket)
+            if (rp_payment_info_model.CurrentPageIsBasket)  // For the checkout workflow, we only handle readyPay while we're in the cart stage.
             {
-                var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
-
-                var store = Services.StoreContext.CurrentStore;
-                var customer = Services.WorkContext.CurrentCustomer;
-                var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
-
-                model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-                model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
-
-                //Get sub-total and discounts that apply to sub-total
-                decimal orderSubTotalDiscountAmountBase = decimal.Zero;
-                Discount orderSubTotalAppliedDiscount = null;
-                decimal subTotalWithoutDiscountBase = decimal.Zero;
-                decimal subTotalWithDiscountBase = decimal.Zero;
-
-                _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
-                    out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
-
-                model.ProductId = "multiple_products_in_shopping_cart";
-                model.OrderTotal = subTotalWithDiscountBase;
-                model.CurrentPageIsBasket = true;
-                model.Sentinel = "ReadyPay";
-                return PartialView(model);
+                PrepareReadyPaymentInfoModel(rp_payment_info_model);
+                return PartialView(rp_payment_info_model);
             }
 
             return new EmptyResult();
@@ -160,32 +163,13 @@ namespace ReadySignOn.ReadyPay.Controllers
         // This payment plugin method for handling mini shopping card specifically
         public ActionResult MiniShoppingCart()
         {
+            var rp_payment_info_model = new ReadyPayPaymentInfoModel();
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
             if (settings.ShowButtonInMiniShoppingCart)
             {
-                var store = Services.StoreContext.CurrentStore;
-                var customer = Services.WorkContext.CurrentCustomer;
-                var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
-
-                var model = new ReadyPayPaymentInfoModel();
-                model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-                model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
-
-                //Get sub-total and discounts that apply to sub-total
-                decimal orderSubTotalDiscountAmountBase = decimal.Zero;
-                Discount orderSubTotalAppliedDiscount = null;
-                decimal subTotalWithoutDiscountBase = decimal.Zero;
-                decimal subTotalWithDiscountBase = decimal.Zero;
-
-                _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
-                    out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
-
-                model.ProductId = "multiple_products_in_shopping_cart";
-                model.OrderTotal = subTotalWithDiscountBase;
-                model.CurrentPageIsBasket = true;
-                model.Sentinel = "ReadyPay";
-                return PartialView(model);
+                PrepareReadyPaymentInfoModel(rp_payment_info_model);
+                return PartialView(rp_payment_info_model);
             }
 
             return new EmptyResult();
