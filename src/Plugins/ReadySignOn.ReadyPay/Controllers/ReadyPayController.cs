@@ -6,6 +6,7 @@ using SmartStore.ComponentModel;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Services;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
@@ -23,6 +24,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 {
     public class ReadyPayController : PublicControllerBase
     {
+        private readonly ICommonServices                _services;
         private readonly IOrderTotalCalculationService  _orderTotalCalculationService;
         private readonly IReadyPayOrders                _readyPayOrders;
         private readonly IReadyPayService               _readyPayService;
@@ -30,12 +32,14 @@ namespace ReadySignOn.ReadyPay.Controllers
         private readonly IStateProvinceService          _stateProvinceService;
 
         public ReadyPayController(
+                    ICommonServices                 services,
                     ICountryService                 countryService,
                     IStateProvinceService           stateProvinceService,
                     IOrderTotalCalculationService   orderTotalCalculationService,
                     IReadyPayOrders                 readyPayOrders,
                     IReadyPayService                readyPayService)
         {
+            _services = services;
             _countryService =                       countryService;
             _stateProvinceService =                 stateProvinceService;
             _orderTotalCalculationService =         orderTotalCalculationService;
@@ -62,6 +66,16 @@ namespace ReadySignOn.ReadyPay.Controllers
             }
         }
 
+
+        public void SetupConfiguration(ReadyPayConfigurationModel model, int storeScope)
+        {
+            var store = storeScope == 0
+                ? _services.StoreContext.CurrentStore
+                : _services.StoreService.GetStoreById(storeScope);
+
+            model.PrimaryStoreCurrencyCode = store.PrimaryStoreCurrency.CurrencyCode;
+        }
+
         [AdminAuthorize, ChildActionOnly, LoadSetting]
         public ActionResult Configure(ReadyPaySettings settings, int storeScope)
         {
@@ -69,7 +83,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             MiniMapper.Map(settings, model);
             
-            _readyPayService.SetupConfiguration(model, storeScope);
+            SetupConfiguration(model, storeScope);
 
             return View(model);
         }

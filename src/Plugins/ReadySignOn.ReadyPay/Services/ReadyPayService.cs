@@ -117,14 +117,5 @@ namespace ReadySignOn.ReadyPay.Services
 
             return null;
         }
-
-        public void SetupConfiguration(ReadyPayConfigurationModel model, int storeScope)
-        {
-            var store = storeScope == 0
-                ? _services.StoreContext.CurrentStore
-                : _services.StoreService.GetStoreById(storeScope);
-
-            model.PrimaryStoreCurrencyCode = store.PrimaryStoreCurrency.CurrencyCode;
-        }
     }
 }
