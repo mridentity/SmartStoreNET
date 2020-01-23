@@ -6,7 +6,6 @@ using SmartStore.ComponentModel;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
-using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
@@ -24,24 +23,24 @@ namespace ReadySignOn.ReadyPay.Controllers
 {
     public class ReadyPayController : PublicControllerBase
     {
-        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
-        private readonly IReadyPayOrders _readyPayOrders;
-        private readonly IReadyPayService _apiService;
-        private readonly ICountryService _countryService;
-        private readonly IStateProvinceService _stateProvinceService;
+        private readonly IOrderTotalCalculationService  _orderTotalCalculationService;
+        private readonly IReadyPayOrders                _readyPayOrders;
+        private readonly IReadyPayService               _readyPayService;
+        private readonly ICountryService                _countryService;
+        private readonly IStateProvinceService          _stateProvinceService;
 
         public ReadyPayController(
-                    ICountryService countryService,
-                    IStateProvinceService stateProvinceService,
-                    IOrderTotalCalculationService orderTotalCalculationService,
-                    IReadyPayOrders readyPayOrders,
-                    IReadyPayService apiService)
+                    ICountryService                 countryService,
+                    IStateProvinceService           stateProvinceService,
+                    IOrderTotalCalculationService   orderTotalCalculationService,
+                    IReadyPayOrders                 readyPayOrders,
+                    IReadyPayService                readyPayService)
         {
-            _countryService = countryService;
-            _stateProvinceService = stateProvinceService;
-            _orderTotalCalculationService = orderTotalCalculationService;
-            _readyPayOrders = readyPayOrders;
-            _apiService = apiService;
+            _countryService =                       countryService;
+            _stateProvinceService =                 stateProvinceService;
+            _orderTotalCalculationService =         orderTotalCalculationService;
+            _readyPayOrders =                       readyPayOrders;
+            _readyPayService =                      readyPayService;
         }
 
         protected ActionResult GetActionResult(ReadyPayViewModel model)
@@ -69,7 +68,8 @@ namespace ReadySignOn.ReadyPay.Controllers
             var model = new ReadyPayConfigurationModel();
 
             MiniMapper.Map(settings, model);
-            _apiService.SetupConfiguration(model, storeScope);
+            
+            _readyPayService.SetupConfiguration(model, storeScope);
 
             return View(model);
         }
@@ -215,7 +215,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             try
             {
-                ReadyPayment rpayment = _apiService.ProcessReadyPay(readypay_request);
+                ReadyPayment rpayment = _readyPayService.ProcessReadyPay(readypay_request);
                 //TODO: rpayment contains authorized payment and tx information that can
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
@@ -293,7 +293,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             try
             {
-                ReadyPayment rpayment = _apiService.ProcessReadyPay(readypay_request);
+                ReadyPayment rpayment = _readyPayService.ProcessReadyPay(readypay_request);
                 //TODO: rpayment contains authorized payment and tx information that can
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.

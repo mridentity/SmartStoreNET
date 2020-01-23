@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web.Routing;
-using SmartStore;
+﻿using ReadySignOn.ReadyPay.Controllers;
+using ReadySignOn.ReadyPay.Models;
 using SmartStore.Core.Logging;
 using SmartStore.Core.Plugins;
 using SmartStore.Services;
@@ -9,6 +7,9 @@ using SmartStore.Services.Cms;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Payments;
 using SmartStore.Web.Models.Catalog;
+using System;
+using System.Collections.Generic;
+using System.Web.Routing;
 
 namespace ReadySignOn.ReadyPay
 {
@@ -69,10 +70,10 @@ namespace ReadySignOn.ReadyPay
 
         public override Type GetControllerType()
         {
-            throw new NotImplementedException();
+            return typeof(ReadyPayController);
         }
 
-		public override PaymentMethodType PaymentMethodType
+        public override PaymentMethodType PaymentMethodType
 		{
 			get { return PaymentMethodType.StandardAndButton; }
 		}
@@ -143,7 +144,7 @@ namespace ReadySignOn.ReadyPay
                 var product_name = summaryItem.Name;
                 var product_price = priceModel.PriceValue;
 
-                CallInPlaceReadyPay(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
+                SetupInPlaceReadyPayRouteValues(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
             }
 
             if (widgetZone == "productdetails_add_info" && settings.ShowInPlaceReadyPay_productdetails_add_info)
@@ -155,13 +156,13 @@ namespace ReadySignOn.ReadyPay
                 var product_name = product_detail.Name;
                 var product_price = product_detail.ProductPrice.PriceValue;
 
-                CallInPlaceReadyPay(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
+                SetupInPlaceReadyPayRouteValues(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
             }
 
             return;
         }
 
-        private void CallInPlaceReadyPay(ref string actionName, ref string controllerName, RouteValueDictionary routeValues, int product_id, string product_sku, SmartStore.Services.Localization.LocalizedValue<string> product_name, ref decimal product_price)
+        private void SetupInPlaceReadyPayRouteValues(ref string actionName, ref string controllerName, RouteValueDictionary routeValues, int product_id, string product_sku, SmartStore.Services.Localization.LocalizedValue<string> product_name, ref decimal product_price)
         {
             if (product_price > decimal.Zero)
             {
@@ -177,7 +178,6 @@ namespace ReadySignOn.ReadyPay
                 routeValues.Add("product_price", product_price);
             }
         }
-
         #endregion
     }
 }

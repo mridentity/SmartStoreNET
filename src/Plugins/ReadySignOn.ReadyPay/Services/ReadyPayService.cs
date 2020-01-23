@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using ReadySignOn.ReadyPay.Models;
 using SmartStore.Services;
-using SmartStore.Services.Authentication.External;
+using System;
+using System.IO;
+using System.Net;
+using System.Text;
 
 namespace ReadySignOn.ReadyPay.Services
 {
@@ -20,15 +16,6 @@ namespace ReadySignOn.ReadyPay.Services
             ICommonServices services)
         {
             _services = services;
-        }
-
-        public void SetupConfiguration(ReadyPayConfigurationModel model, int storeScope)
-        {
-            var store = storeScope == 0
-                ? _services.StoreContext.CurrentStore
-                : _services.StoreService.GetStoreById(storeScope);
-
-            model.PrimaryStoreCurrencyCode = store.PrimaryStoreCurrency.CurrencyCode;
         }
 
         public ReadyPayment ProcessReadyPay(ReadyPayPaymentInfoModel rp_request)
@@ -129,6 +116,15 @@ namespace ReadySignOn.ReadyPay.Services
             }
 
             return null;
+        }
+
+        public void SetupConfiguration(ReadyPayConfigurationModel model, int storeScope)
+        {
+            var store = storeScope == 0
+                ? _services.StoreContext.CurrentStore
+                : _services.StoreService.GetStoreById(storeScope);
+
+            model.PrimaryStoreCurrencyCode = store.PrimaryStoreCurrency.CurrencyCode;
         }
     }
 }
