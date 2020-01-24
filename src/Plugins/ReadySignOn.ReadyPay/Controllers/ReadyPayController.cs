@@ -139,13 +139,16 @@ namespace ReadySignOn.ReadyPay.Controllers
             _orderTotalCalculationService.GetShoppingCartSubTotal(cart,
                 out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
 
+            rp_payment_info.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
+
             rp_payment_info.ProductId = "multiple_products_in_shopping_cart";
-            rp_payment_info.OrderTotal = subTotalWithDiscountBase;
+            rp_payment_info.CartSubTotal = subTotalWithDiscountBase;
             rp_payment_info.CurrentPageIsBasket = true;
-            rp_payment_info.Sentinel = "ReadyPay";
+            Money cart_sub_total = new Money(rp_payment_info.CartSubTotal, store.PrimaryStoreCurrency);
+            rp_payment_info.Sentinel = cart_sub_total.ToString(true);
         }
 
-        // This action will be called as part of the checkout process.
+        // This action will be called as part of the checkout process including the page after the user clicked on Go to cart on the mini shopping cart page.
         public ActionResult PaymentInfo()
         {
             var rp_payment_info_model = new ReadyPayPaymentInfoModel();
@@ -187,7 +190,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
             model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
             model.ProductId = product_id;
-            model.OrderTotal = product_price;
+            model.CartSubTotal = product_price;
             return PartialView(model);
         }
 
@@ -206,9 +209,9 @@ namespace ReadySignOn.ReadyPay.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ProductId.");
             }
 
-            if (rp_info_model.OrderTotal <= 0)
+            if (rp_info_model.CartSubTotal <= 0)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid OrderTotal.");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid CartSubTotal.");
             }
 
             try
@@ -284,9 +287,9 @@ namespace ReadySignOn.ReadyPay.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ProductId.");
             }
 
-            if (readypay_request.OrderTotal <= 0)
+            if (readypay_request.CartSubTotal <= 0)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid OrderTotal.");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid CartSubTotal.");
             }
 
             try

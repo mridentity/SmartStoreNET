@@ -18,7 +18,8 @@ namespace ReadySignOn.ReadyPay.Models
         public bool CurrentPageIsBasket { get; set; }
         public string SubmitButtonImageUrl { get; set; }
         public string LoaderImageUrl { get; set; }
-        public decimal? OrderTotal { get; set; }
+        public decimal CartSubTotal { get; set; }
+        public decimal TaxTotal { get; set; }
         public string ProductId { get; set; }
     }
 }

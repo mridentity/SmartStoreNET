@@ -40,11 +40,11 @@ namespace ReadySignOn.ReadyPay.Services
             httpWebRequest.Headers.Add("client_id", settings.ClientId);
             httpWebRequest.Headers.Add("client_name", Plugin.SystemName);
             httpWebRequest.Headers.Add("client_secret", settings.ClientSecret);
-            httpWebRequest.Headers.Add("sentinel", string.Format("${0:C}", rp_info_model.OrderTotal));
+            httpWebRequest.Headers.Add("sentinel", rp_info_model.Sentinel);
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-                decimal? order_tax = rp_info_model.OrderTotal * Plugin.FlatPercentTaxRate;
+                decimal? order_tax = rp_info_model.CartSubTotal * Plugin.FlatPercentTaxRate;
 
                 string json = "{\"user\":\"test\"," +
                               "\"password\":\"bla\"}";
@@ -83,9 +83,9 @@ namespace ReadySignOn.ReadyPay.Services
                               "\"IsFinal\": true}" +
                           "]," +
                           "\"SummaryItems\" : [" +
-                              "{\"Label\": \"Cart Price\", \"Amount\": " + rp_info_model.OrderTotal.ToString() + ", \"IsFinal\": true}," +
+                              "{\"Label\": \"Cart Price\", \"Amount\": " + rp_info_model.CartSubTotal.ToString() + ", \"IsFinal\": true}," +
                               "{\"Label\": \"Tax\", \"Amount\": " + order_tax.ToString() + ", \"IsFinal\": true}," +
-                              "{\"Label\": \"Total\", \"Amount\":" + (rp_info_model.OrderTotal + order_tax).ToString() + ", \"IsFinal\": true}" +
+                              "{\"Label\": \"Total\", \"Amount\":" + (rp_info_model.CartSubTotal + order_tax).ToString() + ", \"IsFinal\": true}" +
                           "]" +
                        "}";
 

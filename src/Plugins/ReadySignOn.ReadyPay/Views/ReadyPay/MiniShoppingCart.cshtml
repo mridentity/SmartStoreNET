@@ -4,7 +4,7 @@
         <div class="input-column">
             <input type="hidden" name="Sentinel" value="@(Model.Sentinel)" />
             <input type="hidden" name="ProductId" value="@(Model.ProductId)" />
-            <input type="hidden" name="OrderTotal" value="@(Model.OrderTotal)" />
+            <input type="hidden" name="CartSubTotal" value="@(Model.CartSubTotal)" />
             <input id="idReadyTicket" type="text" pattern="\d*" name="ReadyTicket" placeholder="enter ReadyTicket here" style="vertical-align:middle;">
             <input id="idBtnReadyPay" type="image" name="ReayPayButton" style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
                    src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_update()" value="READYpay">
