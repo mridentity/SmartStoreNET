@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using ReadySignOn.ReadyPay.Models;
+using SmartStore.Core.Domain.Shipping;
 using SmartStore.Services;
+using SmartStore.Services.Common;
 using System;
 using System.IO;
 using System.Net;
@@ -11,16 +13,23 @@ namespace ReadySignOn.ReadyPay.Services
     public class ReadyPayService : IReadyPayService
     {
         private readonly ICommonServices _services;
+        private readonly IAddressService _addressService;
 
         public ReadyPayService(
+            IAddressService addressService,
             ICommonServices services)
         {
+            _addressService = addressService;
             _services = services;
         }
 
         public ReadyPayment ProcessReadyPay(ReadyPayPaymentInfoModel rp_info_model)
         {
             var settings = _services.Settings.LoadSetting<ReadyPaySettings>(_services.StoreContext.CurrentStore.Id);
+            var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
+
+            var org_shipping_address = _addressService.GetAddressById(shippingSettings.ShippingOriginAddressId);
+
             string ep_create_rp_request = settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
                                                  : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
 
@@ -48,8 +57,8 @@ namespace ReadySignOn.ReadyPay.Services
                          "{\"MerchantIdentifier\":\"" + settings.MerchantId + "\"," +  // ReadyPay merchant id to be used for a particular PSP (e.g. merchant.com.adyen.readypay.test) which is registered at the PSP and the RSO app manifest.
                           "\"ApplicationDataBase64\":\"" + application_data_b64 + "\"," +   // Application data that is to be carried and preserved by ReadyPay as it which can be used to validate or match a specific tx.
                           "\"ReadyPayUpdateUrl\":\"" + url_paymentupdate + "\"," +
-                          "\"CountryCode\":\"US\"," +
-                          "\"CurrencyCode\":\"USD\"," +
+                          "\"CountryCode\":\"" + org_shipping_address.Country.TwoLetterIsoCode + "\" ," +   // We assume the apple pay payment will be process in the country where the shipment will be originated.
+                          "\"CurrencyCode\":\"" + _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode + "\" ," +
                           "\"RequireBillingPostalAddress\":true," +
                           "\"RequireBillingEmailAddress\":true," +
                           "\"RequireBillingPhoneNumber\":true," +
