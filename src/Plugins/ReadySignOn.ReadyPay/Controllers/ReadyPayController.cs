@@ -7,9 +7,11 @@ using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Services;
+using SmartStore.Services.Catalog;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
+using SmartStore.Services.Tax;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
 using SmartStore.Web.Framework.Settings;
@@ -26,6 +28,8 @@ namespace ReadySignOn.ReadyPay.Controllers
     {
         private readonly ICommonServices                _services;
         private readonly IOrderTotalCalculationService  _orderTotalCalculationService;
+        private readonly IProductService                _productService;
+        private readonly ITaxService                    _taxService;
         private readonly IReadyPayOrders                _readyPayOrders;
         private readonly IReadyPayService               _readyPayService;
         private readonly ICountryService                _countryService;
@@ -36,6 +40,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                     ICountryService                 countryService,
                     IStateProvinceService           stateProvinceService,
                     IOrderTotalCalculationService   orderTotalCalculationService,
+                    IProductService                 productService,
+                    ITaxService                     taxService,
                     IReadyPayOrders                 readyPayOrders,
                     IReadyPayService                readyPayService)
         {
@@ -43,6 +49,8 @@ namespace ReadySignOn.ReadyPay.Controllers
             _countryService =                       countryService;
             _stateProvinceService =                 stateProvinceService;
             _orderTotalCalculationService =         orderTotalCalculationService;
+            _productService =                       productService;
+            _taxService =                           taxService;
             _readyPayOrders =                       readyPayOrders;
             _readyPayService =                      readyPayService;
         }
@@ -191,8 +199,14 @@ namespace ReadySignOn.ReadyPay.Controllers
             rp_payment_info.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
             rp_payment_info.ProductId = product_id;
             rp_payment_info.CartSubTotal = product_price;
-            Money cart_sub_total = new Money(rp_payment_info.CartSubTotal, Services.StoreContext.CurrentStore.PrimaryStoreCurrency);
+            Money cart_sub_total = new Money(product_price, Services.StoreContext.CurrentStore.PrimaryStoreCurrency);
             rp_payment_info.Sentinel = cart_sub_total.ToString(true);
+
+            var product = _productService.GetProductBySku(product_sku);
+            var tax_rate = _taxService.GetTaxRate(product.TaxCategoryId, Services.WorkContext.CurrentCustomer);
+            // The tax rate is the percentage number so it needs to be divided by 100 to get the actual fraction to be used for calculation.
+            rp_payment_info.TaxTotal = product_price * tax_rate / 100;
+
             return PartialView(rp_payment_info);
         }
 
