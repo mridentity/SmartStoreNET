@@ -44,12 +44,8 @@ namespace ReadySignOn.ReadyPay.Services
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-                decimal? order_tax = rp_info_model.CartSubTotal * Plugin.FlatPercentTaxRate;
-
-                string json = "{\"user\":\"test\"," +
-                              "\"password\":\"bla\"}";
-
-                json = "{\"MerchantIdentifier\":\"" + settings.MerchantId + "\"," +         // ReadyPay merchant id to be used for a particular PSP (e.g. merchant.com.adyen.readypay.test) which is registered at the PSP and the RSO app manifest.
+                string json = 
+                         "{\"MerchantIdentifier\":\"" + settings.MerchantId + "\"," +  // ReadyPay merchant id to be used for a particular PSP (e.g. merchant.com.adyen.readypay.test) which is registered at the PSP and the RSO app manifest.
                           "\"ApplicationDataBase64\":\"" + application_data_b64 + "\"," +   // Application data that is to be carried and preserved by ReadyPay as it which can be used to validate or match a specific tx.
                           "\"ReadyPayUpdateUrl\":\"" + url_paymentupdate + "\"," +
                           "\"CountryCode\":\"US\"," +
@@ -84,8 +80,8 @@ namespace ReadySignOn.ReadyPay.Services
                           "]," +
                           "\"SummaryItems\" : [" +
                               "{\"Label\": \"Cart Price\", \"Amount\": " + rp_info_model.CartSubTotal.ToString() + ", \"IsFinal\": true}," +
-                              "{\"Label\": \"Tax\", \"Amount\": " + order_tax.ToString() + ", \"IsFinal\": true}," +
-                              "{\"Label\": \"Total\", \"Amount\":" + (rp_info_model.CartSubTotal + order_tax).ToString() + ", \"IsFinal\": true}" +
+                              "{\"Label\": \"Tax\", \"Amount\": " + rp_info_model.TaxTotal.ToString() + ", \"IsFinal\": true}," +
+                              "{\"Label\": \"Total\", \"Amount\":" + (rp_info_model.CartSubTotal + rp_info_model.TaxTotal).ToString() + ", \"IsFinal\": true}" +
                           "]" +
                        "}";
 

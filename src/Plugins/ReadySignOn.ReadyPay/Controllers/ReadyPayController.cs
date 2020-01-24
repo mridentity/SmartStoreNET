@@ -221,7 +221,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
 
-                ReadyOrderRequest order_request = PrepareOrderRequest(rpayment);
+                ReadyOrderRequest order_request = PrepareOrderRequest(rp_info_model, rpayment);
                 order_request.IsInPlaceReadyPayOrder = true;
 
                 var order_result = _readyPayOrders.PlaceOrder(order_request, new Dictionary<string, string>());
@@ -241,6 +241,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 //https://stackoverflow.com/questions/2422983/returning-json-object-from-an-asp-net-page
                 //https://stackoverflow.com/questions/1428585/how-can-i-exclude-some-public-properties-from-being-serialized-into-a-jsonresult
 
+                // Build the json to return to front end script
                 var result = new
                 {
                     tx_id = rpayment.transactionIdentifier,
@@ -299,7 +300,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
 
-                ReadyOrderRequest order_request = PrepareOrderRequest(rpayment);
+                ReadyOrderRequest order_request = PrepareOrderRequest(readypay_request, rpayment);
                 order_request.IsInPlaceReadyPayOrder = false;
 
                 var order_result = _readyPayOrders.PlaceOrder(order_request, new Dictionary<string, string>());
@@ -313,24 +314,6 @@ namespace ReadySignOn.ReadyPay.Controllers
                     }
                     return new HttpStatusCodeResult(HttpStatusCode.NotFound, statusDescription);
                 }
-
-                //https://stackoverflow.com/questions/9777731/mvc-how-to-return-a-string-as-json
-                //https://exceptionshub.com/return-a-json-string-explicitly-from-asp-net-webapi-4.html
-                //https://stackoverflow.com/questions/2422983/returning-json-object-from-an-asp-net-page
-                //https://stackoverflow.com/questions/1428585/how-can-i-exclude-some-public-properties-from-being-serialized-into-a-jsonresult
-
-                var result = new
-                {
-                    tx_id = rpayment.transactionIdentifier,
-                    order_id = order_result.PlacedOrder.Id,
-                    charged_total = rpayment.grandTotalCharged,
-                    payment_method = rpayment.paymentMethod.displayName,
-                    shipping_method = rpayment.shippingMethod.detail,
-                    shipping_address = $"{rpayment.shippingContact.givenName} {rpayment.shippingContact.familyName}, {rpayment.shippingContact.street}, {rpayment.shippingContact.city}, {rpayment.shippingContact.state} {rpayment.shippingContact.postalCode}, {rpayment.shippingContact.country}",
-                    email_address = rpayment.shippingContact.emailAddress,
-                    phone_number = rpayment.shippingContact.phoneNumber
-                };
-
                 return RedirectToAction("Completed", "Checkout", new { area = "" });
             }
             catch (Exception ex)
@@ -339,7 +322,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             }
         }
 
-        private ReadyOrderRequest PrepareOrderRequest(ReadyPayment rpayment)
+        private ReadyOrderRequest PrepareOrderRequest(ReadyPayPaymentInfoModel readypay_request, ReadyPayment rpayment)
         {
             var countryAllowsShipping = true;
             var countryAllowsBilling = true;
@@ -385,13 +368,13 @@ namespace ReadySignOn.ReadyPay.Controllers
             order_request.ShippingAddress = shipping_address;
             order_request.ShippingMethod = rpayment.shippingMethod.detail;
             order_request.IsShippingMethodSet = true;
-            order_request.OrderShippingExclTax = rpayment.shippingMethod.amount;
             order_request.OrderShippingInclTax = rpayment.shippingMethod.amount;
+            order_request.OrderShippingExclTax = rpayment.shippingMethod.amount; // Todo: may need to substract the tax for the shipping method.
             order_request.ShippingRateComputationMethodSystemName = Plugin.SystemName;
             order_request.OrderTotal = rpayment.grandTotalCharged;
-            order_request.OrderSubtotalExclTax = (order_request.OrderTotal - order_request.OrderShippingExclTax) / (1 + Plugin.FlatPercentTaxRate);
+            order_request.OrderSubtotalExclTax = readypay_request.CartSubTotal;
             order_request.OrderSubtotalInclTax = (order_request.OrderTotal - order_request.OrderShippingInclTax);
-            order_request.OrderTax = order_request.OrderTotal - rpayment.shippingMethod.amount - order_request.OrderSubtotalExclTax;
+            order_request.OrderTax = readypay_request.TaxTotal;
             return order_request;
         }
 
