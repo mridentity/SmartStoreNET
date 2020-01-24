@@ -36,6 +36,7 @@ getElementsBy(divReadyPay).map(div => {
     const elemReadyTicket = getSInP(div, txtReadyTicket);
     const productid = div.dataset.productid;
     const cartsubtotal = div.dataset.cartsubtotal;
+    const taxtotal = div.dataset.taxtotal;
 
     // `bindReadyTicket` consumes an event: `e`;
     // it sets the `readyticket` attribute of `e.target`
@@ -64,6 +65,7 @@ getElementsBy(divReadyPay).map(div => {
         const jsonData = {
             ProductId: productid,
             CartSubTotal: cartsubtotal,
+            TaxTotal: taxtotal,
             ReadyTicket: readyticket
         };
 
