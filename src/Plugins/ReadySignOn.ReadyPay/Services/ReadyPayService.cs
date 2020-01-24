@@ -3,6 +3,7 @@ using ReadySignOn.ReadyPay.Models;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Services;
 using SmartStore.Services.Common;
+using SmartStore.Services.Shipping;
 using System;
 using System.IO;
 using System.Net;
@@ -14,30 +15,37 @@ namespace ReadySignOn.ReadyPay.Services
     {
         private readonly ICommonServices _services;
         private readonly IAddressService _addressService;
+        private readonly IShippingService _shippingService;
 
         public ReadyPayService(
             IAddressService addressService,
+            IShippingService shippingService,
             ICommonServices services)
         {
             _addressService = addressService;
+            _shippingService = shippingService;
             _services = services;
         }
 
         public ReadyPayment ProcessReadyPay(ReadyPayPaymentInfoModel rp_info_model)
         {
             var settings = _services.Settings.LoadSetting<ReadyPaySettings>(_services.StoreContext.CurrentStore.Id);
+            string ep_create_rp_request = settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
+                                                 : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
+
             var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
 
             var org_shipping_address = _addressService.GetAddressById(shippingSettings.ShippingOriginAddressId);
             string two_letter_billing_country_code = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";
 
-            string ep_create_rp_request = settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
-                                                 : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
+            var shipping_methods = _shippingService.GetAllShippingMethods();
+
+            foreach (SmartStore.Core.Domain.Shipping.ShippingMethod s_method in shipping_methods)
+            {
+                // TODO: generate json for enabled shipping methods, then insert it into the json payment request later.
+            }
 
             string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(rp_info_model.ProductId));
-
-
-            string items_json = "\"SummaryItems\" : [";
 
             string url_paymentupdate = settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
                                                             : "https://iosiap.readysignon.com/PaymentUpdate/";
@@ -67,6 +75,7 @@ namespace ReadySignOn.ReadyPay.Services
                           "\"RequireShippingEmailAddress\":true," +
                           "\"RequireShippingPhoneNumber\":true," +
                           "\"SupportedNetworks\" : [" +
+                              "\"American Express\"," +
                               "\"Visa\"," +
                               "\"MasterCard\"," +
                               "\"Discover\"" +
