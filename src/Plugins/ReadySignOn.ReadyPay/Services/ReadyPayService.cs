@@ -29,6 +29,7 @@ namespace ReadySignOn.ReadyPay.Services
             var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
 
             var org_shipping_address = _addressService.GetAddressById(shippingSettings.ShippingOriginAddressId);
+            string two_letter_billing_country_code = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";
 
             string ep_create_rp_request = settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
                                                  : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
@@ -57,7 +58,7 @@ namespace ReadySignOn.ReadyPay.Services
                          "{\"MerchantIdentifier\":\"" + settings.MerchantId + "\"," +  // ReadyPay merchant id to be used for a particular PSP (e.g. merchant.com.adyen.readypay.test) which is registered at the PSP and the RSO app manifest.
                           "\"ApplicationDataBase64\":\"" + application_data_b64 + "\"," +   // Application data that is to be carried and preserved by ReadyPay as it which can be used to validate or match a specific tx.
                           "\"ReadyPayUpdateUrl\":\"" + url_paymentupdate + "\"," +
-                          "\"CountryCode\":\"" + org_shipping_address.Country.TwoLetterIsoCode + "\" ," +   // We assume the apple pay payment will be process in the country where the shipment will be originated.
+                          "\"CountryCode\":\"" + two_letter_billing_country_code + "\" ," +   // We assume the apple pay payment will be process in the country where the shipment will be originated.
                           "\"CurrencyCode\":\"" + _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode + "\" ," +
                           "\"RequireBillingPostalAddress\":true," +
                           "\"RequireBillingEmailAddress\":true," +
