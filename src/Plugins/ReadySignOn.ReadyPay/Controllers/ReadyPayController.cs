@@ -186,12 +186,14 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
-            var model = new ReadyPayPaymentInfoModel();
-            model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-            model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
-            model.ProductId = product_id;
-            model.CartSubTotal = product_price;
-            return PartialView(model);
+            var rp_payment_info = new ReadyPayPaymentInfoModel();
+            rp_payment_info.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+            rp_payment_info.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+            rp_payment_info.ProductId = product_id;
+            rp_payment_info.CartSubTotal = product_price;
+            Money cart_sub_total = new Money(rp_payment_info.CartSubTotal, Services.StoreContext.CurrentStore.PrimaryStoreCurrency);
+            rp_payment_info.Sentinel = cart_sub_total.ToString(true);
+            return PartialView(rp_payment_info);
         }
 
         [HttpPost]

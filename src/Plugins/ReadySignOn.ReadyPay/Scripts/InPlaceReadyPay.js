@@ -37,6 +37,7 @@ getElementsBy(divReadyPay).map(div => {
     const productid = div.dataset.productid;
     const cartsubtotal = div.dataset.cartsubtotal;
     const taxtotal = div.dataset.taxtotal;
+    const sentinel = div.dataset.sentinel;
 
     // `bindReadyTicket` consumes an event: `e`;
     // it sets the `readyticket` attribute of `e.target`
@@ -66,6 +67,7 @@ getElementsBy(divReadyPay).map(div => {
             ProductId: productid,
             CartSubTotal: cartsubtotal,
             TaxTotal: taxtotal,
+            Sentinel: sentinel,
             ReadyTicket: readyticket
         };
 

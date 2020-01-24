@@ -161,7 +161,11 @@ namespace ReadySignOn.ReadyPay
             return;
         }
 
-        private void SetupInPlaceReadyPayRouteValues(ref string actionName, ref string controllerName, RouteValueDictionary routeValues, int product_id, string product_sku, SmartStore.Services.Localization.LocalizedValue<string> product_name, ref decimal product_price)
+        private void SetupInPlaceReadyPayRouteValues(ref string actionName, ref string controllerName, RouteValueDictionary routeValues, 
+                                                        int product_id, 
+                                                        string product_sku, 
+                                                        SmartStore.Services.Localization.LocalizedValue<string> product_name, 
+                                                        ref decimal product_price)
         {
             if (product_price > decimal.Zero)
             {
