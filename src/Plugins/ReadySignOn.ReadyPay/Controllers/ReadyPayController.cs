@@ -292,31 +292,31 @@ namespace ReadySignOn.ReadyPay.Controllers
         [HttpPost]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
-        public ActionResult MiniCartReadyPayPosted(ReadyPayPaymentInfoModel readypay_request)
+        public ActionResult MiniCartReadyPayPosted(ReadyPayPaymentInfoModel rp_info_model)
         {
-            if (String.IsNullOrWhiteSpace(readypay_request.ReadyTicket))
+            if (String.IsNullOrWhiteSpace(rp_info_model.ReadyTicket))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ReadyTicket.");
             }
 
-            if (String.IsNullOrWhiteSpace(readypay_request.ProductId))
+            if (String.IsNullOrWhiteSpace(rp_info_model.ProductId))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ProductId.");
             }
 
-            if (readypay_request.CartSubTotal <= 0)
+            if (rp_info_model.CartSubTotal <= 0)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid CartSubTotal.");
             }
 
             try
             {
-                ReadyPayment rpayment = _readyPayService.ProcessReadyPay(readypay_request);
+                ReadyPayment rpayment = _readyPayService.ProcessReadyPay(rp_info_model);
                 //TODO: rpayment contains authorized payment and tx information that can
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
 
-                ReadyOrderRequest order_request = PrepareOrderRequest(readypay_request, rpayment);
+                ReadyOrderRequest order_request = PrepareOrderRequest(rp_info_model, rpayment);
                 order_request.IsInPlaceReadyPayOrder = false;
 
                 var order_result = _readyPayOrders.PlaceOrder(order_request, new Dictionary<string, string>());
