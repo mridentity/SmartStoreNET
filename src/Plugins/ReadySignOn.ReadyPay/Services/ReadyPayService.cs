@@ -1,10 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ReadySignOn.ReadyPay.Models;
+using SmartStore;
 using SmartStore.Core.Domain.Shipping;
+using SmartStore.Core.Domain.Tax;
 using SmartStore.Services;
 using SmartStore.Services.Common;
 using SmartStore.Services.Shipping;
+using SmartStore.Services.Tax;
 using System;
 using System.IO;
 using System.Net;
@@ -17,14 +20,20 @@ namespace ReadySignOn.ReadyPay.Services
         private readonly ICommonServices _services;
         private readonly IAddressService _addressService;
         private readonly IShippingService _shippingService;
+        private readonly ITaxService _taxService;
+        private readonly TaxSettings _taxSettings;
 
         public ReadyPayService(
             IAddressService addressService,
             IShippingService shippingService,
+            ITaxService taxService,
+            TaxSettings taxSettings,
             ICommonServices services)
         {
             _addressService = addressService;
             _shippingService = shippingService;
+            _taxService = taxService;
+            _taxSettings = taxSettings;
             _services = services;
         }
 
@@ -35,24 +44,19 @@ namespace ReadySignOn.ReadyPay.Services
         /// <returns>A ReadyPayment object that describes the payment that has be sucessfully processed; null if the payment process fails.</returns>
         public ReadyPayment ProcessReadyPay(ReadyPayPaymentInfoModel rp_info_model)
         {
-            var settings = _services.Settings.LoadSetting<ReadyPaySettings>(_services.StoreContext.CurrentStore.Id);
-            string ep_create_rp_request = settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
+            var rp_settings = _services.Settings.LoadSetting<ReadyPaySettings>(_services.StoreContext.CurrentStore.Id);
+            string ep_create_rp_request = rp_settings.UseSandbox ? "https://readyconnectsvcqa.readysignon.com/api/ReadyPay/CreatePurchaseRequest/"
                                                  : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
             ep_create_rp_request += rp_info_model.ReadyTicket;
 
-            string url_paymentupdate = settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
+            string url_paymentupdate = rp_settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
                                                             : "https://iosiap.readysignon.com/PaymentUpdate/";
 
             var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
 
             var org_shipping_address = _addressService.GetAddressById(shippingSettings.ShippingOriginAddressId);
-            string two_letter_billing_country_code = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";
-
-            var shipping_methods = _shippingService.GetAllShippingMethods();
-            foreach (SmartStore.Core.Domain.Shipping.ShippingMethod s_method in shipping_methods)
-            {
-                // TODO: generate json for enabled shipping methods, then insert it into the json payment request later.
-            }
+            string payment_processing_country = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";   
+            //TODO: In the above we assumed the country where the payment will be processed is the same as the originating country of the shipment. Ideally we could add a setting on the readyPay configuration page.
 
             string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(rp_info_model.ProductId));
 
@@ -60,16 +64,16 @@ namespace ReadySignOn.ReadyPay.Services
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(ep_create_rp_request);
             httpWebRequest.ContentType = "application/x-www-form-urlencoded";
             httpWebRequest.Method = "POST";
-            httpWebRequest.Headers.Add("client_id", settings.ClientId);
+            httpWebRequest.Headers.Add("client_id", rp_settings.ClientId);
             httpWebRequest.Headers.Add("client_name", Plugin.SystemName);
-            httpWebRequest.Headers.Add("client_secret", settings.ClientSecret);
+            httpWebRequest.Headers.Add("client_secret", rp_settings.ClientSecret);
             httpWebRequest.Headers.Add("sentinel", rp_info_model.Sentinel);
 
             JObject payment_request = new JObject();
-            payment_request["MerchantIdentifier"] = settings.MerchantId;
+            payment_request["MerchantIdentifier"] = rp_settings.MerchantId;
             payment_request["ApplicationDataBase64"] = application_data_b64;
             payment_request["ReadyPayUpdateUrl"] = url_paymentupdate;
-            payment_request["CountryCode"] = two_letter_billing_country_code;
+            payment_request["CountryCode"] = payment_processing_country;
             payment_request["CurrencyCode"] = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
             payment_request["RequireBillingPostalAddress"] = true;
             payment_request["RequireBillingEmailAddress"] = true;
@@ -78,43 +82,65 @@ namespace ReadySignOn.ReadyPay.Services
             payment_request["RequireShippingEmailAddress"] = true;
             payment_request["RequireShippingPhoneNumber"] = true;
 
-            payment_request["SupportedNetworks"] = JArray.FromObject(new string[] {"American Express","Visa","MasterCard","Discover"});
+            payment_request["SupportedNetworks"] = JArray.FromObject(new string[] {"American Express","Visa","MasterCard","Discover"}); // TODO: Perhaps need to create setting options for this.
 
-            JArray j_shipping_methods = new JArray();
+            var shipping_methods = _shippingService.GetAllShippingMethods();
+            if (shipping_methods != null && shipping_methods.Count > 0)
+            {
+                JArray j_methods = new JArray();
+
+                foreach (SmartStore.Core.Domain.Shipping.ShippingMethod s_method in shipping_methods)
                 {
-                    JObject j_shipping_method = new JObject();
-                    j_shipping_method["Label"] = "USPS";
-                    j_shipping_method["Detail"] = "United States Postal Services";
-                    j_shipping_method["Identifier"] = "id_usps";
-                    j_shipping_method["Amount"] = 1.23;
-                    j_shipping_method["IsFinal"] = true;
-                    j_shipping_methods.Add(j_shipping_method);
+                    double shipping_cost = 1.23;    //TODO: The actual shipping cost needs to be updated via readyPay PaymentUpdate callback endpoint.
 
+                    JObject j_method = new JObject();
+                    j_method["Label"] = s_method.Name;
+                    j_method["Detail"] = new Money(shipping_cost, _services.StoreContext.CurrentStore.PrimaryStoreCurrency).ToString(true);
+                    j_method["Identifier"] = s_method.Name.Replace(" ", string.Empty);
+                    j_method["IsFinal"] = true;
+                    j_method["Amount"] = shipping_cost;      
+                    j_methods.Add(j_method);
                 }
 
-                {
-                    JObject j_shipping_method = new JObject();
-                    j_shipping_method["Label"] = "UPS";
-                    j_shipping_method["Detail"] = "United Parcel Services";
-                    j_shipping_method["Identifier"] = "id_ups";
-                    j_shipping_method["Amount"] = 4.56;
-                    j_shipping_method["IsFinal"] = true;
+                payment_request["ShippingMethods"] = j_methods;
+            }
 
-                    j_shipping_methods.Add(j_shipping_method);
-                }
 
-                {
-                    JObject j_shipping_method = new JObject();
-                    j_shipping_method["Label"] = "Fedex";
-                    j_shipping_method["Detail"] = "Federal Express";
-                    j_shipping_method["Identifier"] = "id_fedex";
-                    j_shipping_method["Amount"] = 7.89;
-                    j_shipping_method["IsFinal"] = true;
+            //JArray j_shipping_methods = new JArray();
+            //    {
+            //        JObject j_shipping_method = new JObject();
+            //        j_shipping_method["Label"] = "USPS";
+            //        j_shipping_method["Detail"] = "United States Postal Services";
+            //        j_shipping_method["Identifier"] = "id_usps";
+            //        j_shipping_method["Amount"] = 1.23;
+            //        j_shipping_method["IsFinal"] = true;
+            //        j_shipping_methods.Add(j_shipping_method);
 
-                    j_shipping_methods.Add(j_shipping_method);
-                }
+            //    }
 
-            payment_request["ShippingMethods"] = j_shipping_methods;
+            //    {
+            //        JObject j_shipping_method = new JObject();
+            //        j_shipping_method["Label"] = "UPS";
+            //        j_shipping_method["Detail"] = "United Parcel Services";
+            //        j_shipping_method["Identifier"] = "id_ups";
+            //        j_shipping_method["Amount"] = 4.56;
+            //        j_shipping_method["IsFinal"] = true;
+
+            //        j_shipping_methods.Add(j_shipping_method);
+            //    }
+
+            //    {
+            //        JObject j_shipping_method = new JObject();
+            //        j_shipping_method["Label"] = "Fedex";
+            //        j_shipping_method["Detail"] = "Federal Express";
+            //        j_shipping_method["Identifier"] = "id_fedex";
+            //        j_shipping_method["Amount"] = 7.89;
+            //        j_shipping_method["IsFinal"] = true;
+
+            //        j_shipping_methods.Add(j_shipping_method);
+            //    }
+
+            //payment_request["ShippingMethods"] = j_shipping_methods;
 
             JArray j_summary_items = new JArray();
                 {

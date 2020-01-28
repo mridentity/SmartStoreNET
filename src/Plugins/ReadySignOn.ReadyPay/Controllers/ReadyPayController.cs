@@ -4,10 +4,14 @@ using ReadySignOn.ReadyPay.Services;
 using SmartStore;
 using SmartStore.ComponentModel;
 using SmartStore.Core.Domain.Common;
+using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Core.Domain.Shipping;
+using SmartStore.Core.Domain.Tax;
 using SmartStore.Services;
 using SmartStore.Services.Catalog;
+using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
@@ -34,6 +38,7 @@ namespace ReadySignOn.ReadyPay.Controllers
         private readonly IReadyPayService               _readyPayService;
         private readonly ICountryService                _countryService;
         private readonly IStateProvinceService          _stateProvinceService;
+        private readonly TaxSettings _taxSettings;
 
         public ReadyPayController(
                     ICommonServices                 services,
@@ -43,7 +48,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                     IProductService                 productService,
                     ITaxService                     taxService,
                     IReadyPayOrders                 readyPayOrders,
-                    IReadyPayService                readyPayService)
+                    IReadyPayService                readyPayService,
+                    TaxSettings taxSettings)
         {
             _services = services;
             _countryService =                       countryService;
@@ -53,6 +59,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             _taxService =                           taxService;
             _readyPayOrders =                       readyPayOrders;
             _readyPayService =                      readyPayService;
+            _taxSettings = taxSettings;
         }
 
         protected ActionResult GetActionResult(ReadyPayViewModel model)
@@ -148,7 +155,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
 
             rp_payment_info.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
-
+            rp_payment_info.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? decimal.Zero;
             rp_payment_info.ProductId = "multiple_products_in_shopping_cart";
             rp_payment_info.CartSubTotal = subTotalWithDiscountBase;
             rp_payment_info.CurrentPageIsBasket = true;
@@ -199,6 +206,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             rp_payment_info.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
             rp_payment_info.ProductId = product_id;
             rp_payment_info.CartSubTotal = product_price;
+
             Money cart_sub_total = new Money(product_price, Services.StoreContext.CurrentStore.PrimaryStoreCurrency);
             rp_payment_info.Sentinel = cart_sub_total.ToString(true);
 
@@ -206,6 +214,54 @@ namespace ReadySignOn.ReadyPay.Controllers
             var tax_rate = _taxService.GetTaxRate(product.TaxCategoryId, Services.WorkContext.CurrentCustomer);
             // The tax rate is the percentage number so it needs to be divided by 100 to get the actual fraction to be used for calculation.
             rp_payment_info.TaxTotal = product_price * tax_rate / 100;
+
+            if(product.IsShipEnabled || !product.IsFreeShipping)
+            {
+                if (_taxSettings.ShippingIsTaxable)
+                {
+                    var shipping_tax_rate = decimal.Zero;
+
+                    var shippingOption = Services.WorkContext.CurrentCustomer.GetAttribute<ShippingOption>(SystemCustomerAttributeNames.SelectedShippingOption, Services.StoreContext.CurrentStore.Id);
+                    if (shippingOption != null && shippingOption.Rate > 0)
+                    {
+                        shipping_tax_rate = shippingOption.Rate;
+                    }
+
+                    if (shipping_tax_rate <= 0 && !_taxSettings.ShippingPriceIncludesTax)
+                    {
+                        var taxCategoryId = 0;
+
+                        if (_taxSettings.AuxiliaryServicesTaxingType == AuxiliaryServicesTaxType.HighestCartAmount
+                            || _taxSettings.AuxiliaryServicesTaxingType == AuxiliaryServicesTaxType.HighestTaxRate)
+                        {
+                            taxCategoryId = product.TaxCategoryId;
+                        }
+
+                        // fallback to setting
+                        if (taxCategoryId == 0)
+                        {
+                            taxCategoryId = _taxSettings.ShippingTaxClassId;
+                        }
+
+                        var shipping_tax = _taxService.GetShippingPrice(product_price, true, Services.WorkContext.CurrentCustomer, taxCategoryId, out shipping_tax_rate)
+                                        - _taxService.GetShippingPrice(product_price, false, Services.WorkContext.CurrentCustomer, taxCategoryId, out shipping_tax_rate);
+
+                        shipping_tax = shipping_tax.RoundIfEnabledFor(Services.StoreContext.CurrentStore.PrimaryStoreCurrency);
+
+                        rp_payment_info.ShippingTax = shipping_tax;
+                        rp_payment_info.TaxTotal += shipping_tax;
+                    }
+                }
+                else
+                {
+                    rp_payment_info.ShippingTotal = _taxService.GetShippingPrice(product_price, false, Services.WorkContext.CurrentCustomer) - rp_payment_info.CartSubTotal;
+                }
+            }
+            else // The product may not be shippable, such as digital downloads etc.
+            {
+                rp_payment_info.ShippingTax = decimal.Zero;
+                rp_payment_info.ShippingTotal = decimal.Zero;
+            }
 
             return PartialView(rp_payment_info);
         }
@@ -385,7 +441,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             order_request.ShippingMethod = rpayment.shippingMethod.detail;
             order_request.IsShippingMethodSet = true;
             order_request.OrderShippingInclTax = rpayment.shippingMethod.amount;
-            order_request.OrderShippingExclTax = rpayment.shippingMethod.amount; // Todo: may need to substract the tax for the shipping method.
+            order_request.OrderShippingExclTax = rpayment.grandTotalCharged - readypay_request.TaxTotal - readypay_request.CartSubTotal;
             order_request.ShippingRateComputationMethodSystemName = Plugin.SystemName;
             order_request.OrderTotal = rpayment.grandTotalCharged;
             order_request.OrderSubtotalExclTax = readypay_request.CartSubTotal;

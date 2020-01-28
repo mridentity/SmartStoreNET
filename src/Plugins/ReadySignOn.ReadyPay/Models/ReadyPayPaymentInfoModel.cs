@@ -20,6 +20,8 @@ namespace ReadySignOn.ReadyPay.Models
         public string LoaderImageUrl { get; set; }
         public decimal CartSubTotal { get; set; }
         public decimal TaxTotal { get; set; }
+        public decimal ShippingTotal { get; set; }
+        public decimal ShippingTax { get; set; }
         public string ProductId { get; set; }
     }
 }
