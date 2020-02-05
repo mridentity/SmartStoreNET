@@ -70,19 +70,19 @@ namespace ReadySignOn.ReadyPay.Services
             httpWebRequest.Headers.Add("sentinel", rp_info_model.Sentinel);
 
             JObject payment_request = new JObject();
-            payment_request["MerchantIdentifier"] = rp_settings.MerchantId;
-            payment_request["ApplicationDataBase64"] = application_data_b64;
-            payment_request["ReadyPayUpdateUrl"] = url_paymentupdate;
-            payment_request["CountryCode"] = payment_processing_country;
-            payment_request["CurrencyCode"] = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
-            payment_request["RequireBillingPostalAddress"] = true;
-            payment_request["RequireBillingEmailAddress"] = true;
-            payment_request["RequireBillingPhoneNumber"] = true;
-            payment_request["RequireShippingPostalAddress"] = true;
-            payment_request["RequireShippingEmailAddress"] = true;
-            payment_request["RequireShippingPhoneNumber"] = true;
+            payment_request["MerchantId"] = rp_settings.MerchantId;
+            payment_request["AppDataB64"] = application_data_b64;
+            payment_request["RpUpdEp"] = url_paymentupdate;
+            payment_request["CountryCd"] = payment_processing_country;
+            payment_request["CurrencyCd"] = _services.StoreContext.CurrentStore.PrimaryStoreCurrency.CurrencyCode;
+            payment_request["RqBilPa"] = true;
+            payment_request["RqBilEmail"] = true;
+            payment_request["RqBilPh"] = true;
+            payment_request["RqShpPa"] = true;
+            payment_request["RqShpEmail"] = true;
+            payment_request["RqShpPh"] = true;
 
-            payment_request["SupportedNetworks"] = JArray.FromObject(new string[] {"American Express","Visa","MasterCard","Discover"}); // TODO: Perhaps need to create setting options for this.
+            payment_request["PmtNwks"] = JArray.FromObject(new string[] {"American Express","Visa","MasterCard","Discover"}); // TODO: Perhaps need to create setting options for this.
 
             var shipping_methods = _shippingService.GetAllShippingMethods();
             if (shipping_methods != null && shipping_methods.Count > 0)
@@ -94,83 +94,47 @@ namespace ReadySignOn.ReadyPay.Services
                     double shipping_cost = 1.23;    //TODO: The actual shipping cost needs to be updated via readyPay PaymentUpdate callback endpoint.
 
                     JObject j_method = new JObject();
-                    j_method["Label"] = s_method.Name;
-                    j_method["Detail"] = new Money(shipping_cost, _services.StoreContext.CurrentStore.PrimaryStoreCurrency).ToString(true);
-                    j_method["Identifier"] = s_method.Name.Replace(" ", string.Empty);
-                    j_method["IsFinal"] = true;
-                    j_method["Amount"] = shipping_cost;      
+                    j_method["Lbl"] = s_method.Name;
+                    j_method["Desc"] = new Money(shipping_cost, _services.StoreContext.CurrentStore.PrimaryStoreCurrency).ToString(true);
+                    j_method["Id"] = s_method.Name.Replace(" ", string.Empty);
+                    j_method["Final"] = true;
+                    j_method["Amt"] = shipping_cost;      
                     j_methods.Add(j_method);
                 }
 
-                payment_request["ShippingMethods"] = j_methods;
+                payment_request["ShpMthds"] = j_methods;
             }
 
-
-            //JArray j_shipping_methods = new JArray();
-            //    {
-            //        JObject j_shipping_method = new JObject();
-            //        j_shipping_method["Label"] = "USPS";
-            //        j_shipping_method["Detail"] = "United States Postal Services";
-            //        j_shipping_method["Identifier"] = "id_usps";
-            //        j_shipping_method["Amount"] = 1.23;
-            //        j_shipping_method["IsFinal"] = true;
-            //        j_shipping_methods.Add(j_shipping_method);
-
-            //    }
-
-            //    {
-            //        JObject j_shipping_method = new JObject();
-            //        j_shipping_method["Label"] = "UPS";
-            //        j_shipping_method["Detail"] = "United Parcel Services";
-            //        j_shipping_method["Identifier"] = "id_ups";
-            //        j_shipping_method["Amount"] = 4.56;
-            //        j_shipping_method["IsFinal"] = true;
-
-            //        j_shipping_methods.Add(j_shipping_method);
-            //    }
-
-            //    {
-            //        JObject j_shipping_method = new JObject();
-            //        j_shipping_method["Label"] = "Fedex";
-            //        j_shipping_method["Detail"] = "Federal Express";
-            //        j_shipping_method["Identifier"] = "id_fedex";
-            //        j_shipping_method["Amount"] = 7.89;
-            //        j_shipping_method["IsFinal"] = true;
-
-            //        j_shipping_methods.Add(j_shipping_method);
-            //    }
-
-            //payment_request["ShippingMethods"] = j_shipping_methods;
 
             JArray j_summary_items = new JArray();
                 {
                     JObject j_summary_item = new JObject();
-                    j_summary_item["Label"] = "Cart Price";
-                    j_summary_item["Amount"] = rp_info_model.CartSubTotal;
-                    j_summary_item["IsFinal"] = true;
+                    j_summary_item["Lbl"] = "Cart Price";
+                    j_summary_item["Amt"] = rp_info_model.CartSubTotal;
+                    j_summary_item["Final"] = true;
 
                     j_summary_items.Add(j_summary_item);
                 }
 
                 {
                     JObject j_summary_item = new JObject();
-                    j_summary_item["Label"] = "Tax";
-                    j_summary_item["Amount"] = rp_info_model.TaxTotal;
-                    j_summary_item["IsFinal"] = true;
+                    j_summary_item["Lbl"] = "Tax";
+                    j_summary_item["Amt"] = rp_info_model.TaxTotal;
+                    j_summary_item["Final"] = true;
 
                     j_summary_items.Add(j_summary_item);
                 }
 
                 {
                     JObject j_summary_item = new JObject();
-                    j_summary_item["Label"] = "Total";
-                    j_summary_item["Amount"] = rp_info_model.CartSubTotal + rp_info_model.TaxTotal;
-                    j_summary_item["IsFinal"] = true;
+                    j_summary_item["Lbl"] = "Total";
+                    j_summary_item["Amt"] = rp_info_model.CartSubTotal + rp_info_model.TaxTotal;
+                    j_summary_item["Final"] = true;
 
                     j_summary_items.Add(j_summary_item);
                 }
 
-            payment_request["SummaryItems"] = j_summary_items;
+            payment_request["SumItems"] = j_summary_items;
 
             string json_payment_request = payment_request.ToString(Formatting.None);    // The default format is Indented with tabs and spaces; Formatting.None miniturizes the result string.
 
