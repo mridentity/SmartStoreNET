@@ -18,6 +18,41 @@
 </form>
 
 <script>
+    // ----------------
+    // Data
+    // ----------------
+
+    // divSubTotal :: Div
+    // div containing subtotal price
+    var divSubTotal = $('div.offcanvas-cart-footer div.sub-total.price');
+
+    // rpSubTotal :: Input
+    // hidden Input containing subtotal price
+    var rpSubTotal = $('#idReadyPayForm input[name="CartSubTotal"]');
+
+    // ----------------
+    // Function
+    // ----------------
+
+    // >>> "$5,988.30 excl tax" => 5988.3000
+    // parseSubtotal :: String -> Float
+    var parseSubTotal = (str) => {
+        // nonNumeric :: RegExp
+        // match: "0 - 9", "."
+        const nonNumeric = /[^\d\.]+/g;
+        return Number(str.replace(nonNumeric, ''));
+    }
+
+    // ----------------
+    // Main
+    // ----------------
+
+    // update `rpSubTotal` each time `divSubTotal` changes
+    divSubTotal.on('DOMSubtreeModified', (e) => {
+        rpSubTotal.val((parseSubTotal($(e.target).text())));
+
+    });
+
     var validate_and_update = function () { };  // Will be re-assigned laster. JS hoisting may take care of this automatically though.
 
     $(function () {
