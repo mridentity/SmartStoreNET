@@ -136,10 +136,10 @@ namespace ReadySignOn.ReadyPay.Controllers
 
         private void PrepareReadyPaymentInfoModel(ReadyPayPaymentInfoModel rp_payment_info)
         {
-            var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
+            //var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
             var store = Services.StoreContext.CurrentStore;
-            var customer = Services.WorkContext.CurrentCustomer;
+            //var customer = Services.WorkContext.CurrentCustomer;
             var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
 
             rp_payment_info.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
@@ -364,6 +364,11 @@ namespace ReadySignOn.ReadyPay.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid CartSubTotal.");
             }
+
+            // Because the tax information is not displayed on the mini cart view the client side would not be able to update it without making a call to the server so we update it here.
+            var store = Services.StoreContext.CurrentStore;
+            var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+            rp_info_model.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
 
             try
             {
