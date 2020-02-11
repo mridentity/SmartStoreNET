@@ -146,8 +146,8 @@ namespace ReadySignOn.ReadyConnect.Core
                     var data = extraData.ToDictionary(x => x.Key, x => x.Value.ToString());
 
                     data.Add("picture", string.Format("_settings.UseSandbox ? " +
-                        "                               https://membersqa.readysignon.com/{0}/picture : " +
-                        "                               https://members.readysignon.com/{0}/picture", 
+                                                        "https://membersqa.readysignon.com/{0}/picture : " +
+                                                        "https://members.readysignon.com/{0}/picture", 
                                                         data["sub"]));  
 
                     return data;
