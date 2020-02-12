@@ -15,7 +15,7 @@
         }
     </style>
 
-    <input id="idReadyTicket" type="text" pattern="\d*" name="ReadyTicket" placeholder="enter ReadyTicket here" required>
+    <input id="idReadyTicket" type="text" name="ReadyTicket" placeholder="enter ReadyTicket here">
     <input id="idBtnReadyPay" type="image" name="ReayPayButton" src="@Url.Content(Model.SubmitButtonImageUrl)">
 
 <script>
@@ -84,50 +84,72 @@
             inputReadyTicket.prop("disabled", true);
             inputReadyPay.attr("src", RS.model.LoaderImageUrl);
             inputReadyPay.prop("disabled", true)
-        }
+        };
 
         // does the opposite of `freeze`
         const unFreeze = () => {
             inputReadyTicket.prop("disabled", false);
             inputReadyPay.prop("disabled", false)
             inputReadyPay.attr("src", RS.model.SubmitButtonImageUrl);
-        }
+        };
+        
+        // custom validation for inputReadyTicket
+        // validateReadyTicket ::  elem -> Bool
+        const validateReadyTicket = (elem) => {
+            const val = $(elem).val()
+            return (val.length > 0 && $.isNumeric(val)) ? true : false
+        };
 
-        // disable/enable `inputReadyPay` if `inputReadyTicket` is invalid/valid
+        // disable/enable `inputReadyPay` on validation of `inputReadyTicket`;
+        // update `RS.model`
         inputReadyTicket.on("input", (e) => {
+
+            updateModel();
+
             const el = e.target;
-            if (el.validity.valid) {
+
+            if (validateReadyTicket(el)) {
                 inputReadyPay.prop("disabled", false);
             }
             else {
-                inputReadyPay.prop("disabled", true)
+                inputReadyPay.prop("disabled", true);
+            }
+
+        });
+        
+        // when `inputReadyPay` is enabled, press "enter"
+        // trigger its `click()`
+        inputReadyTicket.on("keypress", (e) => {	
+            if (e.which == 13)  {
+                // cancel default: form submit 
+                e.preventDefault();	
+                // trigger `inputReadyPay` if it's enabled
+                if (! inputReadyPay.prop("disabled")) {
+                    inputReadyPay.trigger('click');	
+                }
             }
         });
-
-        // ----------------
-        // Main
-        // ----------------
-
-        // disable `inputReadyPay` button on load
-        inputReadyPay.prop("disabled", true)
-
-        // make a HTTP request with updated model;
-        // redirect on success
-        inputReadyPay.on('click', (e) => {
-            
-            // supress form submission made by pressing "enter" or by mouse click
-            e.preventDefault();
-
-            // obtaining the updated values
+        
+        // update `RS.model`
+        const updateModel = () => {
             const modelChanged = {
                 "CartSubTotal": parseSubTotal(tdSubTotal.text()),
                 "TaxTotal": parseSubTotal(tdTaxTotal.text()),
                 "ReadyTicket": inputReadyTicket.val()
             };
-
-            // re-bind RS.model to the updated model
             RS.model = Object.assign(RS.model, modelChanged);
+        };
 
+        // ----------------
+        // Main
+        // ----------------
+        
+        // disable `inputReadyPay` button after page loads
+        inputReadyPay.prop("disabled", true)
+
+        // make HTTP request, redirect on success
+        inputReadyPay.on('click', (e) => {        
+            e.preventDefault();
             // make a HTTP request
             $.ajax({
                 type: 'POST',
@@ -151,8 +173,6 @@
                 }
             });
         });
-
-
     });  
 </script>
 
