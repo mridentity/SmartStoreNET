@@ -82,7 +82,7 @@ namespace ReadySignOn.ReadyPay.Services
             payment_request["RqShpEmail"] = true;
             payment_request["RqShpPh"] = true;
 
-            payment_request["PmtNwks"] = JArray.FromObject(new string[] {"American Express","Visa","MasterCard","Discover"}); // TODO: Perhaps need to create setting options for this.
+            payment_request["PmtNwks"] = JArray.FromObject(new string[] {"AmEx","Visa","MasterCard","Discover"}); // TODO: Perhaps need to create setting options for this.
 
             var shipping_methods = _shippingService.GetAllShippingMethods();
             if (shipping_methods != null && shipping_methods.Count > 0)
