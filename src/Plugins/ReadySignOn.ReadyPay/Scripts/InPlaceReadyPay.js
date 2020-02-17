@@ -64,7 +64,7 @@ getElementsBy(divReadyPay).map(div => {
         // construct data to be posted
         const readyticket = elemReadyTicket.dataset.readyticket;
         const jsonData = {
-            ProductId: productid,
+            AppData: productid,
             CartSubTotal: cartsubtotal,
             TaxTotal: taxtotal,
             Sentinel: sentinel,

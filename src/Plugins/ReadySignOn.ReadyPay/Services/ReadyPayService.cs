@@ -58,7 +58,7 @@ namespace ReadySignOn.ReadyPay.Services
             string payment_processing_country = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";   
             //TODO: In the above we assumed the country where the payment will be processed is the same as the originating country of the shipment. Ideally we could add a setting on the readyPay configuration page.
 
-            string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(rp_info_model.ProductId));
+            string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(rp_info_model.AppData));
 
             //https://stackoverflow.com/questions/9145667/how-to-post-json-to-a-server-using-c
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(ep_create_rp_request);

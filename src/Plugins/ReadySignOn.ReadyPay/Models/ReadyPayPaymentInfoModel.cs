@@ -22,6 +22,6 @@ namespace ReadySignOn.ReadyPay.Models
         public decimal TaxTotal { get; set; }
         public decimal ShippingTotal { get; set; }
         public decimal ShippingTax { get; set; }
-        public string ProductId { get; set; }
+        public string AppData { get; set; }     // Base64 encoded application specific data used by readyPay for tracking orders.
     }
 }

@@ -140,7 +140,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             var store = Services.StoreContext.CurrentStore;
             //var customer = Services.WorkContext.CurrentCustomer;
-            var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+            List<OrganizedShoppingCartItem> cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
 
             rp_payment_info.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
             rp_payment_info.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
@@ -156,7 +156,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             rp_payment_info.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
             rp_payment_info.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? decimal.Zero;
-            rp_payment_info.ProductId = "multiple_products_in_shopping_cart";
+            rp_payment_info.AppData = cart.Select(c => c.Item.ProductId.ToString()).ToArray().StrJoin(","); 
             rp_payment_info.CartSubTotal = subTotalWithDiscountBase;
             rp_payment_info.CurrentPageIsBasket = true;
             Money cart_sub_total = new Money(rp_payment_info.CartSubTotal, store.PrimaryStoreCurrency);
@@ -199,18 +199,25 @@ namespace ReadySignOn.ReadyPay.Controllers
             if (product_price <= 0)
                 return new EmptyResult();
 
+            var product = _productService.GetProductBySku(product_sku);
+            if (product == null 
+                || product.ProductType != SmartStore.Core.Domain.Catalog.ProductType.SimpleProduct
+                || product.ProductVariantAttributes.Count > 0
+                || product.HasTierPrices
+                || product.HasUserAgreement) 
+                return new EmptyResult();
+
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
 
             var rp_payment_info = new ReadyPayPaymentInfoModel();
             rp_payment_info.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
             rp_payment_info.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
-            rp_payment_info.ProductId = product_id;
+            rp_payment_info.AppData = product_id;
             rp_payment_info.CartSubTotal = product_price;
 
             Money cart_sub_total = new Money(product_price, Services.StoreContext.CurrentStore.PrimaryStoreCurrency);
             rp_payment_info.Sentinel = cart_sub_total.ToString(true);
 
-            var product = _productService.GetProductBySku(product_sku);
             var tax_rate = _taxService.GetTaxRate(product.TaxCategoryId, Services.WorkContext.CurrentCustomer);
             // The tax rate is the percentage number so it needs to be divided by 100 to get the actual fraction to be used for calculation.
             rp_payment_info.TaxTotal = product_price * tax_rate / 100;
@@ -276,7 +283,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ReadyTicket.");
             }
 
-            if (String.IsNullOrWhiteSpace(rp_info_model.ProductId))
+            if (String.IsNullOrWhiteSpace(rp_info_model.AppData))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ProductId.");
             }
@@ -355,7 +362,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ReadyTicket.");
             }
 
-            if (String.IsNullOrWhiteSpace(rp_info_model.ProductId))
+            if (String.IsNullOrWhiteSpace(rp_info_model.AppData))
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid ProductId.");
             }
