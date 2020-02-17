@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ReadySignOn.ReadyPay.Controllers;
 using ReadySignOn.ReadyPay.Models;
 using SmartStore;
 using SmartStore.Core.Domain.Shipping;
@@ -12,6 +13,8 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace ReadySignOn.ReadyPay.Services
 {
@@ -51,6 +54,8 @@ namespace ReadySignOn.ReadyPay.Services
 
             string url_paymentupdate = rp_settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
                                                             : "https://iosiap.readysignon.com/PaymentUpdate/";
+
+            url_paymentupdate = _services.StoreContext.CurrentStore.Url.EnsureEndsWith("/") + "Plugins/ReadySignOn.ReadyPay/ReadyPay/";
 
             var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
 

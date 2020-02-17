@@ -28,7 +28,7 @@ using System.Web.Mvc;
 
 namespace ReadySignOn.ReadyPay.Controllers
 {
-    public class ReadyPayController : PublicControllerBase
+    public partial class ReadyPayController : PublicControllerBase
     {
         private readonly ICommonServices                _services;
         private readonly IOrderTotalCalculationService  _orderTotalCalculationService;
@@ -80,6 +80,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                     return RedirectToAction(model.RedirectAction, model.RedirectController, new { area = "" });
             }
         }
+
+        #region Plugin Configuration UI
         public void SetupConfiguration(ReadyPayConfigurationModel model, int storeScope)
         {
             var store = storeScope == 0
@@ -95,7 +97,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             var model = new ReadyPayConfigurationModel();
 
             MiniMapper.Map(settings, model);    // Populate the ReadyPaySettings with system settings
-            
+
             SetupConfiguration(model, storeScope);
 
             return View(model);
@@ -134,6 +136,9 @@ namespace ReadySignOn.ReadyPay.Controllers
             return RedirectToConfiguration(Plugin.SystemName, false);
         }
 
+        #endregion
+
+        #region ReadyPay UI and processing
         private void PrepareReadyPaymentInfoModel(ReadyPayPaymentInfoModel rp_payment_info)
         {
             //var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
@@ -156,7 +161,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             rp_payment_info.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
             rp_payment_info.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? decimal.Zero;
-            rp_payment_info.AppData = cart.Select(c => c.Item.ProductId.ToString()).ToArray().StrJoin(","); 
+            rp_payment_info.AppData = cart.Select(c => c.Item.ProductId.ToString()).ToArray().StrJoin(",");
             rp_payment_info.CartSubTotal = subTotalWithDiscountBase;
             rp_payment_info.CurrentPageIsBasket = true;
             Money cart_sub_total = new Money(rp_payment_info.CartSubTotal, store.PrimaryStoreCurrency);
@@ -206,7 +211,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             if (widget_zone == "productbox_add_info" && (product.Id.ToString() != product_id    // This is a grouped product 
                                                         || product.ProductType != SmartStore.Core.Domain.Catalog.ProductType.SimpleProduct
                                                         || product.HasTierPrices)
-                ) 
+                )
                 return new EmptyResult();
 
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
@@ -224,7 +229,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             // The tax rate is the percentage number so it needs to be divided by 100 to get the actual fraction to be used for calculation.
             rp_payment_info.TaxTotal = product_price * tax_rate / 100;
 
-            if(product.IsShipEnabled || !product.IsFreeShipping)
+            if (product.IsShipEnabled || !product.IsFreeShipping)
             {
                 if (_taxSettings.ShippingIsTaxable)
                 {
@@ -464,6 +469,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             return order_request;
         }
 
+        #endregion
         private Address CreateAddress(
             string email,
             string firstName,
