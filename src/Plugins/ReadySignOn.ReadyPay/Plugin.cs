@@ -140,10 +140,9 @@ namespace ReadySignOn.ReadyPay
 
                 var product_id = summaryItem.Id;
                 var product_sku = summaryItem.Sku;
-                var product_name = summaryItem.Name;
                 var product_price = priceModel.PriceValue;
 
-                SetupInPlaceReadyPayRouteValues(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
+                SetupInPlaceReadyPayRouteValues(ref actionName, ref controllerName, routeValues, product_id, product_sku, widgetZone, ref product_price);
             }
 
             if (widgetZone == "productdetails_add_info" && settings.ShowInPlaceReadyPay_productdetails_add_info)
@@ -152,10 +151,9 @@ namespace ReadySignOn.ReadyPay
 
                 var product_id = product_detail.Id;
                 var product_sku = product_detail.Sku;
-                var product_name = product_detail.Name;
                 var product_price = product_detail.ProductPrice.PriceValue;
 
-                SetupInPlaceReadyPayRouteValues(ref actionName, ref controllerName, routeValues, product_id, product_sku, product_name, ref product_price);
+                SetupInPlaceReadyPayRouteValues(ref actionName, ref controllerName, routeValues, product_id, product_sku, widgetZone, ref product_price);
             }
 
             return;
@@ -164,7 +162,7 @@ namespace ReadySignOn.ReadyPay
         private void SetupInPlaceReadyPayRouteValues(ref string actionName, ref string controllerName, RouteValueDictionary routeValues, 
                                                         int product_id, 
                                                         string product_sku, 
-                                                        SmartStore.Services.Localization.LocalizedValue<string> product_name, 
+                                                        string widget_zone, 
                                                         ref decimal product_price)
         {
             if (product_price > decimal.Zero)
@@ -177,7 +175,7 @@ namespace ReadySignOn.ReadyPay
 
                 routeValues.Add("product_id", product_id);
                 routeValues.Add("product_sku", product_sku);
-                routeValues.Add("product_name", product_name);
+                routeValues.Add("widget_zone", widget_zone);
                 routeValues.Add("product_price", product_price);
             }
         }

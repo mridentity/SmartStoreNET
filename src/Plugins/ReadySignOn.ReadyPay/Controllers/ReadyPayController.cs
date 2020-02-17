@@ -194,17 +194,19 @@ namespace ReadySignOn.ReadyPay.Controllers
         }
 
         //GetDisplayWidgetRoute sets the routes so this method will be used for displaying the wedget at various zones.
-        public ActionResult InPlaceReadyPay(string product_id, string product_sku, string product_name, decimal product_price)
+        public ActionResult InPlaceReadyPay(string product_id, string product_sku, string widget_zone, decimal product_price)
         {
             if (product_price <= 0)
                 return new EmptyResult();
 
             var product = _productService.GetProductBySku(product_sku);
-            if (product == null 
-                || product.ProductType != SmartStore.Core.Domain.Catalog.ProductType.SimpleProduct
-                || product.ProductVariantAttributes.Count > 0
-                || product.HasTierPrices
-                || product.HasUserAgreement) 
+            if (product == null || product.HasUserAgreement || product.IsGiftCard || product.IsRecurring || product.DisableBuyButton || product.ProductVariantAttributes.Count > 0)
+                return new EmptyResult();
+
+            if (widget_zone == "productbox_add_info" && (product.Id.ToString() != product_id    // This is a grouped product 
+                                                        || product.ProductType != SmartStore.Core.Domain.Catalog.ProductType.SimpleProduct
+                                                        || product.HasTierPrices)
+                ) 
                 return new EmptyResult();
 
             var settings = Services.Settings.LoadSetting<ReadyPaySettings>(Services.StoreContext.CurrentStore.Id);
