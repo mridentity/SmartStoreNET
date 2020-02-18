@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.IO;
 
 namespace ReadySignOn.ReadyPay.Controllers
 {
@@ -13,13 +15,17 @@ namespace ReadySignOn.ReadyPay.Controllers
     {
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult> UpdatePaymentMethodCost(JObject json_obj)
+        public async Task<ActionResult> UpdatePaymentMethodCost()
         {
-            //https://forums.asp.net/t/2126864.aspx?How+to+receive+JSON+object+in+POST+using+web+api
-            string json_str = json_obj.ToString();
+            StreamReader stream = new StreamReader(Request.InputStream);
+            string json_str = stream.ReadToEnd();
+
+            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
+            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+
             //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
             var json_result = new JsonResult();
-            json_result.Data = json_obj;
+            json_result.Data = jResult;
             json_result.ContentType = "application/json";
             json_result.ContentEncoding = Encoding.UTF8;
             return json_result;
@@ -27,11 +33,17 @@ namespace ReadySignOn.ReadyPay.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult> UpdateShippingCostForContact(JObject json_obj)
+        public async Task<ActionResult> UpdateShippingCostForContact()
         {
-            string json_str = json_obj.ToString();
+            StreamReader stream = new StreamReader(Request.InputStream);
+            string json_str = stream.ReadToEnd();
+
+            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
+            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+
+            //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
             var json_result = new JsonResult();
-            json_result.Data = json_obj;
+            json_result.Data = jResult;
             json_result.ContentType = "application/json";
             json_result.ContentEncoding = Encoding.UTF8;
             return json_result;
@@ -39,11 +51,17 @@ namespace ReadySignOn.ReadyPay.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult> ShippingMethodsForContact(JObject json_obj)
+        public async Task<ActionResult> ShippingMethodsForContact()
         {
-            string json_str = json_obj.ToString();
+            StreamReader stream = new StreamReader(Request.InputStream);
+            string json_str = stream.ReadToEnd();
+
+            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
+            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+
+            //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
             var json_result = new JsonResult();
-            json_result.Data = json_obj;
+            json_result.Data = jResult;
             json_result.ContentType = "application/json";
             json_result.ContentEncoding = Encoding.UTF8;
             return json_result;
@@ -51,11 +69,17 @@ namespace ReadySignOn.ReadyPay.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult> UpdateShippingCostForShippingMethod(JObject json_obj)
+        public async Task<ActionResult> UpdateShippingCostForShippingMethod()
         {
-            string json_str = json_obj.ToString();
+            StreamReader stream = new StreamReader(Request.InputStream);
+            string json_str = stream.ReadToEnd();
+
+            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
+            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+
+            //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
             var json_result = new JsonResult();
-            json_result.Data = json_obj;
+            json_result.Data = jResult;
             json_result.ContentType = "application/json";
             json_result.ContentEncoding = Encoding.UTF8;
             return json_result;
