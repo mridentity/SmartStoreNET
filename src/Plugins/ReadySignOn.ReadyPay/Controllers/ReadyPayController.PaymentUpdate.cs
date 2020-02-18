@@ -25,26 +25,41 @@ namespace ReadySignOn.ReadyPay.Controllers
             return json_result;
         }
 
-        //[HttpPost("UpdateShippingCostForContact")]         // The API call path is: ~/api/UpdateShippingCostForContact
-        //public async Task<IActionResult> UpdateShippingCostForContact([FromBody]JObject json_obj)
-        //{
-        //    string json_str = json_obj.ToString();
-        //    return Ok(json_obj);
-        //}
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ActionResult> UpdateShippingCostForContact(JObject json_obj)
+        {
+            string json_str = json_obj.ToString();
+            var json_result = new JsonResult();
+            json_result.Data = json_obj;
+            json_result.ContentType = "application/json";
+            json_result.ContentEncoding = Encoding.UTF8;
+            return json_result;
+        }
 
-        //[HttpPost("ShippingMethodsForContact")]         // The API call path is: ~/api/ShippingMethodsForContact
-        //public async Task<IActionResult> ShippingMethodsForContact([FromBody]JObject json_obj)
-        //{
-        //    string json_str = json_obj.ToString();
-        //    return Ok(json_obj);
-        //}
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ActionResult> ShippingMethodsForContact(JObject json_obj)
+        {
+            string json_str = json_obj.ToString();
+            var json_result = new JsonResult();
+            json_result.Data = json_obj;
+            json_result.ContentType = "application/json";
+            json_result.ContentEncoding = Encoding.UTF8;
+            return json_result;
+        }
 
-        //[HttpPost("UpdateShippingCostForShippingMethod")]         // The API call path is: ~/api/UpdateShippingCostForShippingMethod
-        //public async Task<IActionResult> UpdateShippingCostForShippingMethod([FromBody]JObject json_obj)
-        //{
-        //    string json_str = json_obj.ToString();
-        //    return Ok(json_obj);
-        //}
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ActionResult> UpdateShippingCostForShippingMethod(JObject json_obj)
+        {
+            string json_str = json_obj.ToString();
+            var json_result = new JsonResult();
+            json_result.Data = json_obj;
+            json_result.ContentType = "application/json";
+            json_result.ContentEncoding = Encoding.UTF8;
+            return json_result;
+        }
 
     }
 }

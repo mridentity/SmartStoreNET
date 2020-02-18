@@ -52,10 +52,24 @@ namespace ReadySignOn.ReadyPay.Services
                                                  : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
             ep_create_rp_request += rp_info_model.ReadyTicket;
 
-            string url_paymentupdate = rp_settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
-                                                            : "https://iosiap.readysignon.com/PaymentUpdate/";
+            string url_paymentupdate = _services.StoreContext.CurrentStore.Url.EnsureEndsWith("/") + "Plugins/ReadySignOn.ReadyPay/ReadyPay/";
 
-            url_paymentupdate = _services.StoreContext.CurrentStore.Url.EnsureEndsWith("/") + "Plugins/ReadySignOn.ReadyPay/ReadyPay/";
+            if (url_paymentupdate.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) || url_paymentupdate.StartsWith("https://localhost", StringComparison.OrdinalIgnoreCase))
+            {
+                //Since localhost is unreachable by other devices we will set the paymentupdate endpoint to
+                //the default ReadyConnect paymentupdate endpoint. Note: ReadyConnect endpoint cannot and
+                //will not produce the correct updates (shipping methods, costs, tax etc.) that are specific
+                //to individual merchants during the processing of a readyPay request, it simply echos whatever
+                //it receives back to the caller so that readyPay requests can be processed without error. This
+                //endpoint is offered as a convenient for developers to test and debug their implementations.
+                //!!! WARNING!!!! LIVE PRODUCTION IMPLEMENTATION SHOULD NOT RELY ON THIS CONVENIENT ENDPOINT
+                // AS DOING SO MAY ALLOW ORDER TO BE PLACED WITH INCORRECT SHIPPING CHARGES OR FEES. EACH MERCHANT
+                // MUST IMPLEMENT THEIR OWN PAYMENT UPDATE ENDPOINT THAT PROVIDES SHIPPING METHODS AND FEES SPECIFIC
+                // TO THEIR BUSINESS.
+
+                url_paymentupdate = rp_settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
+                                                            : "https://iosiap.readysignon.com/PaymentUpdate/";
+            }
 
             var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
 
