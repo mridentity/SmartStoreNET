@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
+using SmartStore;
+using SmartStore.Core.Logging;
 
 namespace ReadySignOn.ReadyPay.Controllers
 {
@@ -20,15 +22,57 @@ namespace ReadySignOn.ReadyPay.Controllers
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_str = stream.ReadToEnd();
 
-            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
-            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+            JObject jObj = JObject.Parse(json_str);
 
-            //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
-            var json_result = new JsonResult();
-            json_result.Data = jResult;
-            json_result.ContentType = "application/json";
-            json_result.ContentEncoding = Encoding.UTF8;
-            return json_result;
+            try
+            {
+                //Get the product IDs of this payment
+                string product_id_str = jObj["appDataB64"].ToString();
+                if (string.IsNullOrEmpty(product_id_str))
+                {
+                    throw new ArgumentException("//Product ID cannot be null or empty when updating payment method cost.");
+                }
+
+                int[] product_ids = Encoding.UTF8.GetString(Convert.FromBase64String(product_id_str)).ToIntArray();
+                if (product_ids.IsNullOrEmpty())
+                {
+                    throw new ArgumentException("//Product ID is required when updating payment method cost.");
+                }
+
+                //Get selected payment name
+                string selected_payment = jObj["paymentName"].ToString();
+
+                if(string.IsNullOrEmpty(selected_payment))
+                {
+                    throw new ArgumentException("//Payment method name cannot be null or empty when updating payment method cost.");
+                }
+
+                //Get payment network name
+                string payment_network = jObj["paymentNetwork"].ToString();
+
+                if(string.IsNullOrEmpty(payment_network))
+                {
+                    throw new ArgumentException("//Payment network cannot be null or empty when updating payment method cost.");
+                }
+
+                //Get payment type
+                string payment_type = jObj["PaymentType"].ToString();
+
+                if(string.IsNullOrEmpty(payment_type))
+                {
+                    throw new ArgumentException("//Payment type cannot be null or empty when updating payment method cost.");
+                }
+
+
+
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex);
+                return new EmptyResult();
+            }
+
+            return Json(jObj, "application/json", Encoding.UTF8);
         }
 
         [HttpPost]
@@ -38,15 +82,9 @@ namespace ReadySignOn.ReadyPay.Controllers
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_str = stream.ReadToEnd();
 
-            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
-            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+            JObject jObj = JObject.Parse(json_str);
 
-            //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
-            var json_result = new JsonResult();
-            json_result.Data = jResult;
-            json_result.ContentType = "application/json";
-            json_result.ContentEncoding = Encoding.UTF8;
-            return json_result;
+            return Json(jObj, "application/json", Encoding.UTF8);
         }
 
         [HttpPost]
@@ -56,15 +94,9 @@ namespace ReadySignOn.ReadyPay.Controllers
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_str = stream.ReadToEnd();
 
-            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
-            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+            JObject jObj = JObject.Parse(json_str);
 
-            //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
-            var json_result = new JsonResult();
-            json_result.Data = jResult;
-            json_result.ContentType = "application/json";
-            json_result.ContentEncoding = Encoding.UTF8;
-            return json_result;
+            return Json(jObj, "application/json", Encoding.UTF8);
         }
 
         [HttpPost]
@@ -74,16 +106,9 @@ namespace ReadySignOn.ReadyPay.Controllers
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_str = stream.ReadToEnd();
 
-            //http://techxposer.com/2017/05/03/do-we-need-to-use-newtonsoft-json-jsonconvert-deserializeobject-or-newtonsoft-json-linq-jtoken-parse/
-            dynamic jResult = Newtonsoft.Json.JsonConvert.DeserializeObject(json_str);
+            JObject jObj = JObject.Parse(json_str);
 
-            //https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
-            var json_result = new JsonResult();
-            json_result.Data = jResult;
-            json_result.ContentType = "application/json";
-            json_result.ContentEncoding = Encoding.UTF8;
-            return json_result;
+            return Json(jObj, "application/json", Encoding.UTF8);
         }
-
     }
 }

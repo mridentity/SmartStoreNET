@@ -17,7 +17,7 @@ namespace ReadySignOn.ReadyPay.Models
         {
             CustomProperties = new Dictionary<string, CustomPaymentRequestValue>();
             IsMultiOrder = false;
-            ShoppingCartItemIds = new List<int>();
+            ShoppingCartItemProdutIds = new List<int>();
         }
 
         #region ReadyPay related
@@ -81,7 +81,7 @@ namespace ReadySignOn.ReadyPay.Models
         /// </summary>
         public Dictionary<string, CustomPaymentRequestValue> CustomProperties { get; set; }
 
-        public IList<int> ShoppingCartItemIds { get; set; }
+        public IList<int> ShoppingCartItemProdutIds { get; set; }
 
         #region Payment method specific properties 
 

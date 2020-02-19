@@ -198,10 +198,10 @@ namespace ReadySignOn.ReadyPay.Services
 
             if(!processPaymentRequest.IsInPlaceReadyPayOrder)
             {
-                if (processPaymentRequest.ShoppingCartItemIds.Any())
+                if (processPaymentRequest.ShoppingCartItemProdutIds.Any())
                 {
                     cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, processPaymentRequest.StoreId)
-                        .Where(x => processPaymentRequest.ShoppingCartItemIds.Contains(x.Item.Id))
+                        .Where(x => processPaymentRequest.ShoppingCartItemProdutIds.Contains(x.Item.ProductId))
                         .ToList();
                 }
                 else
@@ -258,11 +258,11 @@ namespace ReadySignOn.ReadyPay.Services
                 var orderShippingTotalInclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, true, out var orderShippingTaxRate, out var shippingTotalDiscount);
                 var orderShippingTotalExclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, false);
 
-                if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
-                {
-                    warnings.Add(T("Order.CannotCalculateShippingTotal"));
-                    return warnings;
-                }
+                //if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
+                //{
+                //    warnings.Add(T("Order.CannotCalculateShippingTotal"));
+                //    return warnings;
+                //}
 
                 var cartTotal = _orderTotalCalculationService.GetShoppingCartTotal(cart);
                 if (!cartTotal.TotalAmount.HasValue)
@@ -653,7 +653,7 @@ namespace ReadySignOn.ReadyPay.Services
 
                         if (processPaymentRequest.IsInPlaceReadyPayOrder)   // InPlaceReadyPay does not have cart item so we need to add the product to order as an item directly.
                         {
-                            int product_id = processPaymentRequest.ShoppingCartItemIds.First();
+                            int product_id = processPaymentRequest.ShoppingCartItemProdutIds.First();
                             var product = _productService.GetProductById(product_id);
 
                             var orderItem = new OrderItem

@@ -280,9 +280,13 @@ namespace ReadySignOn.ReadyPay.Controllers
             return PartialView(rp_payment_info);
         }
 
+        /// <summary>
+        /// This action method is used for processing postback from InPlaceReadyPay widget
+        /// </summary>
+        /// <param name="rp_info_model">readyPay payment model containning informaiton necessary to create a readyPay request.</param>
+        /// <returns>Stringified JSON object that contains the necessary information for the front-end script to create a pop-up notification window.</returns>
         [HttpPost]
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
         public ActionResult InPlaceReadyPayPosted(ReadyPayPaymentInfoModel rp_info_model)
         {
             if (String.IsNullOrWhiteSpace(rp_info_model.ReadyTicket))
@@ -360,9 +364,13 @@ namespace ReadySignOn.ReadyPay.Controllers
             }
         }
 
+        /// <summary>
+        /// This action method is used for handling postbacks from both mini shopping cart as well as the shopping cart (PaymentInfo)
+        /// </summary>
+        /// <param name="rp_info_model">readyPay payment model containning informaiton necessary to create a readyPay request.</param>
+        /// <returns>An HTTP redirect to the order page.</returns>
         [HttpPost]
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken]
         public ActionResult MiniCartReadyPayPosted(ReadyPayPaymentInfoModel rp_info_model)
         {
             if (String.IsNullOrWhiteSpace(rp_info_model.ReadyTicket))
@@ -384,6 +392,8 @@ namespace ReadySignOn.ReadyPay.Controllers
             var store = Services.StoreContext.CurrentStore;
             var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
             rp_info_model.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
+            rp_info_model.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? 0;
+            rp_info_model.ShippingTax = _orderTotalCalculationService.GetShoppingCartAdditionalShippingCharge(cart); // TODO: Not sure this is the correct way of getting the shipping tax, need to verify.
 
             try
             {
@@ -467,7 +477,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             order_request.OrderSubtotalExclTax = readypay_request.CartSubTotal;
             order_request.OrderSubtotalInclTax = (order_request.OrderTotal - order_request.OrderShippingInclTax);
             order_request.OrderTax = readypay_request.TaxTotal;
-            order_request.ShoppingCartItemIds = readypay_request.AppData.ToIntArray();
+            order_request.ShoppingCartItemProdutIds = readypay_request.AppData.ToIntArray();
             order_request.TaxRate = order_request.OrderTax / order_request.OrderTotal * 100.0M;
             return order_request;
         }
