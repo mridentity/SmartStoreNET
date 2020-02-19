@@ -471,7 +471,7 @@ namespace ReadySignOn.ReadyPay.Services
                             PaymentMethodAdditionalFeeInclTax = processPaymentRequest.PaymentMethodAdditionalFeeTaxRate,
                             PaymentMethodAdditionalFeeExclTax = processPaymentRequest.PaymentMethodAdditionalFeeExclTax,
                             PaymentMethodAdditionalFeeTaxRate = processPaymentRequest.PaymentMethodAdditionalFeeTaxRate,
-                            TaxRates = processPaymentRequest.TaxRates,
+                            TaxRates = processPaymentRequest.TaxRate.ToString(),
                             OrderTax = processPaymentRequest.OrderTax,
                             OrderTotalRounding = processPaymentRequest.OrderTotalRounding,
                             OrderTotal = processPaymentRequest.OrderTotal,
@@ -649,7 +649,39 @@ namespace ReadySignOn.ReadyPay.Services
                             {
                                 cart.ToList().ForEach(sci => _shoppingCartService.DeleteShoppingCartItem(sci.Item, false));
                             }
+                        }   // Move items from cart to order
+
+                        if (processPaymentRequest.IsInPlaceReadyPayOrder)   // InPlaceReadyPay does not have cart item so we need to add the product to order as an item directly.
+                        {
+                            int product_id = processPaymentRequest.ShoppingCartItemIds.First();
+                            var product = _productService.GetProductById(product_id);
+
+                            var orderItem = new OrderItem
+                            {
+                                OrderItemGuid = Guid.NewGuid(),
+                                Order = order,
+                                ProductId = product_id,
+                                UnitPriceInclTax = processPaymentRequest.OrderSubtotalInclTax,
+                                UnitPriceExclTax = processPaymentRequest.OrderSubtotalExclTax,
+                                PriceInclTax = processPaymentRequest.OrderSubtotalInclTax,
+                                PriceExclTax = processPaymentRequest.OrderSubtotalExclTax,
+                                TaxRate = processPaymentRequest.TaxRate,
+                                Quantity = 1,
+                                DiscountAmountInclTax = processPaymentRequest.OrderDiscount,
+                                DiscountAmountExclTax = processPaymentRequest.OrderDiscount,
+                                DownloadCount = 0,
+                                IsDownloadActivated = false,
+                                LicenseDownloadId = 0,
+                                ItemWeight = product.Weight,
+                                ProductCost = product.ProductCost,
+                                DeliveryTimeId = product.DeliveryTimeId,
+                                DisplayDeliveryTime = true
+                            };
+
+                            order.OrderItems.Add(orderItem);
+
                         }
+
 
                         // Discount usage history.
                         {

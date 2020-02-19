@@ -308,6 +308,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 // be sent to the end user.
 
                 ReadyOrderRequest order_request = PrepareOrderRequest(rp_info_model, rpayment);
+
                 order_request.IsInPlaceReadyPayOrder = true;
 
                 var order_result = _readyPayOrders.PlaceOrder(order_request, new Dictionary<string, string>());
@@ -466,6 +467,8 @@ namespace ReadySignOn.ReadyPay.Controllers
             order_request.OrderSubtotalExclTax = readypay_request.CartSubTotal;
             order_request.OrderSubtotalInclTax = (order_request.OrderTotal - order_request.OrderShippingInclTax);
             order_request.OrderTax = readypay_request.TaxTotal;
+            order_request.ShoppingCartItemIds = readypay_request.AppData.ToIntArray();
+            order_request.TaxRate = order_request.OrderTax / order_request.OrderTotal * 100.0M;
             return order_request;
         }
 

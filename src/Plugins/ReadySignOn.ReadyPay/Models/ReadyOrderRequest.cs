@@ -30,7 +30,7 @@ namespace ReadySignOn.ReadyPay.Models
         public decimal PaymentMethodAdditionalFeeInclTax { get; set; }
         public decimal PaymentMethodAdditionalFeeExclTax { get; set; }
         public decimal PaymentMethodAdditionalFeeTaxRate { get; set; }
-        public string TaxRates { get; set; }
+        public decimal TaxRate { get; set; }
         public decimal OrderTotalRounding { get; set; }
         public decimal OrderDiscount { get; set; }
         public decimal CreditBalance { get; set; }
