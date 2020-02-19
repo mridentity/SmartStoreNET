@@ -10,15 +10,22 @@ namespace ReadySignOn.ReadyPay
 	{
 		public void RegisterRoutes(RouteCollection routes)
 		{
-			routes.MapRoute("ReadySignOn.ReadyPay",
+            routes.MapRoute("ReadySignOn.ReadyPay",
                     "Plugins/ReadySignOn.ReadyPay/{controller}/{action}",
-					new { controller = "ReadyPay" },
-					new[] { "ReadySignOn.ReadyPay.Controllers" }
-			)
-			.DataTokens["area"] = Plugin.SystemName;
+                    new { controller = "ReadyPay" },
+                    new[] { "ReadySignOn.ReadyPay.Controllers" }
+            )
+            .DataTokens["area"] = Plugin.SystemName;
 
-			// for backward compatibility (IPN!)
-			routes.MapRoute("ReadySignOn.ReadyPay.Legacy",
+            routes.MapRoute("ReadySignOn.ReadyPay.PaymentUpdate",
+                    "Plugins/ReadySignOn.ReadyPay/{controller}/api/{action}",
+                    new { controller = "ReadyPay" },
+                    new[] { "ReadySignOn.ReadyPay.Controllers" }
+            )
+            .DataTokens["area"] = Plugin.SystemName;
+
+            // for backward compatibility (IPN!)
+            routes.MapRoute("ReadySignOn.ReadyPay.Legacy",
 					"Plugins/PaymentsReadyPay/{action}",
 					new { controller = "ReadyPay" },
 					new[] { "ReadySignOn.ReadyPay.Controllers" }

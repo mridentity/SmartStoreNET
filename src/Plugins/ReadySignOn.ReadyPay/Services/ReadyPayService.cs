@@ -52,9 +52,9 @@ namespace ReadySignOn.ReadyPay.Services
                                                  : "https://readyconnectsvc.readysignon.com/api/ReadyPay/CreatePurchaseRequest/";
             ep_create_rp_request += rp_info_model.ReadyTicket;
 
-            string url_paymentupdate = _services.StoreContext.CurrentStore.Url.EnsureEndsWith("/") + "Plugins/ReadySignOn.ReadyPay/ReadyPay/";
+            string url_paymentupdate = _services.StoreContext.CurrentStore.SecureUrl.EnsureEndsWith("/") + "Plugins/ReadySignOn.ReadyPay/ReadyPay/";
 
-            if (url_paymentupdate.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) || url_paymentupdate.StartsWith("https://localhost", StringComparison.OrdinalIgnoreCase))
+            if (url_paymentupdate.StartsWith("https://localhost", StringComparison.OrdinalIgnoreCase))
             {
                 //Since localhost is unreachable by other devices we will set the paymentupdate endpoint to
                 //the default ReadyConnect paymentupdate endpoint. Note: ReadyConnect endpoint cannot and
