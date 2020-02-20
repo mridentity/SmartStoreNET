@@ -265,43 +265,38 @@ namespace ReadySignOn.ReadyPay.Services
                 //    return warnings;
                 //}
 
-                var cartTotal = _orderTotalCalculationService.GetShoppingCartTotal(cart);
-                if (!cartTotal.TotalAmount.HasValue)
-                {
-                    warnings.Add(T("Order.CannotCalculateOrderTotal"));
-                    return warnings;
-                }
+                var cartTotalAmount = _orderTotalCalculationService.GetShoppingCartTotal(cart).TotalAmount ?? processPaymentRequest.OrderTotal;
 
-                skipPaymentWorkflow = cartTotal.TotalAmount.Value == decimal.Zero;
+                skipPaymentWorkflow = cartTotalAmount == decimal.Zero;
 
                 // Address validations.
-                if (customer.BillingAddress == null)
+                if (processPaymentRequest.BillingAddress == null)
                 {
                     warnings.Add(T("Order.BillingAddressMissing"));
                 }
-                else if (!customer.BillingAddress.Email.IsEmail())
+                else if (!processPaymentRequest.BillingAddress.Email.IsEmail())
                 {
                     warnings.Add(T("Common.Error.InvalidEmail"));
                 }
-                else if (customer.BillingAddress.Country != null && !customer.BillingAddress.Country.AllowsBilling)
+                else if (processPaymentRequest.BillingAddress.Country != null && !processPaymentRequest.BillingAddress.Country.AllowsBilling)
                 {
-                    warnings.Add(T("Order.CountryNotAllowedForBilling", customer.BillingAddress.Country.Name));
+                    warnings.Add(T("Order.CountryNotAllowedForBilling", processPaymentRequest.BillingAddress.Country.Name));
                 }
 
                 if (cart.RequiresShipping())
                 {
-                    if (customer.ShippingAddress == null)
+                    if (processPaymentRequest.ShippingAddress == null)
                     {
                         warnings.Add(T("Order.ShippingAddressMissing"));
                         throw new SmartException();
                     }
-                    else if (!customer.ShippingAddress.Email.IsEmail())
+                    else if (!processPaymentRequest.ShippingAddress.Email.IsEmail())
                     {
                         warnings.Add(T("Common.Error.InvalidEmail"));
                     }
-                    else if (customer.ShippingAddress.Country != null && !customer.ShippingAddress.Country.AllowsShipping)
+                    else if (processPaymentRequest.ShippingAddress.Country != null && !processPaymentRequest.ShippingAddress.Country.AllowsShipping)
                     {
-                        warnings.Add(T("Order.CountryNotAllowedForShipping", customer.ShippingAddress.Country.Name));
+                        warnings.Add(T("Order.CountryNotAllowedForShipping", processPaymentRequest.ShippingAddress.Country.Name));
                     }
                 }
             }
@@ -340,21 +335,7 @@ namespace ReadySignOn.ReadyPay.Services
             try
             {
                 var customer = _customerService.GetCustomerById(processPaymentRequest.CustomerId);
-                
-                if (customer.BillingAddress == null)
-                {
-                    customer.BillingAddress = processPaymentRequest.BillingAddress;
-                }
 
-                if (customer.ShippingAddress == null)
-                {
-                    customer.ShippingAddress = processPaymentRequest.ShippingAddress;
-                }
-
-                if (customer.Email == null)
-                {
-                    customer.Email = processPaymentRequest.ShippingAddress.Email;
-                }
 
                 var warnings = GetOrderPlacementWarnings(processPaymentRequest, customer, out var cart);
                 if (warnings.Any())
