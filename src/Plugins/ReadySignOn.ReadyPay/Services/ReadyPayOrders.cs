@@ -258,6 +258,7 @@ namespace ReadySignOn.ReadyPay.Services
                 var orderShippingTotalInclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, true, out var orderShippingTaxRate, out var shippingTotalDiscount);
                 var orderShippingTotalExclTax = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart, false);
 
+                //Comment out here because InPlaceReadyPay would not have items added to a cart so it will fail the validation below.
                 //if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
                 //{
                 //    warnings.Add(T("Order.CannotCalculateShippingTotal"));
@@ -651,7 +652,7 @@ namespace ReadySignOn.ReadyPay.Services
                             }
                         }   // Move items from cart to order
 
-                        if (processPaymentRequest.IsInPlaceReadyPayOrder)   // InPlaceReadyPay does not have cart item so we need to add the product to order as an item directly.
+                        if (processPaymentRequest.IsInPlaceReadyPayOrder)   // InPlaceReadyPay does not have cart item so we need to add the product to the order as an item directly.
                         {
                             int product_id = processPaymentRequest.ShoppingCartItemProdutIds.First();
                             var product = _productService.GetProductById(product_id);

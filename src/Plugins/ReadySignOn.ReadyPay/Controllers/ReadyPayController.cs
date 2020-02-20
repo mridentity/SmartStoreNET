@@ -388,7 +388,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid CartSubTotal.");
             }
 
-            // Because the tax information is not displayed on the mini cart view the client side would not be able to update it without making a call to the server so we update it here.
+            // Because the tax information is not displayed on the mini cart view the client side would not be able to update it (after a spinned quatity change) without making a call to the server so we refresh our model object it here.
             var store = Services.StoreContext.CurrentStore;
             var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
             rp_info_model.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
@@ -477,7 +477,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             order_request.OrderSubtotalExclTax = readypay_request.CartSubTotal;
             order_request.OrderSubtotalInclTax = (order_request.OrderTotal - order_request.OrderShippingInclTax);
             order_request.OrderTax = readypay_request.TaxTotal;
-            order_request.ShoppingCartItemProdutIds = readypay_request.AppData.ToIntArray();
+            order_request.ShoppingCartItemProdutIds = readypay_request.AppData.ToIntArray(); // TODO: Make sure that SHA256(AppData) is identical to rpayment.paymentData.header.applicationData
             order_request.TaxRate = order_request.OrderTax / order_request.OrderTotal * 100.0M;
             return order_request;
         }
