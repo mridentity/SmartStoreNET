@@ -20,7 +20,7 @@ namespace ReadySignOn.ReadyPay.Models
         public string LoaderImageUrl { get; set; }
         public decimal CartSubTotal { get; set; }
         public decimal TaxTotal { get; set; }
-        public decimal ShippingTotal { get; set; }
+        public decimal? ShippingTotal { get; set; }
         public decimal ShippingTax { get; set; }
         public string AppData { get; set; }     // Base64 encoded application specific data used by readyPay for tracking orders.
     }

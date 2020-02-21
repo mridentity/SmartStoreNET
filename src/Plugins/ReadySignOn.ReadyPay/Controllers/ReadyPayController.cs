@@ -160,7 +160,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 out orderSubTotalDiscountAmountBase, out orderSubTotalAppliedDiscount, out subTotalWithoutDiscountBase, out subTotalWithDiscountBase);
 
             rp_payment_info.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
-            rp_payment_info.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? decimal.Zero;
+            rp_payment_info.ShippingTotal = rp_payment_info.ShippingTotal ?? (_orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? decimal.Zero);
             rp_payment_info.AppData = cart.Select(c => c.Item.ProductId.ToString()).ToArray().StrJoin(",");
             rp_payment_info.CartSubTotal = subTotalWithDiscountBase;
             rp_payment_info.CurrentPageIsBasket = true;

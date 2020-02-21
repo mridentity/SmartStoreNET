@@ -110,7 +110,7 @@ namespace ReadySignOn.ReadyPay.Services
 
                 foreach (SmartStore.Core.Domain.Shipping.ShippingMethod s_method in shipping_methods)
                 {
-                    decimal shipping_cost = rp_info_model.ShippingTotal;    //The actual shipping cost needs to be updated via readyPay PaymentUpdate callback endpoint, so here we just assign the current shipping cost shown to the user.
+                    decimal shipping_cost = rp_info_model.ShippingTotal ?? decimal.Zero;    //The actual shipping cost needs to be updated via readyPay PaymentUpdate callback endpoint, so here we just assign the current shipping cost shown to the user.
 
                     JObject j_method = new JObject();
                     j_method["Lbl"] = s_method.Name;
