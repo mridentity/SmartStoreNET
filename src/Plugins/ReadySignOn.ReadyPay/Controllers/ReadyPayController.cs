@@ -228,20 +228,24 @@ namespace ReadySignOn.ReadyPay.Controllers
             var tax_rate = _taxService.GetTaxRate(product.TaxCategoryId, Services.WorkContext.CurrentCustomer);
             // The tax rate is the percentage number so it needs to be divided by 100 to get the actual fraction to be used for calculation.
             rp_payment_info.TaxTotal = product_price * tax_rate / 100;
+            // Next we need to figure out shipping total and add shipping tax if any to the tax total
+            // However since we're using readyPay we will let readyPay payment update service to handle that.
+            return PartialView(rp_payment_info);
+
 
             if (product.IsShipEnabled || !product.IsFreeShipping)
             {
                 if (_taxSettings.ShippingIsTaxable)
                 {
-                    var shipping_tax_rate = decimal.Zero;
+                    var shipping_fee = decimal.Zero;
 
                     var shippingOption = Services.WorkContext.CurrentCustomer.GetAttribute<ShippingOption>(SystemCustomerAttributeNames.SelectedShippingOption, Services.StoreContext.CurrentStore.Id);
                     if (shippingOption != null && shippingOption.Rate > 0)
                     {
-                        shipping_tax_rate = shippingOption.Rate;
+                        shipping_fee = shippingOption.Rate;
                     }
 
-                    if (shipping_tax_rate <= 0 && !_taxSettings.ShippingPriceIncludesTax)
+                    if (shipping_fee > 0 && !_taxSettings.ShippingPriceIncludesTax)
                     {
                         var taxCategoryId = 0;
 
@@ -257,8 +261,8 @@ namespace ReadySignOn.ReadyPay.Controllers
                             taxCategoryId = _taxSettings.ShippingTaxClassId;
                         }
 
-                        var shipping_tax = _taxService.GetShippingPrice(product_price, true, Services.WorkContext.CurrentCustomer, taxCategoryId, out shipping_tax_rate)
-                                        - _taxService.GetShippingPrice(product_price, false, Services.WorkContext.CurrentCustomer, taxCategoryId, out shipping_tax_rate);
+                        var shipping_tax = _taxService.GetShippingPrice(product_price, true, Services.WorkContext.CurrentCustomer, taxCategoryId, out shipping_fee)
+                                        - _taxService.GetShippingPrice(product_price, false, Services.WorkContext.CurrentCustomer, taxCategoryId, out shipping_fee);
 
                         shipping_tax = shipping_tax.RoundIfEnabledFor(Services.StoreContext.CurrentStore.PrimaryStoreCurrency);
 
@@ -277,7 +281,6 @@ namespace ReadySignOn.ReadyPay.Controllers
                 rp_payment_info.ShippingTotal = decimal.Zero;
             }
 
-            return PartialView(rp_payment_info);
         }
 
         /// <summary>
@@ -390,10 +393,11 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             // Because the tax information is not displayed on the mini cart view the client side would not be able to update it (after a spinned quatity change) without making a call to the server so we refresh our model object it here.
             var store = Services.StoreContext.CurrentStore;
-            var cart = Services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
+            var customer = Services.WorkContext.CurrentCustomer;
+            var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
             rp_info_model.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
             rp_info_model.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? 0;
-            rp_info_model.ShippingTax = _orderTotalCalculationService.GetShoppingCartAdditionalShippingCharge(cart); // TODO: Not sure this is the correct way of getting the shipping tax, need to verify.
+            rp_info_model.ShippingTax = _taxService.GetShippingPrice(rp_info_model.ShippingTotal.Value, true, customer) - _taxService.GetShippingPrice(rp_info_model.ShippingTotal.Value, false, customer);
 
             try
             {

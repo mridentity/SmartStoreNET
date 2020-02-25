@@ -15,13 +15,13 @@ namespace ReadySignOn.ReadyPay.Models
 
         public string Sentinel { get; set; }
         public string ReadyTicket { get; set; }
-        public bool CurrentPageIsBasket { get; set; }
+        public bool   CurrentPageIsBasket { get; set; }
         public string SubmitButtonImageUrl { get; set; }
         public string LoaderImageUrl { get; set; }
-        public decimal CartSubTotal { get; set; }
-        public decimal TaxTotal { get; set; }
-        public decimal? ShippingTotal { get; set; }
-        public decimal ShippingTax { get; set; }
-        public string AppData { get; set; }     // Base64 encoded application specific data used by readyPay for tracking orders.
+        public decimal CartSubTotal { get; set; }       // All the items of the order excluding shippig and tax
+        public decimal TaxTotal { get; set; }           // The total tax amount including shipping tax if any.
+        public decimal? ShippingTotal { get; set; }     // The total shipping cost including shipping tas if any
+        public decimal ShippingTax { get; set; }        // The tax amount for shipping
+        public string AppData { get; set; }             // Base64 encoded application specific data used by readyPay for tracking orders.
     }
 }
