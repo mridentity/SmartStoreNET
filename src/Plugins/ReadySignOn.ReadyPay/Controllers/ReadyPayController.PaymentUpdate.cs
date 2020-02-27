@@ -163,8 +163,16 @@ namespace ReadySignOn.ReadyPay.Controllers
                 }
 
                 // Generate list of shipping options
+                //TODO: Need to change to using customer guid to get cart...
                 var cart = new List<OrganizedShoppingCartItem>();
                 cart.Clear();
+
+                foreach (int p_id in product_ids)
+                {
+                    ShoppingCartItem sci = new ShoppingCartItem();
+                    sci.Product = _productService.GetProductById(p_id);
+                }
+
                 cart.Add(new OrganizedShoppingCartItem(new ShoppingCartItem { ProductId = 1 }));
 
             }
