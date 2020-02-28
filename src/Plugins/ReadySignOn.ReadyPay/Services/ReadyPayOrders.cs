@@ -196,7 +196,7 @@ namespace ReadySignOn.ReadyPay.Services
                 return warnings;
             }
 
-            if(!processPaymentRequest.IsInPlaceReadyPayOrder)
+            //if(!processPaymentRequest.IsInPlaceReadyPayOrder)
             {
                 if (processPaymentRequest.ShoppingCartItemProdutIds.Any())
                 {
@@ -633,36 +633,36 @@ namespace ReadySignOn.ReadyPay.Services
                             }
                         }   // Move items from cart to order
 
-                        if (processPaymentRequest.IsInPlaceReadyPayOrder)   // InPlaceReadyPay does not have cart item so we need to add the product to the order as an item directly.
-                        {
-                            int product_id = processPaymentRequest.ShoppingCartItemProdutIds.First();
-                            var product = _productService.GetProductById(product_id);
+                        //if (processPaymentRequest.IsInPlaceReadyPayOrder)   // InPlaceReadyPay does not have cart item so we need to add the product to the order as an item directly.
+                        //{
+                        //    int product_id = processPaymentRequest.ShoppingCartItemProdutIds.First();
+                        //    var product = _productService.GetProductById(product_id);
 
-                            var orderItem = new OrderItem
-                            {
-                                OrderItemGuid = Guid.NewGuid(),
-                                Order = order,
-                                ProductId = product_id,
-                                UnitPriceInclTax = processPaymentRequest.OrderSubtotalInclTax,
-                                UnitPriceExclTax = processPaymentRequest.OrderSubtotalExclTax,
-                                PriceInclTax = processPaymentRequest.OrderSubtotalInclTax,
-                                PriceExclTax = processPaymentRequest.OrderSubtotalExclTax,
-                                TaxRate = processPaymentRequest.TaxRate,
-                                Quantity = 1,
-                                DiscountAmountInclTax = processPaymentRequest.OrderDiscount,
-                                DiscountAmountExclTax = processPaymentRequest.OrderDiscount,
-                                DownloadCount = 0,
-                                IsDownloadActivated = false,
-                                LicenseDownloadId = 0,
-                                ItemWeight = product.Weight,
-                                ProductCost = product.ProductCost,
-                                DeliveryTimeId = product.DeliveryTimeId,
-                                DisplayDeliveryTime = true
-                            };
+                        //    var orderItem = new OrderItem
+                        //    {
+                        //        OrderItemGuid = Guid.NewGuid(),
+                        //        Order = order,
+                        //        ProductId = product_id,
+                        //        UnitPriceInclTax = processPaymentRequest.OrderSubtotalInclTax,
+                        //        UnitPriceExclTax = processPaymentRequest.OrderSubtotalExclTax,
+                        //        PriceInclTax = processPaymentRequest.OrderSubtotalInclTax,
+                        //        PriceExclTax = processPaymentRequest.OrderSubtotalExclTax,
+                        //        TaxRate = processPaymentRequest.TaxRate,
+                        //        Quantity = 1,
+                        //        DiscountAmountInclTax = processPaymentRequest.OrderDiscount,
+                        //        DiscountAmountExclTax = processPaymentRequest.OrderDiscount,
+                        //        DownloadCount = 0,
+                        //        IsDownloadActivated = false,
+                        //        LicenseDownloadId = 0,
+                        //        ItemWeight = product.Weight,
+                        //        ProductCost = product.ProductCost,
+                        //        DeliveryTimeId = product.DeliveryTimeId,
+                        //        DisplayDeliveryTime = true
+                        //    };
 
-                            order.OrderItems.Add(orderItem);
+                        //    order.OrderItems.Add(orderItem);
 
-                        }
+                        //}
 
 
                         // Discount usage history.

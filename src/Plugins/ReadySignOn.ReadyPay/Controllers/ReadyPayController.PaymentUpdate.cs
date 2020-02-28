@@ -102,16 +102,10 @@ namespace ReadySignOn.ReadyPay.Controllers
             try
             {
                 //Get the product IDs of this payment
-                string product_id_str = jInput["appDataB64"].ToString();
-                if (string.IsNullOrEmpty(product_id_str))
+                string customer_guid = jInput["appDataB64"].ToString();
+                if (string.IsNullOrEmpty(customer_guid))
                 {
-                    throw new ArgumentException("//Product ID cannot be null or empty when updating shipping methods for contract.");
-                }
-
-                int[] product_ids = Encoding.UTF8.GetString(Convert.FromBase64String(product_id_str)).ToIntArray();
-                if (product_ids.IsNullOrEmpty())
-                {
-                    throw new ArgumentException("//Product ID is required when updating shipping methods for contract.");
+                    throw new ArgumentException("//Customer GUID cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get street address
@@ -166,14 +160,6 @@ namespace ReadySignOn.ReadyPay.Controllers
                 //TODO: Need to change to using customer guid to get cart...
                 var cart = new List<OrganizedShoppingCartItem>();
                 cart.Clear();
-
-                foreach (int p_id in product_ids)
-                {
-                    ShoppingCartItem sci = new ShoppingCartItem();
-                    sci.Product = _productService.GetProductById(p_id);
-                }
-
-                cart.Add(new OrganizedShoppingCartItem(new ShoppingCartItem { ProductId = 1 }));
 
             }
             catch (Exception ex)

@@ -3,10 +3,12 @@ using Newtonsoft.Json.Linq;
 using ReadySignOn.ReadyPay.Controllers;
 using ReadySignOn.ReadyPay.Models;
 using SmartStore;
+using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Core.Domain.Tax;
 using SmartStore.Services;
 using SmartStore.Services.Common;
+using SmartStore.Services.Customers;
 using SmartStore.Services.Shipping;
 using SmartStore.Services.Tax;
 using System;
@@ -74,10 +76,12 @@ namespace ReadySignOn.ReadyPay.Services
             var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
 
             var org_shipping_address = _addressService.GetAddressById(shippingSettings.ShippingOriginAddressId);
-            string payment_processing_country = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";   
+            string payment_processing_country = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";
             //TODO: In the above we assumed the country where the payment will be processed is the same as the originating country of the shipment. Ideally we could add a setting on the readyPay configuration page.
 
-            string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(rp_info_model.AppData));
+            string customer_guid = _services.WorkContext.CurrentCustomer.CustomerGuid.ToString();
+
+            string application_data_b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(customer_guid));
 
             //https://stackoverflow.com/questions/9145667/how-to-post-json-to-a-server-using-c
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(ep_create_rp_request);
