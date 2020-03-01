@@ -3,6 +3,7 @@ using ReadySignOn.ReadyPay.Models;
 using ReadySignOn.ReadyPay.Services;
 using SmartStore;
 using SmartStore.ComponentModel;
+using SmartStore.Core;
 using SmartStore.Core.Domain.Common;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Core.Domain.Discounts;
@@ -16,6 +17,7 @@ using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
+using SmartStore.Services.Shipping;
 using SmartStore.Services.Tax;
 using SmartStore.Web.Framework.Controllers;
 using SmartStore.Web.Framework.Security;
@@ -31,6 +33,9 @@ namespace ReadySignOn.ReadyPay.Controllers
 {
     public partial class ReadyPayController : PublicControllerBase
     {
+        private readonly IWorkContext                   _workContext;
+        private readonly IPriceFormatter                _priceFormatter;
+        private readonly ICurrencyService               _currencyService;
         private readonly ICommonServices                _services;
         private readonly IOrderTotalCalculationService  _orderTotalCalculationService;
         private readonly IProductService                _productService;
@@ -40,10 +45,14 @@ namespace ReadySignOn.ReadyPay.Controllers
         private readonly ICountryService                _countryService;
         private readonly IStateProvinceService          _stateProvinceService;
         private readonly IShoppingCartService           _shoppingCartService;
-        private readonly ICustomerService _customerService;
+        private readonly ICustomerService               _customerService;
+        private readonly IShippingService               _shippingService;
         private readonly TaxSettings                    _taxSettings;
 
         public ReadyPayController(
+                    IWorkContext                    workContext,
+                    ICurrencyService                currencyService, 
+                    IPriceFormatter                 priceFormatter, 
                     ICommonServices                 services,
                     ICountryService                 countryService,
                     IStateProvinceService           stateProvinceService,
@@ -54,9 +63,13 @@ namespace ReadySignOn.ReadyPay.Controllers
                     IReadyPayService                readyPayService,
                     IShoppingCartService            shoppingCartService,
                     ICustomerService                customerService,
+                    IShippingService                shippingService,
                     TaxSettings taxSettings)
         {
-            _services = services;
+            _workContext =                          workContext;
+            _currencyService =                      currencyService;
+            _priceFormatter =                       priceFormatter;
+            _services =                             services;
             _countryService =                       countryService;
             _stateProvinceService =                 stateProvinceService;
             _orderTotalCalculationService =         orderTotalCalculationService;
@@ -66,6 +79,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             _readyPayService =                      readyPayService;
             _shoppingCartService =                  shoppingCartService;
             _customerService =                      customerService;
+            _shippingService =                      shippingService;
             _taxSettings =                          taxSettings;
         }
 

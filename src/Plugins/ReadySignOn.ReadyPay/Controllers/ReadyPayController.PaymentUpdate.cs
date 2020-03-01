@@ -13,6 +13,10 @@ using SmartStore.Core.Logging;
 using SmartStore.Core.Domain.Customers;
 using SmartStore.Services.Customers;
 using SmartStore.Core.Domain.Orders;
+using SmartStore.Core.Domain.Discounts;
+using SmartStore.Web.Models.Checkout;
+using SmartStore.Core.Domain.Shipping;
+using SmartStore.Services.Common;
 
 namespace ReadySignOn.ReadyPay.Controllers
 {
@@ -157,9 +161,75 @@ namespace ReadySignOn.ReadyPay.Controllers
                 }
 
                 // Generate list of shipping options
-                //TODO: Need to change to using customer guid to get cart...
-                var cart = new List<OrganizedShoppingCartItem>();
-                cart.Clear();
+                var model = new CheckoutShippingMethodModel();
+                var customer = _customerService.GetCustomerByGuid(new Guid(customer_guid));
+                if (customer == null)
+                {
+                    throw new ArgumentException("//Cannot locate the requesting customer during the request session.");
+                }
+
+                var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart);
+                var getShippingOptionResponse = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "");
+
+                if (getShippingOptionResponse.Success)
+                {
+                    var shippingMethods = _shippingService.GetAllShippingMethods(null);
+
+                    foreach (var shippingOption in getShippingOptionResponse.ShippingOptions)
+                    {
+                        var soModel = new CheckoutShippingMethodModel.ShippingMethodModel
+                        {
+                            ShippingMethodId = shippingOption.ShippingMethodId,
+                            Name = shippingOption.Name,
+                            Description = shippingOption.Description,
+                            ShippingRateComputationMethodSystemName = shippingOption.ShippingRateComputationMethodSystemName,
+                        };
+
+                        // Adjust rate.
+                        Discount appliedDiscount = null;
+                        var shippingTotal = _orderTotalCalculationService.AdjustShippingRate(shippingOption.Rate, cart, shippingOption, shippingMethods, out appliedDiscount);
+                        decimal rateBase = _taxService.GetShippingPrice(shippingTotal, customer);
+                        decimal rate = _currencyService.ConvertFromPrimaryStoreCurrency(rateBase, _workContext.WorkingCurrency);
+                        soModel.FeeRaw = rate;
+                        soModel.Fee = _priceFormatter.FormatShippingPrice(rate, true);
+
+                        model.ShippingMethods.Add(soModel);
+                    }
+
+                    // Find a selected (previously) shipping method.
+                    var selectedShippingOption = customer.GetAttribute<ShippingOption>(SystemCustomerAttributeNames.SelectedShippingOption);
+                    if (selectedShippingOption != null)
+                    {
+                        var shippingOptionToSelect = model.ShippingMethods
+                            .ToList()
+                            .Find(so => !String.IsNullOrEmpty(so.Name) && so.Name.Equals(selectedShippingOption.Name, StringComparison.InvariantCultureIgnoreCase) &&
+                            !String.IsNullOrEmpty(so.ShippingRateComputationMethodSystemName) &&
+                            so.ShippingRateComputationMethodSystemName.Equals(selectedShippingOption.ShippingRateComputationMethodSystemName, StringComparison.InvariantCultureIgnoreCase));
+
+                        if (shippingOptionToSelect != null)
+                        {
+                            shippingOptionToSelect.Selected = true;
+                        }
+                    }
+
+                    // If no option has been selected, let's do it for the first one.
+                    if (model.ShippingMethods.Where(so => so.Selected).FirstOrDefault() == null)
+                    {
+                        var shippingOptionToSelect = model.ShippingMethods.FirstOrDefault();
+                        if (shippingOptionToSelect != null)
+                        {
+                            shippingOptionToSelect.Selected = true;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var error in getShippingOptionResponse.Errors)
+                    {
+                        model.Warnings.Add(error);
+                    }
+                }
+
 
             }
             catch (Exception ex)
