@@ -281,7 +281,6 @@ namespace ReadySignOn.ReadyPay.Controllers
                 };
 
                 _shoppingCartService.AddToCart(addToCartContext);
-                _customerService.UpdateCustomer(customer);
 
                 if (addToCartContext.Warnings.Count > 0)
                 {
@@ -290,6 +289,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Invalid CartSubTotal.");
                 }
 
+                cart = customer.GetCartItems(ShoppingCartType.ShoppingCart, store.Id);
                 rp_info_model.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
                 rp_info_model.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart);
                 rp_info_model.ShippingTax = _taxService.GetShippingPrice(rp_info_model.CartSubTotal, true, customer) - _taxService.GetShippingPrice(rp_info_model.CartSubTotal, true, customer);

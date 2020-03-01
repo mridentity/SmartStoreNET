@@ -627,7 +627,7 @@ namespace ReadySignOn.ReadyPay.Services
                             }
 
                             // Clear shopping cart.
-                            if (!processPaymentRequest.IsMultiOrder)
+                            if (!processPaymentRequest.IsMultiOrder && !processPaymentRequest.IsInPlaceReadyPayOrder)   //TODO: Research why calling DeleteShoppingCartItem would fail in the case of InPlaceReadyPay
                             {
                                 cart.ToList().ForEach(sci => _shoppingCartService.DeleteShoppingCartItem(sci.Item, false));
                             }
