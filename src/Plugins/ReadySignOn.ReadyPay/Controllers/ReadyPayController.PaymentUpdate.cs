@@ -27,6 +27,8 @@ namespace ReadySignOn.ReadyPay.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> UpdatePaymentMethodCost()
         {
+            Logger.Debug("UpdatePaymentMethodCost is called");
+
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_request = stream.ReadToEnd();
 
@@ -87,6 +89,8 @@ namespace ReadySignOn.ReadyPay.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> UpdateShippingCostForContact()
         {
+            Logger.Debug("UpdateShippingCostForContact is called");
+
             return await ShippingMethodsForContact();
 
             StreamReader stream = new StreamReader(Request.InputStream);
@@ -101,6 +105,7 @@ namespace ReadySignOn.ReadyPay.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> ShippingMethodsForContact()
         {
+            Logger.Debug("ShippingMethodsForContact is called");
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_request = stream.ReadToEnd();
 
@@ -120,7 +125,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                 string street_address = jInput.Value<string>("street");
                 if (string.IsNullOrEmpty(street_address))
                 {
-                    throw new ArgumentException("//Street address cannot be null or empty when updating shipping methods for contract.");
+                    Logger.Warn("//Street address cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get cit
