@@ -102,6 +102,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             string json_request = stream.ReadToEnd();
 
             JObject jInput = JObject.Parse(json_request);
+            JObject jOutput = new JObject();
 
             try
             {
@@ -169,68 +170,29 @@ namespace ReadySignOn.ReadyPay.Controllers
                 }
 
                 var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart);
-                var getShippingOptionResponse = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "");
+                CheckoutShippingMethodModel co_sm = GetShippingMethodModel(model, customer, cart);
 
-                if (getShippingOptionResponse.Success)
+                JArray j_methods = new JArray();
+
+                foreach (var sm in co_sm.ShippingMethods)
                 {
-                    var shippingMethods = _shippingService.GetAllShippingMethods(null);
-
-                    foreach (var shippingOption in getShippingOptionResponse.ShippingOptions)
+                    JObject j_method = new JObject();
+                    j_method["Lbl"] = sm.Name;
+                    j_method["Desc"] = sm.Description + ":" + sm.Fee;
+                    j_method["Id"] = sm.Name.Replace(" ", string.Empty);
+                    j_method["Final"] = true;
+                    j_method["Amt"] = sm.FeeRaw;
+                    if (sm.Selected)
                     {
-                        var soModel = new CheckoutShippingMethodModel.ShippingMethodModel
-                        {
-                            ShippingMethodId = shippingOption.ShippingMethodId,
-                            Name = shippingOption.Name,
-                            Description = shippingOption.Description,
-                            ShippingRateComputationMethodSystemName = shippingOption.ShippingRateComputationMethodSystemName,
-                        };
-
-                        // Adjust rate.
-                        Discount appliedDiscount = null;
-                        var shippingTotal = _orderTotalCalculationService.AdjustShippingRate(shippingOption.Rate, cart, shippingOption, shippingMethods, out appliedDiscount);
-                        decimal rateBase = _taxService.GetShippingPrice(shippingTotal, customer);
-                        decimal rate = _currencyService.ConvertFromPrimaryStoreCurrency(rateBase, _workContext.WorkingCurrency);
-                        soModel.FeeRaw = rate;
-                        soModel.Fee = _priceFormatter.FormatShippingPrice(rate, true);
-
-                        model.ShippingMethods.Add(soModel);
+                        j_methods.AddFirst(j_method);
                     }
-
-                    // Find a selected (previously) shipping method.
-                    var selectedShippingOption = customer.GetAttribute<ShippingOption>(SystemCustomerAttributeNames.SelectedShippingOption);
-                    if (selectedShippingOption != null)
+                    else
                     {
-                        var shippingOptionToSelect = model.ShippingMethods
-                            .ToList()
-                            .Find(so => !String.IsNullOrEmpty(so.Name) && so.Name.Equals(selectedShippingOption.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                            !String.IsNullOrEmpty(so.ShippingRateComputationMethodSystemName) &&
-                            so.ShippingRateComputationMethodSystemName.Equals(selectedShippingOption.ShippingRateComputationMethodSystemName, StringComparison.InvariantCultureIgnoreCase));
-
-                        if (shippingOptionToSelect != null)
-                        {
-                            shippingOptionToSelect.Selected = true;
-                        }
-                    }
-
-                    // If no option has been selected, let's do it for the first one.
-                    if (model.ShippingMethods.Where(so => so.Selected).FirstOrDefault() == null)
-                    {
-                        var shippingOptionToSelect = model.ShippingMethods.FirstOrDefault();
-                        if (shippingOptionToSelect != null)
-                        {
-                            shippingOptionToSelect.Selected = true;
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var error in getShippingOptionResponse.Errors)
-                    {
-                        model.Warnings.Add(error);
+                        j_methods.Add(j_method);
                     }
                 }
 
-
+                jOutput["ShpMthds"] = j_methods;
             }
             catch (Exception ex)
             {
@@ -238,7 +200,75 @@ namespace ReadySignOn.ReadyPay.Controllers
                 return new EmptyResult();
             }
 
-            return Json(jInput, "application/json", Encoding.UTF8);
+            return Json(jOutput, "application/json", Encoding.UTF8);
+        }
+
+        private CheckoutShippingMethodModel GetShippingMethodModel(CheckoutShippingMethodModel model, Customer customer, List<OrganizedShoppingCartItem> cart)
+        {
+            var getShippingOptionResponse = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "");
+
+            if (getShippingOptionResponse.Success)
+            {
+                var shippingMethods = _shippingService.GetAllShippingMethods(null);
+
+                foreach (var shippingOption in getShippingOptionResponse.ShippingOptions)
+                {
+                    var soModel = new CheckoutShippingMethodModel.ShippingMethodModel
+                    {
+                        ShippingMethodId = shippingOption.ShippingMethodId,
+                        Name = shippingOption.Name,
+                        Description = shippingOption.Description,
+                        ShippingRateComputationMethodSystemName = shippingOption.ShippingRateComputationMethodSystemName,
+                    };
+
+                    // Adjust rate.
+                    Discount appliedDiscount = null;
+                    var shippingTotal = _orderTotalCalculationService.AdjustShippingRate(shippingOption.Rate, cart, shippingOption, shippingMethods, out appliedDiscount);
+                    decimal rateBase = _taxService.GetShippingPrice(shippingTotal, customer);
+                    decimal rate = _currencyService.ConvertFromPrimaryStoreCurrency(rateBase, _workContext.WorkingCurrency);
+                    soModel.FeeRaw = rate;
+                    soModel.Fee = _priceFormatter.FormatShippingPrice(rate, true);
+
+                    model.ShippingMethods.Add(soModel);
+                }
+
+                // Find a selected (previously) shipping method.
+                var selectedShippingOption = customer.GetAttribute<ShippingOption>(SystemCustomerAttributeNames.SelectedShippingOption);
+                if (selectedShippingOption != null)
+                {
+                    var shippingOptionToSelect = model.ShippingMethods
+                        .ToList()
+                        .Find(so => !String.IsNullOrEmpty(so.Name) && so.Name.Equals(selectedShippingOption.Name, StringComparison.InvariantCultureIgnoreCase) &&
+                        !String.IsNullOrEmpty(so.ShippingRateComputationMethodSystemName) &&
+                        so.ShippingRateComputationMethodSystemName.Equals(selectedShippingOption.ShippingRateComputationMethodSystemName, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (shippingOptionToSelect != null)
+                    {
+                        shippingOptionToSelect.Selected = true;
+                    }
+                }
+
+                // If no option has been selected, let's do it for the first one.
+                if (model.ShippingMethods.Where(so => so.Selected).FirstOrDefault() == null)
+                {
+                    var shippingOptionToSelect = model.ShippingMethods.FirstOrDefault();
+                    if (shippingOptionToSelect != null)
+                    {
+                        shippingOptionToSelect.Selected = true;
+                    }
+                }
+
+                return model;
+            }
+            else
+            {
+                foreach (var error in getShippingOptionResponse.Errors)
+                {
+                    model.Warnings.Add(error);
+                }
+
+                throw new Exception(model.Warnings.StrJoin(";"));
+            }
         }
     }
 }
