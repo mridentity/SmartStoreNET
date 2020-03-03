@@ -17,6 +17,7 @@ using SmartStore.Core.Domain.Discounts;
 using SmartStore.Web.Models.Checkout;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Services.Common;
+using System.Net;
 
 namespace ReadySignOn.ReadyPay.Controllers
 {
@@ -86,6 +87,8 @@ namespace ReadySignOn.ReadyPay.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> UpdateShippingCostForContact()
         {
+            return await ShippingMethodsForContact();
+
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_request = stream.ReadToEnd();
 
@@ -107,7 +110,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             try
             {
                 //Get the product IDs of this payment
-                string customer_guid = jInput["appDataB64"].ToString();
+                string customer_guid = jInput.Value<string>("appDataB64");
                 if (string.IsNullOrEmpty(customer_guid))
                 {
                     throw new ArgumentException("//Customer GUID cannot be null or empty when updating shipping methods for contract.");
@@ -197,7 +200,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             catch (Exception ex)
             {
                 Logger.Error(ex);
-                return new EmptyResult();
+                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError, ex.Message);
             }
 
             return Json(jOutput, "application/json", Encoding.UTF8);
