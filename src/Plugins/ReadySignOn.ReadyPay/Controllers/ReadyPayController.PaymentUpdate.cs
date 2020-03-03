@@ -117,48 +117,42 @@ namespace ReadySignOn.ReadyPay.Controllers
                 }
 
                 //Get street address
-                string street_address = jInput["street"].ToString();
-
+                string street_address = jInput.Value<string>("street");
                 if (string.IsNullOrEmpty(street_address))
                 {
                     throw new ArgumentException("//Street address cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get cit
-                string city = jInput["city"].ToString();
-
+                string city = jInput.Value<string>("city");
                 if (string.IsNullOrEmpty(city))
                 {
                     throw new ArgumentException("//City cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get state
-                string state = jInput["state"].ToString();
-
+                string state = jInput.Value<string>("state");
                 if (string.IsNullOrEmpty(state))
                 {
                     throw new ArgumentException("//State cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get postal code
-                string postal_code = jInput["postalCode"].ToString();
-
+                string postal_code = jInput.Value<string>("postalCode");
                 if (string.IsNullOrEmpty(postal_code))
                 {
                     throw new ArgumentException("//PostalCode cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get country
-                string country = jInput["country"].ToString();
-
+                string country = jInput.Value<string>("country");
                 if (string.IsNullOrEmpty(country))
                 {
                     throw new ArgumentException("//Country cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get country code
-                string iso_country_code = jInput["isoCountryCode"].ToString();
-
+                string iso_country_code = jInput.Value<string>("isoCountryCode");
                 if (string.IsNullOrEmpty(iso_country_code))
                 {
                     throw new ArgumentException("//Country code cannot be null or empty when updating shipping methods for contract.");
@@ -200,7 +194,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             catch (Exception ex)
             {
                 Logger.Error(ex);
-                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError, ex.Message);
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, ex.Message);
             }
 
             return Json(jOutput, "application/json", Encoding.UTF8);
