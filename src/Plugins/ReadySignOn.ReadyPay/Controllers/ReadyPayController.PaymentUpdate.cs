@@ -27,47 +27,39 @@ namespace ReadySignOn.ReadyPay.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> UpdatePaymentMethodCost()
         {
-            Logger.Debug("UpdatePaymentMethodCost is called");
+            Logger.Info("UpdatePaymentMethodCost is called");
 
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_request = stream.ReadToEnd();
 
             JObject jInput = JObject.Parse(json_request);
+            JObject jOutput = new JObject();
 
             try
             {
-                //Get the product IDs of this payment
-                string product_id_str = jInput["appDataB64"].ToString();
-                if (string.IsNullOrEmpty(product_id_str))
+                //Get the customer guid encoded in base64 of this payment
+                string customer_guid_b64 = jInput.Value<string>("appDataB64");
+                if (string.IsNullOrEmpty(customer_guid_b64))
                 {
-                    throw new ArgumentException("//Product ID cannot be null or empty when updating payment method cost.");
-                }
-
-                int[] product_ids = Encoding.UTF8.GetString(Convert.FromBase64String(product_id_str)).ToIntArray();
-                if (product_ids.IsNullOrEmpty())
-                {
-                    throw new ArgumentException("//Product ID is required when updating payment method cost.");
+                    throw new ArgumentException("//Customer GUID cannot be null or empty when updating shipping methods for contract.");
                 }
 
                 //Get selected payment name
-                string selected_payment = jInput["paymentName"].ToString();
-
+                string selected_payment = jInput.Value<string>("paymentName");
                 if(string.IsNullOrEmpty(selected_payment))
                 {
                     throw new ArgumentException("//Payment method name cannot be null or empty when updating payment method cost.");
                 }
 
                 //Get payment network name
-                string payment_network = jInput["paymentNetwork"].ToString();
-
+                string payment_network = jInput.Value<string>("paymentNetwork");
                 if(string.IsNullOrEmpty(payment_network))
                 {
                     throw new ArgumentException("//Payment network cannot be null or empty when updating payment method cost.");
                 }
 
                 //Get payment type
-                string payment_type = jInput["PaymentType"].ToString();
-
+                string payment_type = jInput.Value<string>("PaymentType");
                 if(string.IsNullOrEmpty(payment_type))
                 {
                     throw new ArgumentException("//Payment type cannot be null or empty when updating payment method cost.");
@@ -89,23 +81,7 @@ namespace ReadySignOn.ReadyPay.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> UpdateShippingCostForContact()
         {
-            Logger.Debug("UpdateShippingCostForContact is called");
-
-            return await ShippingMethodsForContact();
-
-            StreamReader stream = new StreamReader(Request.InputStream);
-            string json_request = stream.ReadToEnd();
-
-            JObject jInput = JObject.Parse(json_request);
-
-            return Json(jInput, "application/json", Encoding.UTF8);
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult> ShippingMethodsForContact()
-        {
-            Logger.Debug("ShippingMethodsForContact is called");
+            Logger.Info("ShippingMethodsForContact is called");
             StreamReader stream = new StreamReader(Request.InputStream);
             string json_request = stream.ReadToEnd();
 
@@ -114,9 +90,9 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             try
             {
-                //Get the product IDs of this payment
-                string customer_guid = jInput.Value<string>("appDataB64");
-                if (string.IsNullOrEmpty(customer_guid))
+                //Get the customer guid encoded in base64 of this payment
+                string customer_guid_b64 = jInput.Value<string>("appDataB64");
+                if (string.IsNullOrEmpty(customer_guid_b64))
                 {
                     throw new ArgumentException("//Customer GUID cannot be null or empty when updating shipping methods for contract.");
                 }
@@ -165,7 +141,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
                 // Generate list of shipping options
                 var model = new CheckoutShippingMethodModel();
-                var customer = _customerService.GetCustomerByGuid(new Guid(customer_guid));
+                var customer = _customerService.GetCustomerByGuid(new Guid(Encoding.UTF8.GetString(Convert.FromBase64String(customer_guid_b64))));
                 if (customer == null)
                 {
                     throw new ArgumentException("//Cannot locate the requesting customer during the request session.");
@@ -180,16 +156,18 @@ namespace ReadySignOn.ReadyPay.Controllers
                 {
                     JObject j_method = new JObject();
                     j_method["Lbl"] = sm.Name;
-                    j_method["Desc"] = sm.Description + ":" + sm.Fee;
+                    j_method["Desc"] = sm.Description;
                     j_method["Id"] = sm.Name.Replace(" ", string.Empty);
                     j_method["Final"] = true;
                     j_method["Amt"] = sm.FeeRaw;
                     if (sm.Selected)
                     {
+                        Logger.Info($"Adding {sm.Name} shipping method to first with a {sm.Fee} fee.");
                         j_methods.AddFirst(j_method);
                     }
                     else
                     {
+                        Logger.Info($"Adding {sm.Name} shipping method with a {sm.Fee} fee.");
                         j_methods.Add(j_method);
                     }
                 }

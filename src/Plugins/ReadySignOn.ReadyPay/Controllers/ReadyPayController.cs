@@ -472,7 +472,7 @@ namespace ReadySignOn.ReadyPay.Controllers
                                             out countryAllowsBilling);
 
             order_request.ShippingAddress = shipping_address;
-            order_request.ShippingMethod = rpayment.shippingMethod.detail;
+            order_request.ShippingMethod = rpayment.shippingMethod.identifier + ":" + rpayment.shippingMethod.detail;
             order_request.IsShippingMethodSet = true;
             order_request.OrderShippingInclTax = rpayment.shippingMethod.amount;
             order_request.OrderShippingExclTax = rpayment.grandTotalCharged - readypay_request.TaxTotal - readypay_request.CartSubTotal;
