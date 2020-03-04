@@ -483,7 +483,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             order_request.OrderTax = readypay_request.TaxTotal;
             order_request.OrderTotalRounding = readypay_request.TaxTotal.RoundToNearest(Services.StoreContext.CurrentStore.PrimaryStoreCurrency.RoundOrderTotalDenominator, true);
             order_request.ShoppingCartItemProdutIds = readypay_request.AppData.ToIntArray(); // TODO: Make sure that SHA256(AppData) is identical to rpayment.paymentData.header.applicationData
-            order_request.TaxRate = order_request.OrderTax / readypay_request.CartSubTotal * 100.0M;
+            order_request.TaxRate = order_request.OrderSubtotalInclTax.ToTaxPercentage(order_request.OrderSubtotalExclTax);
             return order_request;
         }
 
