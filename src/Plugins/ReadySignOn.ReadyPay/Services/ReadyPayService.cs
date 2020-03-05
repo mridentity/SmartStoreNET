@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ReadySignOn.ReadyPay.Controllers;
 using ReadySignOn.ReadyPay.Models;
 using SmartStore;
+using SmartStore.Core;
+using SmartStore.Core.Domain.Customers;
+using SmartStore.Core.Domain.Discounts;
 using SmartStore.Core.Domain.Orders;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Core.Domain.Tax;
@@ -11,12 +13,17 @@ using SmartStore.Services.Common;
 using SmartStore.Services.Customers;
 using SmartStore.Services.Shipping;
 using SmartStore.Services.Tax;
+using SmartStore.Web.Models.Checkout;
 using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Web.Mvc;
-using System.Web.Routing;
+using SmartStore.Core.Logging;
+using SmartStore.Services.Catalog;
+using SmartStore.Services.Directory;
+using SmartStore.Services.Orders;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ReadySignOn.ReadyPay.Services
 {
@@ -26,20 +33,50 @@ namespace ReadySignOn.ReadyPay.Services
         private readonly IAddressService _addressService;
         private readonly IShippingService _shippingService;
         private readonly ITaxService _taxService;
+        private readonly IWorkContext _workContext;
+        private readonly IPriceFormatter _priceFormatter;
+        private readonly ICurrencyService _currencyService;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
+        private readonly IProductService _productService;
+        private readonly IReadyPayOrders _readyPayOrders;
+        private readonly ICountryService _countryService;
+        private readonly IStateProvinceService _stateProvinceService;
+        private readonly IShoppingCartService _shoppingCartService;
+        private readonly ICustomerService _customerService;
         private readonly TaxSettings _taxSettings;
 
         public ReadyPayService(
-            IAddressService addressService,
-            IShippingService shippingService,
-            ITaxService taxService,
-            TaxSettings taxSettings,
-            ICommonServices services)
+                    IWorkContext                    workContext,
+                    ICurrencyService                currencyService, 
+                    IPriceFormatter                 priceFormatter, 
+                    ICommonServices                 services,
+                    ICountryService                 countryService,
+                    IStateProvinceService           stateProvinceService,
+                    IOrderTotalCalculationService   orderTotalCalculationService,
+                    IProductService                 productService,
+                    ITaxService                     taxService,
+                    IReadyPayOrders                 readyPayOrders,
+                    IShoppingCartService            shoppingCartService,
+                    ICustomerService                customerService,
+                    IShippingService                shippingService,
+                    IAddressService                 addressService,
+                    TaxSettings                     taxSettings)
         {
             _addressService = addressService;
-            _shippingService = shippingService;
-            _taxService = taxService;
-            _taxSettings = taxSettings;
+            _workContext = workContext;
+            _currencyService = currencyService;
+            _priceFormatter = priceFormatter;
             _services = services;
+            _countryService = countryService;
+            _stateProvinceService = stateProvinceService;
+            _orderTotalCalculationService = orderTotalCalculationService;
+            _productService = productService;
+            _taxService = taxService;
+            _readyPayOrders = readyPayOrders;
+            _shoppingCartService = shoppingCartService;
+            _customerService = customerService;
+            _shippingService = shippingService;
+            _taxSettings = taxSettings;
         }
 
         /// <summary>
@@ -107,22 +144,29 @@ namespace ReadySignOn.ReadyPay.Services
 
             payment_request["PmtNwks"] = JArray.FromObject(new string[] {"AmEx","Visa","MasterCard","Discover"}); // TODO: Perhaps need to create setting options for this.
 
-            var shipping_methods = _shippingService.GetAllShippingMethods();
-            if (shipping_methods != null && shipping_methods.Count > 0)
+            var cart = _services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart);
+            CheckoutShippingMethodModel sm_mod = GetShippingMethodModel(_services.WorkContext.CurrentCustomer, cart);
+
+            if (sm_mod != null && sm_mod.ShippingMethods.Count > 0)
             {
                 JArray j_methods = new JArray();
 
-                foreach (SmartStore.Core.Domain.Shipping.ShippingMethod s_method in shipping_methods)
+                foreach (var sm in sm_mod.ShippingMethods)
                 {
-                    decimal shipping_cost = rp_info_model.ShippingTotal ?? decimal.Zero;    //The actual shipping cost needs to be updated via readyPay PaymentUpdate callback endpoint, so here we just assign the current shipping cost shown to the user.
-
                     JObject j_method = new JObject();
-                    j_method["Lbl"] = s_method.Name;
-                    j_method["Desc"] = new Money(shipping_cost, _services.StoreContext.CurrentStore.PrimaryStoreCurrency).ToString(true);
-                    j_method["Id"] = s_method.Name.Replace(" ", string.Empty);
+                    j_method["Lbl"] = sm.Name;
+                    j_method["Desc"] = sm.ShippingRateComputationMethodSystemName;
+                    j_method["Id"] = sm.Name.Replace(" ", string.Empty);
                     j_method["Final"] = true;
-                    j_method["Amt"] = shipping_cost;      
-                    j_methods.Add(j_method);
+                    j_method["Amt"] = sm.FeeRaw.RoundIfEnabledFor(_workContext.WorkingCurrency);
+                    if (sm.Selected)
+                    {
+                        j_methods.AddFirst(j_method);
+                    }
+                    else
+                    {
+                        j_methods.Add(j_method);
+                    }
                 }
 
                 payment_request["ShpMthds"] = j_methods;
@@ -133,7 +177,7 @@ namespace ReadySignOn.ReadyPay.Services
                 {
                     JObject j_summary_item = new JObject();
                     j_summary_item["Lbl"] = "Cart Price";
-                    j_summary_item["Amt"] = rp_info_model.CartSubTotal;
+                    j_summary_item["Amt"] = rp_info_model.CartSubTotal.RoundIfEnabledFor(_workContext.WorkingCurrency);
                     j_summary_item["Final"] = true;
 
                     j_summary_items.Add(j_summary_item);
@@ -142,7 +186,7 @@ namespace ReadySignOn.ReadyPay.Services
                 {
                     JObject j_summary_item = new JObject();
                     j_summary_item["Lbl"] = "Tax";
-                    j_summary_item["Amt"] = rp_info_model.TaxTotal;
+                    j_summary_item["Amt"] = rp_info_model.TaxTotal.RoundIfEnabledFor(_workContext.WorkingCurrency);
                     j_summary_item["Final"] = true;
 
                     j_summary_items.Add(j_summary_item);
@@ -151,7 +195,7 @@ namespace ReadySignOn.ReadyPay.Services
                 {
                     JObject j_summary_item = new JObject();
                     j_summary_item["Lbl"] = "Total";
-                    j_summary_item["Amt"] = rp_info_model.CartSubTotal + rp_info_model.TaxTotal;
+                    j_summary_item["Amt"] = (rp_info_model.CartSubTotal + rp_info_model.TaxTotal).RoundIfEnabledFor(_workContext.WorkingCurrency);
                     j_summary_item["Final"] = true;
 
                     j_summary_items.Add(j_summary_item);
@@ -191,6 +235,76 @@ namespace ReadySignOn.ReadyPay.Services
             }
 
             return null;
+        }
+
+        public CheckoutShippingMethodModel GetShippingMethodModel(Customer customer, List<OrganizedShoppingCartItem> cart)
+        {
+            CheckoutShippingMethodModel model = new CheckoutShippingMethodModel();
+
+            var getShippingOptionResponse = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "");
+
+            if (getShippingOptionResponse.Success)
+            {
+                var shippingMethods = _shippingService.GetAllShippingMethods(null);
+
+                foreach (var shippingOption in getShippingOptionResponse.ShippingOptions)
+                {
+                    var soModel = new CheckoutShippingMethodModel.ShippingMethodModel
+                    {
+                        ShippingMethodId = shippingOption.ShippingMethodId,
+                        Name = shippingOption.Name,
+                        Description = shippingOption.Description,
+                        ShippingRateComputationMethodSystemName = shippingOption.ShippingRateComputationMethodSystemName,
+                    };
+
+                    // Adjust rate.
+                    Discount appliedDiscount = null;
+                    var shippingTotal = _orderTotalCalculationService.AdjustShippingRate(shippingOption.Rate, cart, shippingOption, shippingMethods, out appliedDiscount);
+                    decimal rateBase = _taxService.GetShippingPrice(shippingTotal, customer);
+                    decimal rate = _currencyService.ConvertFromPrimaryStoreCurrency(rateBase, _workContext.WorkingCurrency);
+                    soModel.FeeRaw = rate;
+                    soModel.Fee = _priceFormatter.FormatShippingPrice(rate, true);
+
+                    model.ShippingMethods.Add(soModel);
+                }
+
+                // Find a selected (previously) shipping method.
+                var selectedShippingOption = customer.GetAttribute<ShippingOption>(SystemCustomerAttributeNames.SelectedShippingOption);
+                if (selectedShippingOption != null)
+                {
+                    var shippingOptionToSelect = model.ShippingMethods
+                        .ToList()
+                        .Find(so => !String.IsNullOrEmpty(so.Name) && so.Name.Equals(selectedShippingOption.Name, StringComparison.InvariantCultureIgnoreCase) &&
+                        !String.IsNullOrEmpty(so.ShippingRateComputationMethodSystemName) &&
+                        so.ShippingRateComputationMethodSystemName.Equals(selectedShippingOption.ShippingRateComputationMethodSystemName, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (shippingOptionToSelect != null)
+                    {
+                        shippingOptionToSelect.Selected = true;
+                    }
+                }
+
+                // If no option has been selected, let's do it for the first one.
+                if (model.ShippingMethods.Where(so => so.Selected).FirstOrDefault() == null)
+                {
+                    var shippingOptionToSelect = model.ShippingMethods.FirstOrDefault();
+                    if (shippingOptionToSelect != null)
+                    {
+                        shippingOptionToSelect.Selected = true;
+                    }
+                }
+
+                return model;
+            }
+            else
+            {
+                foreach (var error in getShippingOptionResponse.Errors)
+                {
+                    model.Warnings.Add(error);
+                }
+
+                throw new Exception(model.Warnings.StrJoin(";"));
+            }
         }
     }
 }
