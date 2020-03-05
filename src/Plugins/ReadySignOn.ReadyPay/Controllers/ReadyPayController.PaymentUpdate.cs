@@ -18,6 +18,7 @@ using SmartStore.Web.Models.Checkout;
 using SmartStore.Core.Domain.Shipping;
 using SmartStore.Services.Common;
 using System.Net;
+using SmartStore.Core.Domain.Common;
 
 namespace ReadySignOn.ReadyPay.Controllers
 {
@@ -148,6 +149,27 @@ namespace ReadySignOn.ReadyPay.Controllers
                 }
 
                 var cart = customer.GetCartItems(ShoppingCartType.ShoppingCart);
+
+                var countryAllowsShipping = true;
+                var countryAllowsBilling = true;
+
+                Address shipping_address = CreateAddress(null,
+                                                null,
+                                                null,
+                                                street_address,
+                                                null,
+                                                null,
+                                                city,
+                                                postal_code,
+                                                null,
+                                                iso_country_code,
+                                                state,
+                                                country,
+                                                null,
+                                                out countryAllowsShipping,
+                                                out countryAllowsBilling);
+
+                customer.ShippingAddress = shipping_address;
                 CheckoutShippingMethodModel co_sm = GetShippingMethodModel(model, customer, cart);
 
                 JArray j_methods = new JArray();
