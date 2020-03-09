@@ -1,4 +1,4 @@
-﻿@using ReadySignOn.ReadyPay
+@using ReadySignOn.ReadyPay
 @model ReadySignOn.ReadyPay.Models.ReadyPayPaymentInfoModel
 
 @{
@@ -12,14 +12,7 @@
     Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("https://sciactive.com/pnotify/lib/iife/PNotifyButtons.js"));
 }
 
-<div class="art-ready-pay" 
-     data-productid="@Model.AppData" 
-     data-cartsubtotal="@Model.CartSubTotal" 
-     data-taxtotal="@Model.TaxTotal"
-     data-sentinel="@Model.Sentinel"
-     data-readypaybuttonimg="@Model.SubmitButtonImageUrl"
-     data-readypayloaderimg="@Model.LoaderImageUrl">
-    <input type="text" pattern="\d*" data-readyticket="" size="7" >
-    <button class="normal" disabled></button>
+<div class="art-ready-pay" data-readypayload='{"AppData": "@Model.AppData", "CartSubTotal": "@Model.CartSubTotal", "TaxTotal": "@Model.TaxTotal", "Sentinel": "@Model.Sentinel", "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl" "LoaderImageUrl": "@Model.LoaderImageUrl"}'>
+    <input type="number" pattern="\d*" data-readyticket="" size="7">
+    <input type="image" src="@Url.Content(Model.SubmitButtonImageUrl)">
 </div>
-
