@@ -116,14 +116,14 @@ $(function () {
         const textbox = e.target;
         textbox.dataset.readyticket = textbox.value;
         const $inputReadyPay = $(textbox).parent().find(selReadyPayBtn);
-        toggleWhile([$inputReadyPay], textbox, validateTextbox)
+        toggleWhile([$inputReadyPay], textbox, validateTextbox);
     });
 
     //  prevent readyticket textbox from submitting form when "Enter" key is pressed,
     //  trigger `click` event on `$inputReadyPay` 
     $parentContainer.on("keypress", selReadyTicketTxt, (e) => {
         const $inputReadyPay = $(e.target).parent().find(selReadyPayBtn);
-        if (e.which == 13) {
+        if (e.which === 13) {
             e.preventDefault();
             if (!$inputReadyPay.prop("disabled")) {
                 $inputReadyPay.trigger('click');
@@ -132,7 +132,7 @@ $(function () {
     });
 
     // disable readypay buttons when page loads
-    $(selReadyPayBtn).prop("disabled", true)
+    $(selReadyPayBtn).prop("disabled", true);
 
     // make HTTP request, display confirmation on success, log to the console on error
     $parentContainer.on('click', selReadyPayBtn, (e) => {
@@ -161,7 +161,7 @@ $(function () {
                 displayConfirmation(res);
             },
             error: function (jqXHR, textStatus, errorMsg) {
-                const error = `Request ${textStatus}: ${errorMsg}`
+                const error = `Request ${textStatus}: ${errorMsg}`;
                 console.log(error);
             },
             complete: () => {
