@@ -12,7 +12,7 @@
     Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("https://sciactive.com/pnotify/lib/iife/PNotifyButtons.js"));
 }
 
-<div class="art-ready-pay" data-readypayload='{"AppData": "@Model.AppData", "CartSubTotal": "@Model.CartSubTotal", "TaxTotal": "@Model.TaxTotal", "Sentinel": "@Model.Sentinel", "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl" "LoaderImageUrl": "@Model.LoaderImageUrl"}'>
+<div class="art-ready-pay" data-readypayload='{"AppData": "@Model.AppData", "CartSubTotal": "@Model.CartSubTotal", "TaxTotal": "@Model.TaxTotal", "Sentinel": "@Model.Sentinel", "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl", "LoaderImageUrl": "@Model.LoaderImageUrl"}'>
     <input type="number" pattern="\d*" data-readyticket="" size="7">
     <input type="image" src="@Url.Content(Model.SubmitButtonImageUrl)">
 </div>
