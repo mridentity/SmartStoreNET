@@ -24,6 +24,7 @@ using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
 using System.Collections.Generic;
 using System.Linq;
+using SmartStore.Core.Localization;
 
 namespace ReadySignOn.ReadyPay.Services
 {
@@ -147,7 +148,7 @@ namespace ReadySignOn.ReadyPay.Services
             var cart = _services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart);
             CheckoutShippingMethodModel sm_mod = GetShippingMethodModel(_services.WorkContext.CurrentCustomer, cart);
 
-            if (sm_mod != null && sm_mod.ShippingMethods.Count > 0)
+            if (sm_mod != null)
             {
                 JArray j_methods = new JArray();
 
@@ -167,6 +168,18 @@ namespace ReadySignOn.ReadyPay.Services
                     {
                         j_methods.Add(j_method);
                     }
+                }
+
+                if (j_methods.Count <=0)
+                {
+                    JObject j_method = new JObject();
+                    j_method["Lbl"] = _services.Localization.GetResource("Admin.System.Warnings.NoShipmentItems");
+                    j_method["Desc"] = _services.Localization.GetResource("Admin.System.Warnings.NoShipmentItems");
+                    j_method["Id"] = "DigitalGoods";
+                    j_method["Final"] = true;
+                    j_method["Amt"] = 0.0;
+
+                    j_methods.Add(j_method);
                 }
 
                 payment_request["ShpMthds"] = j_methods;
@@ -243,7 +256,8 @@ namespace ReadySignOn.ReadyPay.Services
 
             var getShippingOptionResponse = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "");
 
-            if (getShippingOptionResponse.Success)
+            string no_shipment_item_loc_str = _services.Localization.GetResource("Admin.System.Warnings.NoShipmentItems");
+            if (getShippingOptionResponse.Success || getShippingOptionResponse.Errors.All( err => err == no_shipment_item_loc_str))
             {
                 var shippingMethods = _shippingService.GetAllShippingMethods(null);
 
