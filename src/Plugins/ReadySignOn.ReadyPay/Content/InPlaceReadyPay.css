@@ -1,19 +1,11 @@
 ﻿@import url('InPlaceReadyPay.css');
-.art-ready-pay > button {
-    background-repeat: no-repeat;
-    background-position: center;
-    vertical-align:middle;
-    background-size:40px;
-    height: 30px;
+
+.art-ready-pay > input {
+    height: 25px;
+}
+
+.art-ready-pay > input[type=image] {
     width: 40px;
     border: none;
     outline: none;
 }
-
-    .art-ready-pay > button.normal {
-        background-image: url(ready_button.png);
-    }
-
-    .art-ready-pay > button.waiting {
-        background-image: url(loader.gif);
-    }
