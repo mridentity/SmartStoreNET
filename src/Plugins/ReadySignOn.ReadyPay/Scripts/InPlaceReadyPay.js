@@ -1,143 +1,68 @@
-﻿// -----------------
-// Data
-// -----------------
+$(function () {
 
-// selector for readypay container
-const divReadyPay = ".art-ready-pay";
+    // -----------------
+    // Type
+    // -----------------
+    // Element:   an element in the (DOM)
+    // jQuery:    a jQuery object 
+    // Selector:  a CSS selector used to select DOM documents.
+    // [a]:       a list/array of element of a
 
-// selector for readypay button
-const btnReadyPay = "button";
+    // -----------------
+    // Data
+    // -----------------
 
-// selector for readyticket textbox
-const txtReadyTicket = "input[data-readyticket]";
+    // selector for `readypay` button
+    const selReadyPayBtn = "input[type=image]";
 
-// destination url to post the ready ticket
-const destUrl = "Plugins/ReadySignOn.ReadyPay/ReadyPay/InPlaceReadyPayPosted";
-// const destUrl = "https://reqres.in/api/users";
+    // selector for `readyticket` textbox
+    const selReadyTicketTxt = "input[data-readyticket]";
+    
+    // the parent container that delegates the events
+    const $parentContainer = $(document);
 
-// -----------------
-// Function
-// -----------------
+    // destination url to post request
+    const destUrl = "Plugins/ReadySignOn.ReadyPay/ReadyPay/InPlaceReadyPayPosted";
+    // const destUrl = "https://reqres.in/api/users";
 
-// getElementsBy consumes a selector: `s`;
-// it produces a list of elements selected by: `s`
-const getElementsBy = (s) => [...document.querySelectorAll(s)];
+    // ----------------
+    // Function
+    // ----------------
 
-// getSInP consumes a list parent element: `p`, a selector: `s`;
-// it produces the elment matching `s` under `p`
-const getSInP = (p, s) => p.querySelector(s);
-
-// -----------------
-// Main
-// -----------------
-
-getElementsBy(divReadyPay).map(div => {
-    const elemReadyPay = getSInP(div, btnReadyPay);
-    const elemReadyTicket = getSInP(div, txtReadyTicket);
-    const productid = div.dataset.productid;
-    const cartsubtotal = div.dataset.cartsubtotal;
-    const taxtotal = div.dataset.taxtotal;
-    const sentinel = div.dataset.sentinel;
-
-    // `bindReadyTicket` consumes an event: `e`;
-    // it sets the `readyticket` attribute of `e.target`
-    const bindReadyTicket = (e) => {
-        const elem = e.target;
-        const isValid = elem.value.length !== 0;
-
-        // if Enter key is detected.
-        if (e.which === 13) {
-            e.preventDefault ? e.preventDefault() : (e.returnValue = false);    // Prevent re-submit
-            $('#btnReadyPay').click();
-        }
-
-        if (isValid && elemReadyPay.disabled) {
-            elemReadyPay.disabled = false;
-        } else if (!isValid && !elemReadyPay.disabled) {
-            elemReadyPay.disabled = true;
-        }
-        elem.dataset.readyticket = elem.value;
+    // freeze :: (jQuery a, jQuery b)  => [a] -> [b] -> String -> ()
+    // disables elements in `xs`; 
+    // updates image url to `url` for elements in `ys`
+    const freeze = (xs, ys, url, disabled = true) => {
+        xs.map(($x) => $x.prop("disabled", disabled));
+        ys.map(($y) => $y.attr("src", url));
     };
 
+    // `unFreeze` enables controls;
+    // updates image url to `url` for elements in `ys`
+    const unFreeze = (xs, ys, url) => {
+        freeze(xs, ys, url, false);
+    };
 
-    const bindReadyPay = (e) => {
-        // construct data to be posted
-        const readyticket = elemReadyTicket.dataset.readyticket;
-        const jsonData = {
-            AppData: productid,
-            CartSubTotal: cartsubtotal,
-            TaxTotal: taxtotal,
-            Sentinel: sentinel,
-            ReadyTicket: readyticket
-        };
+    // validateTextbox ::  (Element a) => a -> Bool
+    // returns `true` if the `elem`'s value is numeric and it's non-empty,
+    // otherwise, returns `false`
+    const validateTextbox = (elem) => {
+        const val = elem.value;
+        return (val.length > 0 && $.isNumeric(val)) ? true : false
+    };
 
-        // construct settings for the request
-        const options = {
-            method: 'POST',
-            body: JSON.stringify(jsonData),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
-
-        const freeze = () => {
-            elemReadyTicket.disabled = true;
-            elemReadyPay.setAttribute('class', `waiting`);
-            elemReadyPay.disabled = true;
-        }
-
-        const unFreeze = () => {
-            elemReadyTicket.disabled = false;
-            elemReadyPay.setAttribute('class', `normal`);
-            elemReadyPay.disabled = false;
-        }
-
-        // disable textbox for readyticket;
-        // change the background image for the ready pay button
-        freeze();
-
-        // make the request; process the response: `res` if it succeeds;
-        // otherwise, logs errors to the console.
-        fetch(destUrl, options)
-            .then(res => {
-                unFreeze();
-                if (res.ok) {
-                    return res.json();
-                } else {
-                    return Promise.reject(res.statusText);
-                }
-            })
-            .then(res => {
-                console.log(res);
-                displayConfirmation(res);
-            })
-            .catch(err => console.log(`Error when making request. ${err}`));
-    }
-
-    // disable ReadyPay button on load
-    elemReadyPay.disabled = true;
-
-    // initial button background image
-    elemReadyPay.setAttribute('class', `normal`);
-
-    // set `data-readyticket` attribute each time users change the ready ticket number 
-    elemReadyTicket.addEventListener("input", bindReadyTicket);
-
-    // simulates the readypay button client the user changes the readyTicket text by pressing the enter key 
-    elemReadyTicket.addEventListener("keypress", function (event) {
-        if (event.which === 13) {   // Enter key pressed.
-            event.preventDefault ? event.preventDefault() : (event.returnValue = false);    // Prevent re-submit
-            elemReadyPay.click();
-        }
-    });
-
-    // run `bindReadyPay` when users click readypay button 
-    elemReadyPay.addEventListener("click", bindReadyPay);
-
+    // toggleWhile :: (jQuery a, Element b) =>  [a] -> b -> (b -> Bool) -> ()
+    // disables `x`in xs if `p(y)` is true, otherwise enables `x`
+    const toggleWhile = (xs, y, p) => {
+        xs.map((x) => p(y) ? x.prop("disabled", false) : x.prop("disabled", true));
+    };
+    
+    // displayConfirmation :: JSON -> ()
+    // displays confirmation popup
     const displayConfirmation = (res) => {
         var notice = PNotify.success({
             title: `Thank you for placing your order! `,
-            text: `Your order ID is ${res.order_id}. <br> The total amount of USD ${res.charged_total} will be charged to ${res.payment_method}.<br> Your order confimration will be sent to <b> ${res.email_address} </b>`,
+            text: `Your order ID is ${res.order_id}. <br> The total amount of USD ${res.charged_total} will be charged to ${res.payment_method}.<br> Your order confirmation will be sent to <b> ${res.email_address} </b>`,
             textTrusted: true,
             icon: 'fas fa-question-circle',
             hide: true,
@@ -180,4 +105,68 @@ getElementsBy(divReadyPay).map(div => {
             }
         });
     };
+
+    // -----------------
+    // Event
+    // -----------------
+
+    // when readyticket value changes, update its `data-readyticket` attribute,  
+    // toggle `$inputReadyPay`'s state on validation of readyticket 
+    $parentContainer.on("input", selReadyTicketTxt, (e) => {
+        const textbox = e.target;
+        textbox.dataset.readyticket = textbox.value;
+        const $inputReadyPay = $(textbox).parent().find(selReadyPayBtn);
+        toggleWhile([$inputReadyPay], textbox, validateTextbox)
+    });
+
+    //  prevent readyticket textbox from submitting form when "Enter" key is pressed,
+    //  trigger `click` event on `$inputReadyPay` 
+    $parentContainer.on("keypress", selReadyTicketTxt, (e) => {
+        const $inputReadyPay = $(e.target).parent().find(selReadyPayBtn);
+        if (e.which == 13) {
+            e.preventDefault();
+            if (!$inputReadyPay.prop("disabled")) {
+                $inputReadyPay.trigger('click');
+            }
+        }
+    });
+
+    // disable readypay buttons when page loads
+    $(selReadyPayBtn).prop("disabled", true)
+
+    // make HTTP request, display confirmation on success, log to the console on error
+    $parentContainer.on('click', selReadyPayBtn, (e) => {
+        const $inputReadyPay = $(e.target);
+        const $inputReadyTicket = $inputReadyPay.parent().find(selReadyTicketTxt);
+        // get readyticket number
+        const ReadyTicket = $inputReadyTicket.data("readyticket").toString();
+        // get readyPayload
+        const readyPayload = $inputReadyPay.parent().data("readypayload");
+        // produce a new payload
+        const payLoad = Object.assign(readyPayload, { ReadyTicket });
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: destUrl,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            contentType: false,
+            processData: false,
+            data: JSON.stringify(payLoad),
+            beforeSend: () => {
+                freeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.LoaderImageUrl);
+            },
+            success: function (res, textStatus) {
+                displayConfirmation(res);
+            },
+            error: function (jqXHR, textStatus, errorMsg) {
+                const error = `Request ${textStatus}: ${errorMsg}`
+                console.log(error);
+            },
+            complete: () => {
+                unFreeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.SubmitButtonImageUrl);
+            }
+        });
+    });
 });
