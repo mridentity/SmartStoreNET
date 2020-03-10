@@ -5,21 +5,24 @@
 
 @if (Model.CurrentPageIsBasket)
 {
-     <style>
+    <img src="~/Plugins/ReadySignOn.ReadyPay/Content/ApplePayGooglePayCombinedLogo.jpg" style="width:100px" />
+
+    <style>
         #idReadyTicket {
             vertical-align: middle;
             outline: none;
         }
-        #idReadyTicket:required:invalid {
-            border: 1px black dashed;
-        }
+
+            #idReadyTicket:required:invalid {
+                border: 1px black dashed;
+            }
     </style>
 
     <input id="idReadyTicket" type="text" pattern="\d*" name="ReadyTicket" placeholder="enter ReadyTicket here">
-    <input id="idBtnReadyPay" type="image" name="ReayPayButton" src="@Url.Content(Model.SubmitButtonImageUrl)">
+    <input id="idBtnReadyPay" type="image" name="ReayPayButton" src="@Url.Content(Model.SubmitButtonImageUrl)" style="vertical-align:middle;background-color:green;border-width:2px;width:50px">
 
-<script>
-    
+    <script>
+
     // ----------------
     // Namespace
     // ----------------
@@ -92,7 +95,7 @@
             inputReadyPay.prop("disabled", false)
             inputReadyPay.attr("src", RS.model.SubmitButtonImageUrl);
         };
-        
+
         // custom validation for inputReadyTicket
         // validateReadyTicket ::  elem -> Bool
         const validateReadyTicket = (elem) => {
@@ -116,20 +119,20 @@
             }
 
         });
-        
+
         // when `inputReadyPay` is enabled, press "enter"
         // trigger its `click()`
-        inputReadyTicket.on("keypress", (e) => {	
+        inputReadyTicket.on("keypress", (e) => {
             if (e.which == 13)  {
-                // cancel default: form submit 
-                e.preventDefault();	
+                // cancel default: form submit
+                e.preventDefault();
                 // trigger `inputReadyPay` if it's enabled
                 if (! inputReadyPay.prop("disabled")) {
-                    inputReadyPay.trigger('click');	
+                    inputReadyPay.trigger('click');
                 }
             }
         });
-        
+
         // update `RS.model`
         const updateModel = () => {
             const modelChanged = {
@@ -143,12 +146,12 @@
         // ----------------
         // Main
         // ----------------
-        
+
         // disable `inputReadyPay` button after page loads
         inputReadyPay.prop("disabled", true)
 
         // make HTTP request, redirect on success
-        inputReadyPay.on('click', (e) => {        
+        inputReadyPay.on('click', (e) => {
             e.preventDefault();
             // make a HTTP request
             $.ajax({
@@ -173,7 +176,7 @@
                 }
             });
         });
-    });  
-</script>
+    });
+    </script>
 
 }

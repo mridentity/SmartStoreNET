@@ -5,8 +5,13 @@
     width: 80px;
 }
 
-.art-ready-pay > input[type=image] {
-    width: 40px;
-    border: none;
-    outline: none;
-}
+    .art-ready-pay > input[type=image] {
+        background-repeat: no-repeat;
+        background-position: center;
+        vertical-align: middle;
+        background-size: 40px;
+        height: 30px;
+        width: 40px;
+        border: none;
+        outline: none;
+    }

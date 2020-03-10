@@ -2,6 +2,7 @@
 <form id="idReadyPayForm" action="Plugins/ReadySignOn.ReadyPay/ReadyPay/MiniCartReadyPayPosted" enctype="application/x-www-form-urlencoded" method="post">
     <div class="form-inputs">
         <div class="input-column">
+            <img src="~/Plugins/ReadySignOn.ReadyPay/Content/ApplePayGooglePayCombinedLogo.jpg" style="width:100px" />
             <input type="hidden" name="Sentinel" value="@(Model.Sentinel)" />
             <input type="hidden" name="AppData" value="@(Model.AppData)" />
             <input type="hidden" name="CartSubTotal" value="@(Model.CartSubTotal)" />

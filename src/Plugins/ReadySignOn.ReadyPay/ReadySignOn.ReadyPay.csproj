@@ -124,6 +124,7 @@
     <Compile Include="Services\ReadyPayService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\ApplePayGooglePayCombinedLogo.jpg" />
     <Content Include="Content\icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
