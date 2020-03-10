@@ -143,7 +143,7 @@ $(function () {
         // get readyPayload
         const readyPayload = $inputReadyPay.parent().data("readypayload");
         // produce a new payload
-        const payLoad = Object.assign(readyPayload, { ReadyTicket });
+        const payLoad = Object.assign(readyPayload, {ReadyTicket: ReadyTicket });
         e.preventDefault();
         $.ajax({
             type: 'POST',
