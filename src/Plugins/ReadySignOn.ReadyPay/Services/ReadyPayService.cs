@@ -24,7 +24,6 @@ using SmartStore.Services.Directory;
 using SmartStore.Services.Orders;
 using System.Collections.Generic;
 using System.Linq;
-using SmartStore.Core.Localization;
 
 namespace ReadySignOn.ReadyPay.Services
 {
@@ -148,7 +147,7 @@ namespace ReadySignOn.ReadyPay.Services
             var cart = _services.WorkContext.CurrentCustomer.GetCartItems(ShoppingCartType.ShoppingCart);
             CheckoutShippingMethodModel sm_mod = GetShippingMethodModel(_services.WorkContext.CurrentCustomer, cart);
 
-            if (sm_mod != null)
+            if (sm_mod != null && sm_mod.ShippingMethods.Count > 0)
             {
                 JArray j_methods = new JArray();
 
@@ -168,18 +167,6 @@ namespace ReadySignOn.ReadyPay.Services
                     {
                         j_methods.Add(j_method);
                     }
-                }
-
-                if (j_methods.Count <=0)
-                {
-                    JObject j_method = new JObject();
-                    j_method["Lbl"] = _services.Localization.GetResource("Admin.System.Warnings.NoShipmentItems");
-                    j_method["Desc"] = _services.Localization.GetResource("Admin.System.Warnings.NoShipmentItems");
-                    j_method["Id"] = "DigitalGoods";
-                    j_method["Final"] = true;
-                    j_method["Amt"] = 0.0;
-
-                    j_methods.Add(j_method);
                 }
 
                 payment_request["ShpMthds"] = j_methods;
@@ -253,11 +240,28 @@ namespace ReadySignOn.ReadyPay.Services
         public CheckoutShippingMethodModel GetShippingMethodModel(Customer customer, List<OrganizedShoppingCartItem> cart)
         {
             CheckoutShippingMethodModel model = new CheckoutShippingMethodModel();
+            GetShippingOptionResponse getShippingOptionResponse = new GetShippingOptionResponse();
 
-            var getShippingOptionResponse = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "");
+            // Check to see if the cart contain any shippable item.
+            var shipping_request = _shippingService.CreateShippingOptionRequest(cart, customer.ShippingAddress, _services.StoreContext.CurrentStore.Id);
+            if (shipping_request.Items == null || shipping_request.Items.Count < 1) // No shippable item in cart
+            {
+                var so = new ShippingOption {
+                    Name = _services.Localization.GetResource("No shipping required"),
+                    Description = _services.Localization.GetResource("Admin.System.Warnings.NoShipmentItems"),
+                    ShippingMethodId = 0,
+                    Rate = 0,
+                    ShippingRateComputationMethodSystemName = Plugin.SystemName
+                };
 
-            string no_shipment_item_loc_str = _services.Localization.GetResource("Admin.System.Warnings.NoShipmentItems");
-            if (getShippingOptionResponse.Success || getShippingOptionResponse.Errors.All( err => err == no_shipment_item_loc_str))
+                getShippingOptionResponse.ShippingOptions.Add(so);
+            }
+            else
+            {
+                getShippingOptionResponse = _shippingService.GetShippingOptions(cart, customer.ShippingAddress, "");
+            }
+
+            if (getShippingOptionResponse.Success)
             {
                 var shippingMethods = _shippingService.GetAllShippingMethods(null);
 
