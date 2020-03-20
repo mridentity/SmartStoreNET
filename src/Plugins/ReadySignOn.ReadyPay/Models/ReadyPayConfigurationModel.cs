@@ -17,8 +17,14 @@ namespace ReadySignOn.ReadyPay.Models
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.UseSandbox")]
         public bool UseSandbox { get; set; }
 
+        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.GatewayId")]
+        public string GatewayId { get; set; }
+
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.MerchantId")]
         public string MerchantId { get; set; }
+
+        [SmartResourceDisplayName("Plugins.Payments.ReadyPay.PaymentProcessingCountryCode")]
+        public string PaymentProcessingCountryCode { get; set; }
 
         [SmartResourceDisplayName("Plugins.Payments.ReadyPay.ClientSecret")]
         [DataType(DataType.Password)]

@@ -20,7 +20,7 @@ You can find these information in your <a href="https://members.readysignon.com"
 		<Value>Please note that this billing address is possibly not the valid billing address for this order!</Value>
 	</LocaleResource>
 	<LocaleResource Name="MissingOrderReferenceId">
-		<Value>There was no order reference ID transmitted by Amazon.</Value>
+		<Value>There was no order reference ID transmitted by readyPay.</Value>
 	</LocaleResource>
 	<LocaleResource Name="MissingAddressConsentToken">
 		<Value>There was no access token transmitted by ReadySignOn.</Value>
@@ -93,7 +93,7 @@ You can find these information in your <a href="https://members.readysignon.com"
 		<Value>Encryption of access data is not supported.</Value>
 	</LocaleResource>
 	<LocaleResource Name="MissingBillingAddress">
-		<Value>Missing billing address of the customer. Please enter a billing address at Amazon or choose another payment method.</Value>
+		<Value>Missing billing address of the customer. Please enter a billing address or choose another payment method.</Value>
 	</LocaleResource>
 	<LocaleResource Name="ConfigGroups">
 		<Value>Access data;Data exchange;Layout;Miscellaneous</Value>
@@ -101,196 +101,41 @@ You can find these information in your <a href="https://members.readysignon.com"
 	<LocaleResource Name="MessageStrings">
 		<Value>Message type;Message ID;Authorization ID;Capture ID;Refund ID;Reference ID;State;State update;Fee;Authorized amount;Captured amount;Refunded amount;Capture now;Creation;Expiration</Value>
 	</LocaleResource>
-
-    <LocaleResource Name="UseSandbox">
-		<Value>Use Sandbox</Value>
+  <LocaleResource Name="UseSandbox">
+    <Value>Use Sandbox</Value>
 	</LocaleResource>
 	<LocaleResource Name="UseSandbox.Hint">
 		<Value>Check the box to use the sandbox (testing environment).</Value>
-	</LocaleResource>
-	<LocaleResource Name="ShowPayButtonForAdminOnly">
-		<Value>Show pay button for administrators only</Value>
-	</LocaleResource>
-	<LocaleResource Name="ShowPayButtonForAdminOnly.Hint">
-		<Value>Specifies whether the pay button is visible to administrators only. Intended for testing without having to offer the payment method to customers.</Value>
-	</LocaleResource>
-	<LocaleResource Name="SellerId">
-		<Value>Your Merchant ID</Value>
-	</LocaleResource>
-	<LocaleResource Name="SellerId.Hint">
-		<Value>The Merchant ID you received during registration at Amazon's Seller Central.</Value>
-	</LocaleResource>
-	<LocaleResource Name="Marketplace">
-		<Value>Currency</Value>
-	</LocaleResource>
-	<LocaleResource Name="Marketplace.Hint">
-		<Value>Specifies both the currency and the Amazon region.</Value>
-	</LocaleResource>
-    <LocaleResource Name="Marketplace.De">
-        <Value>EUR (Euro)</Value>
-    </LocaleResource>
-    <LocaleResource Name="Marketplace.Uk">
-        <Value>GBP (Pound Sterling)</Value>
-    </LocaleResource>
-    <LocaleResource Name="Marketplace.Us">
-        <Value>USD (US Dollar)</Value>
-    </LocaleResource>
-    <LocaleResource Name="Marketplace.Jp">
-        <Value>JPY (Japanese Yen)</Value>
-    </LocaleResource>
-	<LocaleResource Name="AccessKey">
-		<Value>Your Access Key ID</Value>
-	</LocaleResource>
-	<LocaleResource Name="AccessKey.Hint">
-		<Value>You can find the Access Key ID at Amazon's Seller Central under Integration - MWS Access Key.</Value>
-	</LocaleResource>
-	<LocaleResource Name="SecretKey">
-		<Value>Your Secret Access Key</Value>
-	</LocaleResource>
-	<LocaleResource Name="SecretKey.Hint">
-		<Value>This is your client secret key or API access key. You should obtain this key from your ReadyConnect or ReadyPay service provider.</Value>
 	</LocaleResource>
 	<LocaleResource Name="ClientId">
 		<Value>Your Client ID</Value>
 	</LocaleResource>
 	<LocaleResource Name="ClientId.Hint">
-		<Value>You can find the Client ID at Amazon's Seller Central under Integration - MWS Access Key.</Value>
+		<Value>You can create and obtain your application Client ID from https://members.readysignon.com</Value>
 	</LocaleResource>
-	<LocaleResource Name="MerchantLoginDomains">
-		<Value>Allowed JavaScript origins</Value>
+	<LocaleResource Name="GatewayId">
+		<Value>The gateway or payment service provider identifier</Value>
 	</LocaleResource>
-	<LocaleResource Name="MerchantLoginDomains.Hint">
-		<Value>Please enter these origins at Amazon Seller Central under Login with Amazon. The origins must use the HTTPS protocol.</Value>
+	<LocaleResource Name="GatewayId.Hint">
+		<Value>The identifier used by Google Pay for PAYMENT_GATEWAY tokenization type integration with gateway or payment service providers.</Value>
 	</LocaleResource>
-	<LocaleResource Name="MerchantLoginRedirectUrls">
-		<Value>Allowed redirect URLs</Value>
+	<LocaleResource Name="MerchantId">
+		<Value>Gateway Merchant ID</Value>
 	</LocaleResource>
-	<LocaleResource Name="MerchantLoginRedirectUrls.Hint">
-		<Value>Please enter these URLs at Amazon Seller Central under Login with Amazon. The redirect URL protocol must be HTTPS.</Value>
+	<LocaleResource Name="MerchantId.Hint">
+		<Value>The Merchant ID assigned and obtained from your payment service provider or gateway.</Value>
 	</LocaleResource>
-	<LocaleResource Name="PayButtonColor">
-		<Value>Pay button color</Value>
+	<LocaleResource Name="PaymentProcessingCountryCode">
+		<Value>Payment processing country</Value>
 	</LocaleResource>
-	<LocaleResource Name="PayButtonColor.Hint">
-		<Value>Specifies the prefered color of the Pay button.</Value>
+	<LocaleResource Name="PaymentProcessingCountryCode.Hint">
+		<Value>The two-letter ISO country code specifying the country where the actual payment will be processed.</Value>
 	</LocaleResource>
-	<LocaleResource Name="ButtonColor.Gold">
-		<Value>Orange</Value>
+	<LocaleResource Name="ClientSecret">
+		<Value>Secret Access Key</Value>
 	</LocaleResource>
-	<LocaleResource Name="ButtonColor.LightGray">
-		<Value>Light gray</Value>
-	</LocaleResource>
-	<LocaleResource Name="ButtonColor.DarkGray">
-		<Value>Dark gray</Value>
-	</LocaleResource>
-	<LocaleResource Name="PayButtonSize">
-		<Value>Pay button size</Value>
-	</LocaleResource>
-	<LocaleResource Name="PayButtonSize.Hint">
-		<Value>Specifies the size of the Pay button.</Value>
-	</LocaleResource>
-	<LocaleResource Name="ButtonSize.Small">
-		<Value>Small</Value>
-	</LocaleResource>
-	<LocaleResource Name="ButtonSize.Medium">
-		<Value>Medium</Value>
-	</LocaleResource>
-	<LocaleResource Name="ButtonSize.Large">
-		<Value>Large</Value>
-	</LocaleResource>
-	<LocaleResource Name="ButtonSize.Xlarge">
-		<Value>Extra large</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonType">
-		<Value>Login button type</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonType.Hint">
-		<Value>Specifies the prefered type of the Login button.</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonType.Login">
-		<Value>Login</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonType.LwA">
-		<Value>Login with Amazon</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonColor">
-		<Value>Login button color</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonColor.Hint">
-		<Value>Specifies the prefered color of the Login button.</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonSize">
-		<Value>Login button size</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthButtonSize.Hint">
-		<Value>Specifies the size of the Login button.</Value>
-	</LocaleResource>
-	<LocaleResource Name="DataFetching">
-		<Value>Updating the payment status</Value>
-	</LocaleResource>
-	<LocaleResource Name="DataFetching.Hint">
-		<Value>Specifies the method used to update the payment status.</Value>
-	</LocaleResource>
-	<LocaleResource Name="DataFetching.Warning">
-		<Value>
-			<![CDATA[The URL for IPN (Instant Payment Notification) must be entered separately for Sandbox and Live Mode in Amazon Seller Central. Live mode requires a valid SSL certificate issued by a trusted certificate authority, self-signed certificates are not permitted. The sandbox does not require an SSL certificate. In this case, the IPN URL must be specified with HTTP.]]>
-		</Value>
-	</LocaleResource>
-	<LocaleResource Name="DataFetching.Ipn">
-		<Value>IPN (Instant Payment Notification)</Value>
-	</LocaleResource>
-	<LocaleResource Name="DataFetching.Polling">
-		<Value>Data polling</Value>
-	</LocaleResource>
-	<LocaleResource Name="IpnUrl">
-		<Value>IPN URL</Value>
-	</LocaleResource>
-	<LocaleResource Name="IpnUrl.Hint">
-		<Value>Please enter this URL at Amazon Seller Central under Integration Settings - Instant Notification Settings - Merchant URL.</Value>
-	</LocaleResource>
-	<LocaleResource Name="TransactionType">
-		<Value>Payment action</Value>
-	</LocaleResource>
-	<LocaleResource Name="TransactionType.Hint">
-		<Value>Specifies when to debit the customer account.</Value>
-	</LocaleResource>
-	<LocaleResource Name="TransactionType.AuthAndCapture">
-		<Value>Immediately debit</Value>
-	</LocaleResource>
-	<LocaleResource Name="TransactionType.Auth">
-		<Value>Authorize immediately, debit later</Value>
-	</LocaleResource>
-	<LocaleResource Name="TransactionType.Warning">
-		<Value>
-			<![CDATA[Please use <b>Immediately debit</b> method only in the case you are shipping goods on the same day they are ordered and you have been white-listed for this service. Do not activate this option without contacting Amazon Pay first.]]>
-		</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthorizeMethod">
-		<Value>Authorize method</Value>
-	</LocaleResource>
-	<LocaleResource Name="AuthorizeMethod.Hint">
-		<Value>Specifies the method by which payments are to be authorized.</Value>
-	</LocaleResource>
-	<LocaleResource Name="Enums.ReadySignOn.ReadyPay.Services.AmazonPayAuthorizeMethod.Omnichronous" AppendRootKey="false">
-		<Value>Standard (Omnichronous)</Value>
-	</LocaleResource>
-	<LocaleResource Name="Enums.ReadySignOn.ReadyPay.Services.AmazonPayAuthorizeMethod.Asynchronous" AppendRootKey="false">
-		<Value>Asynchronous</Value>
-	</LocaleResource>
-	<LocaleResource Name="Enums.ReadySignOn.ReadyPay.Services.AmazonPayAuthorizeMethod.Synchronous" AppendRootKey="false">
-		<Value>Synchronous</Value>
-	</LocaleResource>
-	<LocaleResource Name="SaveEmailAndPhone">
-		<Value>Apply customer data</Value>
-	</LocaleResource>
-	<LocaleResource Name="SaveEmailAndPhone.Hint">
-		<Value>Specifies whether and when the Amazon email address and telephone number of the customer should be saved.</Value>
-	</LocaleResource>
-	<LocaleResource Name="AmazonPaySaveDataType.OnlyIfEmpty">
-		<Value>Only if empty</Value>
-	</LocaleResource>
-	<LocaleResource Name="AmazonPaySaveDataType.Always">
-		<Value>Always</Value>
+	<LocaleResource Name="ClientSecret.Hint">
+		<Value>This is your client secret key or API access key. You should obtain this key from your ReadyConnect or ReadyPay service provider.</Value>
 	</LocaleResource>
   <LocaleResource Name="ShowButtonInMiniShoppingCart">
     <Value>Show ReadyPay in mini shopping cart</Value>
@@ -334,11 +179,23 @@ You can find these information in your <a href="https://members.readysignon.com"
   <LocaleResource Name="ShowInPlaceReadyPay_invoice_aftertotal.Hint">
     <Value>When enabled ReadyTicket input field and ReadyPay button will be displayed in invoice_aftertotal widget zone.</Value>
   </LocaleResource>
+  <LocaleResource Name="CallbackTimeout">
+      <Value>Timeout for API callback</Value>
+  </LocaleResource>
+  <LocaleResource Name="CallbackTimeout.Hint">
+      <Value>Determines the timeout for API callbacks.</Value>
+  </LocaleResource>
+   <LocaleResource Name="DefaultShippingPrice">
+      <Value>Shipping costs (fallback)</Value>
+  </LocaleResource>
+  <LocaleResource Name="DefaultShippingPrice.Hint">
+      <Value>Determines shipping costs if no other could be obtained.</Value>
+  </LocaleResource>
   <LocaleResource Name="AddOrderNotes">
 		<Value>Create order notes</Value>
 	</LocaleResource>
 	<LocaleResource Name="AddOrderNotes.Hint">
-		<Value>Specifies that order notes should be created in context of the data exchange with Amazon Pay.</Value>
+		<Value>Specifies that order notes should be created in context of the data exchange with readyPay.</Value>
 	</LocaleResource>
 	<LocaleResource Name="PollingMaxOrderCreationDays">
 		<Value>Maximal order age</Value>
@@ -350,7 +207,7 @@ You can find these information in your <a href="https://members.readysignon.com"
 		<Value>Inform about a refusal of an authorization</Value>
 	</LocaleResource>
 	<LocaleResource Name="InformCustomerAboutErrors.Hint">
-		<Value>Specifies to create order notes in case of a declination of an Amazon Pay, which are visible for customers too. In addition the customer is informed by email about the case.</Value>
+		<Value>Specifies to create order notes in case of a declination of an readyPay, which are visible for customers too. In addition the customer is informed by email about the case.</Value>
 	</LocaleResource>
 	<LocaleResource Name="InformCustomerAddErrors">
 		<Value>Append error message</Value>

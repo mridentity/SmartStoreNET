@@ -106,15 +106,12 @@ namespace ReadySignOn.ReadyPay.Services
                 // MUST IMPLEMENT THEIR OWN PAYMENT UPDATE ENDPOINT THAT PROVIDES SHIPPING METHODS AND FEES SPECIFIC
                 // TO THEIR BUSINESS.
 
-                url_paymentupdate = rp_settings.UseSandbox  ? "https://iosiapqa.readysignon.com/PaymentUpdate/" 
-                                                            : "https://iosiap.readysignon.com/PaymentUpdate/";
+                url_paymentupdate = rp_settings.UseSandbox  ? "https://readyconnectsvcqa.readysignon.com/PaymentUpdate/"
+                                                            : "https://readyconnectsvcqa.readysignon.com/PaymentUpdate/";
             }
 
-            var shippingSettings = _services.Settings.LoadSetting<ShippingSettings>(_services.StoreContext.CurrentStore.Id);
-
-            var org_shipping_address = _addressService.GetAddressById(shippingSettings.ShippingOriginAddressId);
-            string payment_processing_country = org_shipping_address != null ? org_shipping_address.Country.TwoLetterIsoCode : "US";
-            //TODO: In the above we assumed the country where the payment will be processed is the same as the originating country of the shipment. Ideally we could add a setting on the readyPay configuration page.
+            string payment_processing_country = rp_settings.PaymentProcessingCountryCode;
+            if (string.IsNullOrWhiteSpace(payment_processing_country)) payment_processing_country = "US";
 
             string customer_guid = _services.WorkContext.CurrentCustomer.CustomerGuid.ToString();
 
@@ -130,7 +127,9 @@ namespace ReadySignOn.ReadyPay.Services
             httpWebRequest.Headers.Add("sentinel", rp_info_model.Sentinel);
 
             JObject payment_request = new JObject();
+            payment_request["GatewayId"] = rp_settings.GatewayId;
             payment_request["MerchantId"] = rp_settings.MerchantId;
+            payment_request["UseSandbox"] = rp_settings.UseSandbox;
             payment_request["AppDataB64"] = application_data_b64;
             payment_request["RpUpdEp"] = url_paymentupdate;
             payment_request["CountryCd"] = payment_processing_country;

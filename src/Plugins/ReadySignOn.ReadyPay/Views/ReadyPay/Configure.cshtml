@@ -54,11 +54,29 @@
     </tr>
     <tr>
         <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.GatewayId)
+        </td>
+        <td class="adminData">
+            @Html.SettingEditorFor(model => model.GatewayId)
+            @Html.ValidationMessageFor(model => model.GatewayId)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
             @Html.SmartLabelFor(model => model.MerchantId)
         </td>
         <td class="adminData">
             @Html.SettingEditorFor(model => model.MerchantId)
             @Html.ValidationMessageFor(model => model.MerchantId)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            @Html.SmartLabelFor(model => model.PaymentProcessingCountryCode)
+        </td>
+        <td class="adminData">
+            @Html.SettingEditorFor(model => model.PaymentProcessingCountryCode)
+            @Html.ValidationMessageFor(model => model.PaymentProcessingCountryCode)
         </td>
     </tr>
     <tr>
@@ -133,25 +151,6 @@
             @Html.ValidationMessageFor(model => model.ShowInPlaceReadyPay_invoice_aftertotal)
         </td>
     </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.ConfirmedShipment)
-        </td>
-        <td class="adminData">
-            @Html.SettingEditorFor(model => model.ConfirmedShipment)
-            @Html.ValidationMessageFor(model => model.ConfirmedShipment)
-        </td>
-    </tr>
-    <tr>
-        <td class="adminTitle">
-            @Html.SmartLabelFor(model => model.NoShipmentAddress)
-        </td>
-        <td class="adminData">
-            @Html.SettingEditorFor(model => model.NoShipmentAddress)
-            @Html.ValidationMessageFor(model => model.NoShipmentAddress)
-        </td>
-    </tr>
-
     <tr>
         <td class="adminTitle">
             @Html.SmartLabelFor(model => model.CallbackTimeout)

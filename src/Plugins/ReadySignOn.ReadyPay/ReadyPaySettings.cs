@@ -38,7 +38,11 @@ namespace ReadySignOn.ReadyPay
 
         public bool UseSandbox { get; set; }
 
+        public string GatewayId { get; set; }
+
         public string MerchantId { get; set; }
+
+        public string PaymentProcessingCountryCode { get; set; }
 
         public string ClientSecret { get; set; }
 

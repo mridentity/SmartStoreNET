@@ -138,6 +138,7 @@ namespace ReadySignOn.ReadyPay.Controllers
 
             model.ClientId = model.ClientId.TrimSafe();
             model.ClientSecret = model.ClientSecret.TrimSafe();
+            model.GatewayId = model.GatewayId.TrimSafe();
             model.MerchantId = model.MerchantId.TrimSafe();
 
             MiniMapper.Map(model, settings);
