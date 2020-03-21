@@ -60,50 +60,90 @@ $(function () {
     // displayConfirmation :: JSON -> ()
     // displays confirmation popup
     const displayConfirmation = (res) => {
-        var notice = PNotify.success({
-            title: `Thank you for placing your order! `,
-            text: `Your order ID is ${res.order_id}. <br> The total amount of USD ${res.charged_total} will be charged to ${res.payment_method}.<br> Your order confirmation will be sent to <b> ${res.email_address} </b>`,
-            textTrusted: true,
-            icon: 'fas fa-question-circle',
-            hide: true,
-            delay: 8000,
-            modules: {
-                Confirm: {
-                    confirm: true,
-                    focus: true,
-                    buttons: [
-                        {
-                            text: 'OK',
-                            textTrusted: false,
-                            addClass: '',
-                            primary: true,
-                            // Whether to trigger this button when the user hits enter in a single line
-                            // prompt. Also, focus the button if it is a modal prompt.
-                            promptTrigger: true,
-                            click: (notice, value) => {
-                                notice.close();
+        if (res.order_id) {
+            var notice = PNotify.success({
+                title: `Thank you for placing your order! `,
+                text: `Your order ID is ${res.order_id}. <br> The total amount of USD ${res.charged_total} will be charged to ${res.payment_method}.<br> Your order confirmation will be sent to <b> ${res.email_address} </b>`,
+                textTrusted: true,
+                icon: 'fas fa-question-circle',
+                hide: true,
+                delay: 8000,
+                modules: {
+                    Confirm: {
+                        confirm: true,
+                        focus: true,
+                        buttons: [
+                            {
+                                text: 'OK',
+                                textTrusted: false,
+                                addClass: '',
+                                primary: true,
+                                // Whether to trigger this button when the user hits enter in a single line
+                                // prompt. Also, focus the button if it is a modal prompt.
+                                promptTrigger: true,
+                                click: (notice, value) => {
+                                    notice.close();
+                                }
+                            },
+                            {
+                                text: `<a href="Order/Details/${res.order_id}" target="_blank">View Order Detail</a>`,
+                                textTrusted: true,
+                                addClass: '',
+                                click: (notice) => {
+                                    notice.close();
+                                    notice.fire('pnotify.cancel', { notice });
+                                }
                             }
-                        },
-                        {
-                            text: `<a href="Order/Details/${res.order_id}" target="_blank">View Order Detail</a>`,
-                            textTrusted: true,
-                            addClass: '',
-                            click: (notice) => {
-                                notice.close();
-                                notice.fire('pnotify.cancel', { notice });
-                            }
-                        }
-                    ],
-                },
-                Buttons: {
-                    closer: true,
-                    sticker: false
-                },
-                History: {
-                    history: true
+                        ],
+                    },
+                    Buttons: {
+                        closer: true,
+                        sticker: false
+                    },
+                    History: {
+                        history: true
+                    }
                 }
-            }
-        });
+            });
+        }
+        else {
+            notice = PNotify.error({
+                title: `Payment failed.`,
+                text: `The payment was denied by the user or an error has occurred while processing the payment, please verify your payment information then try again.`,
+                textTrusted: true,
+                icon: 'fas fa-question-circle',
+                hide: true,
+                delay: 8000,
+                modules: {
+                    Confirm: {
+                        confirm: true,
+                        focus: true,
+                        buttons: [
+                            {
+                                text: 'OK',
+                                textTrusted: false,
+                                addClass: '',
+                                primary: true,
+                                // Whether to trigger this button when the user hits enter in a single line
+                                // prompt. Also, focus the button if it is a modal prompt.
+                                promptTrigger: true,
+                                click: (notice, value) => {
+                                    notice.close();
+                                }
+                            }
+                        ]
+                    },
+                    Buttons: {
+                        closer: true,
+                        sticker: false
+                    },
+                    History: {
+                        history: true
+                    }
+                }
+            });
+        }
+
     };
 
     // -----------------

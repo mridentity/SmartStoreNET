@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Web;
 using System.Web.Mvc;
 
 namespace ReadySignOn.ReadyPay.Controllers
@@ -362,6 +363,11 @@ namespace ReadySignOn.ReadyPay.Controllers
                     ContentEncoding = Encoding.UTF8
                 };
             }
+            catch (WebException we)
+            {
+                HttpWebResponse response = (HttpWebResponse)we.Response;
+                return new HttpStatusCodeResult(response.StatusCode, we.Message);
+            }
             catch (Exception ex)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.InternalServerError, ex.Message);
@@ -419,13 +425,27 @@ namespace ReadySignOn.ReadyPay.Controllers
                     {
                         statusDescription = string.Join(" ", order_result.Errors);
                     }
-                    return new HttpStatusCodeResult(HttpStatusCode.NotFound, statusDescription);
+
+                    NotifyError(statusDescription);
+                    throw new WebException(statusDescription);
                 }
+
                 return RedirectToAction("Completed", "Checkout", new { area = "" });
             }
             catch (Exception ex)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError, ex.Message);
+                NotifyError(ex.Message);
+
+                if (rp_info_model.SubmitButtonImageUrl == null) //HACK: We came from the MiniShoppingCart partial view because this was set in the PaymentInfo partial view
+                {
+                    rp_info_model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
+                    rp_info_model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
+                    return RedirectToAction("Cart", "ShoppingCart", new { area = "" });
+                }
+                else
+                {
+                    return RedirectToAction("PaymentMethod", "Checkout", new { area = "" });
+                }
             }
         }
 
