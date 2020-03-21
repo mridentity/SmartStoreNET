@@ -1,101 +1,170 @@
 ﻿@model ReadySignOn.ReadyPay.Models.ReadyPayPaymentInfoModel
-<form id="idReadyPayForm" action="Plugins/ReadySignOn.ReadyPay/ReadyPay/MiniCartReadyPayPosted" enctype="application/x-www-form-urlencoded" method="post">
-    <div class="form-inputs">
-        <div class="input-column">
-            <img src="~/Plugins/ReadySignOn.ReadyPay/Content/ApplePayGooglePayCombinedLogo.jpg" style="width:100px" />
-            <input type="hidden" name="Sentinel" value="@(Model.Sentinel)" />
-            <input type="hidden" name="AppData" value="@(Model.AppData)" />
-            <input type="hidden" name="CartSubTotal" value="@(Model.CartSubTotal)" />
-            <input type="hidden" name="TaxTotal" value="@(Model.TaxTotal)" />
-            <input id="idReadyTicket" type="text" pattern="\d*" name="ReadyTicket" placeholder="enter ReadyTicket here" style="vertical-align:middle;">
-            <input id="idBtnReadyPay" type="image" name="ReayPayButton" style="vertical-align:middle;background-color:green;border-width:2px;width:50px"
-                   src="@Url.Content(Model.SubmitButtonImageUrl)" onclick="return validate_and_update()" value="READYpay">
-        </div>
+@{
+    Layout = "";
+}
 
-        <div id="idAuthStatus" class="input-column" align="center">
-            <img id="idWaitingImage" src="@Url.Content(Model.LoaderImageUrl)" style="visibility:hidden;width:30px" />
-        </div>
-    </div>
-</form>
+<div>
+    <img src="~/Plugins/ReadySignOn.ReadyPay/Content/ApplePayGooglePayCombinedLogo.jpg" style="width:100px" />
+    <style>
+        #idReadyTicket {
+            vertical-align: middle;
+            outline: none;
+        }
+
+            #idReadyTicket:required:invalid {
+                border: 1px black dashed;
+            }
+    </style>
+
+    <input id="idReadyTicket" type="text" pattern="\d*" name="ReadyTicket" placeholder="enter ReadyTicket here">
+    <input id="idBtnReadyPay" type="image" name="ReayPayButton" src="@Url.Content(Model.SubmitButtonImageUrl)" style="vertical-align:middle;background-color:green;border-width:2px;width:50px">
+
+</div>
 
 <script>
-    // ----------------
-    // Data
-    // ----------------
-
-    // divSubTotal :: Div
-    // div containing subtotal price
-    var divSubTotal = $('div.offcanvas-cart-footer div.sub-total.price');
-
-    // rpSubTotal :: Input
-    // hidden Input containing subtotal price
-    var rpSubTotal = $('#idReadyPayForm input[name="CartSubTotal"]');
 
     // ----------------
-    // Function
+    // Namespace
     // ----------------
 
-    // >>> "$5,988.30 excl tax" => 5988.3000
-    // parseSubtotal :: String -> Float
-    var parseSubTotal = (str) => {
-        // nonNumeric :: RegExp
-        // match: "0 - 9", "."
-        const nonNumeric = /[^\d\.]+/g;
-        return Number(str.replace(nonNumeric, ''));
-    }
+    // expose `RS` on `window` object.
+    // window.RS :: Object
+    var RS = RS || {};
 
-    // ----------------
-    // Main
-    // ----------------
-
-    // update `rpSubTotal` each time `divSubTotal` changes
-    divSubTotal.on('DOMSubtreeModified', (e) => {
-        rpSubTotal.val((parseSubTotal($(e.target).text())));
-
-    });
-
-    var validate_and_update = function () { };  // Will be re-assigned laster. JS hoisting may take care of this automatically though.
-
+    // on `Document.ready()`, update model, make request, handle response
     $(function () {
-        $("#idReadyTicket").keypress(function (event) {
-            if (event.which == 13)  {   // Enter key pressed.
-                event.preventDefault ? event.preventDefault() : (event.returnValue = false);    // Prevent re-submit
-                $("#idBtnReadyPay").click();
+
+        // ----------------
+        // Data
+        // ----------------
+
+        RS.model = {
+            "Sentinel": "@Model.Sentinel",
+            "ReadyTicket": $('#idReadyTicket').val(),
+            "CurrentPageIsBasket": "@Model.CurrentPageIsBasket",
+            "CartSubTotal": @Model.CartSubTotal,
+            "TaxTotal": @Model.TaxTotal,
+            "AppData": "@Model.AppData",
+            "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl",
+            "LoaderImageUrl": "@Model.LoaderImageUrl"
+        };
+
+        // inputReadyTicket :: Input[text]
+        // input text field containing the ready ticket
+        const inputReadyTicket = $("#idReadyTicket");
+
+        // inputReadyPay :: Input[image]
+        // button invoking ReadyPay payment
+        const inputReadyPay = $('#idBtnReadyPay');
+
+        // ----------------
+        // Function
+        // ----------------
+
+        // "$5,988.30 excl tax" >>> 5988.3000
+        // parseSubtotal :: String -> Float
+        const parseSubTotal = (str) => {
+            // nonNumeric :: RegExp
+            // match: "0 - 9", "."
+            const nonNumeric = /[^\d\.]+/g;
+            return Number(str.replace(nonNumeric, ''));
+        }
+
+        // ----------------
+        // Effect
+        // ----------------
+
+        // disable controls, show loader
+        const freeze = () => {
+            inputReadyTicket.prop("disabled", true);
+            inputReadyPay.attr("src", RS.model.LoaderImageUrl);
+            inputReadyPay.prop("disabled", true)
+        };
+
+        // does the opposite of `freeze`
+        const unFreeze = () => {
+            inputReadyTicket.prop("disabled", false);
+            inputReadyPay.prop("disabled", false)
+            inputReadyPay.attr("src", RS.model.SubmitButtonImageUrl);
+        };
+
+        // custom validation for inputReadyTicket
+        // validateReadyTicket ::  elem -> Bool
+        const validateReadyTicket = (elem) => {
+            const val = $(elem).val()
+            return (val.length > 0 && $.isNumeric(val)) ? true : false
+        };
+
+        // disable/enable `inputReadyPay` on validation of `inputReadyTicket`;
+        // update `RS.model`
+        inputReadyTicket.on("input", (e) => {
+
+            updateModel();
+
+            const el = e.target;
+
+            if (validateReadyTicket(el)) {
+                inputReadyPay.prop("disabled", false);
+            }
+            else {
+                inputReadyPay.prop("disabled", true);
+            }
+
+        });
+
+        // when `inputReadyPay` is enabled, press "enter"
+        // trigger its `click()`
+        inputReadyTicket.on("keypress", (e) => {
+            if (e.which == 13)  {
+                // cancel default: form submit
+                e.preventDefault();
+                // trigger `inputReadyPay` if it's enabled
+                if (! inputReadyPay.prop("disabled")) {
+                    inputReadyPay.trigger('click');
+                }
             }
         });
 
-        validate_and_update = function validateAndUpdate() {
-            if ($("#idReadyTicket").val() == '') {
-                // No ticket entered.
-                $("#idReadyTicket").html('<span class="alert alert-error" style="color: red">Please fill in ReadyTicket.</span>');
-                return false;
-            }
-            else {
-                doSubmit();
+        // update `RS.model`
+        const updateModel = () => {
+            const modelChanged = {
+                "ReadyTicket": inputReadyTicket.val()
+            };
+            RS.model = Object.assign(RS.model, modelChanged);
+        };
 
-                return true;
-            }
-        }
+        // ----------------
+        // Main
+        // ----------------
 
-        function doSubmit() {
+        // disable `inputReadyPay` button after page loads
+        inputReadyPay.prop("disabled", true)
 
-            $("#idAuthStatus").show();
-            //your client side validation here
-            valid = true;
-            if (valid) { // all client side validation passed, ReadyTicket is valid...
-                $("#idBtnReadyPay").hide();
-                document.getElementById('idWaitingImage').style.visibility = 'visible';
-                $('#idWaitingImage').show();
-                $("#idReadyPayForm").submit();
-                return true;
-            }
-            else {  // Fail client side validation
-                $(this).removeAttr('disabled'); // Renable the Ready button
-                $("#idAuthStatus").hide();      // Hide the status and the loader image.
-                return false;
-            }
-        }
-    })
-
+        // make HTTP request, redirect on success
+        inputReadyPay.on('click', (e) => {
+            e.preventDefault();
+            // make a HTTP request
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("MiniCartReadyPayPosted","ReadyPay")",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                contentType: false,
+                processData: false,
+                data: JSON.stringify(RS.model),
+                beforeSend: freeze,
+                200: function (response) {  // We use 200 here instead of success since the backend will return HTTP 204 (no content) in case of error.
+                    window.location.href = "@Url.Action("Completed","Checkout", new { area = "" })";
+                },
+                error: function (response) {
+                    console.log("//MiniCartReadyPayPosted() did not return HTTP 200.");
+                },
+                complete: () => {
+                    unFreeze();
+                }
+            });
+        });
+    });
 </script>
 

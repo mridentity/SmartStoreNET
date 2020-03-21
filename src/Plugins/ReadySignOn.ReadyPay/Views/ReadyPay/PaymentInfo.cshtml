@@ -164,11 +164,11 @@
                 processData: false,
                 data: JSON.stringify(RS.model),
                 beforeSend: freeze,
-                success: function (response) {
+                200: function (response) {  // We use 200 here instead of success since the backend will return HTTP 204 (no content) in case of error.
                     window.location.href = "@Url.Action("Completed","Checkout", new { area = "" })";
                 },
                 error: function (response) {
-                    console.log("///Ajax call failed.");
+                    console.log("//MiniCartReadyPayPosted() did not return HTTP 200.");
                 },
                 complete: () => {
                     unFreeze();

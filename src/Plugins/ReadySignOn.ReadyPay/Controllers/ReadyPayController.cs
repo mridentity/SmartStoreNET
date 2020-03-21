@@ -435,17 +435,8 @@ namespace ReadySignOn.ReadyPay.Controllers
             catch (Exception ex)
             {
                 NotifyError(ex.Message);
-
-                if (rp_info_model.SubmitButtonImageUrl == null) //HACK: We came from the MiniShoppingCart partial view because this was set in the PaymentInfo partial view
-                {
-                    rp_info_model.SubmitButtonImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/ready_button.png";
-                    rp_info_model.LoaderImageUrl = "/Plugins/ReadySignOn.ReadyPay/Content/loader.gif";
-                    return RedirectToAction("Cart", "ShoppingCart", new { area = "" });
-                }
-                else
-                {
-                    return RedirectToAction("PaymentMethod", "Checkout", new { area = "" });
-                }
+                Logger.Error(ex);
+                return new HttpStatusCodeResult(HttpStatusCode.NoContent);  //HTTP 204 will not match the 200 code expected in the AJAX call
             }
         }
 

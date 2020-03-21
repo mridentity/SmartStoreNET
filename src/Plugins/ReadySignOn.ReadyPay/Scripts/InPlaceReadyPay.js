@@ -179,7 +179,7 @@ $(function () {
         const $inputReadyPay = $(e.target);
         const $inputReadyTicket = $inputReadyPay.parent().find(selReadyTicketTxt);
         // get readyticket number
-        const ReadyTicket = $inputReadyTicket.data("readyticket").toString();
+        const ReadyTicket = $inputReadyTicket.data("readyticket");
         // get readyPayload
         const readyPayload = $inputReadyPay.parent().data("readypayload");
         // produce a new payload
