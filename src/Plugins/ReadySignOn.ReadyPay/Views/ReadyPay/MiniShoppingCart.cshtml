@@ -143,7 +143,6 @@
         // make HTTP request, redirect on success
         inputReadyPay.on('click', (e) => {
             e.preventDefault();
-            // make a HTTP request
             $.ajax({
                 type: 'POST',
                 url: "@Url.Action("MiniCartReadyPayPosted","ReadyPay")",
@@ -154,15 +153,17 @@
                 processData: false,
                 data: JSON.stringify(RS.model),
                 beforeSend: freeze,
-                200: function (response) {  // We use 200 here instead of success since the backend will return HTTP 204 (no content) in case of error.
-                    window.location.href = "@Url.Action("Completed","Checkout", new { area = "" })";
+                success: (res, textStatus, jqXHR) => {  // We use 200 here instead of success since the backend will return HTTP 204 (no content) in case of error.
+                    // console.log(`The status code returned from the server is: ${jqXHR.status}`);
+                    if (jqXHR.status !== "204") {
+                        window.location.href = "@Url.Action("Completed","Checkout", new { area = "" })";
+                        // console.log(`The data returned from the server is: ${res}`);
+                        }
                 },
-                error: function (response) {
+                error: res => {
                     console.log("//MiniCartReadyPayPosted() did not return HTTP 200.");
                 },
-                complete: () => {
-                    unFreeze();
-                }
+                complete: unFreeze
             });
         });
     });

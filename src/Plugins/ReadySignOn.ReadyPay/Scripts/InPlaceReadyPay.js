@@ -33,20 +33,18 @@ $(function () {
     // disables elements in `xs`; 
     // updates image url to `url` for elements in `ys`
     const freeze = (xs, ys, url, disabled = true) => {
-        xs.map(($x) => $x.prop("disabled", disabled));
-        ys.map(($y) => $y.attr("src", url));
+        xs.map($x => $x.prop("disabled", disabled));
+        ys.map($y => $y.attr("src", url));
     };
 
-    // `unFreeze` enables controls;
+    // unFreeze enables controls;
     // updates image url to `url` for elements in `ys`
-    const unFreeze = (xs, ys, url) => {
-        freeze(xs, ys, url, false);
-    };
+    const unFreeze = (xs, ys, url) => freeze(xs, ys, url, false);
 
     // validateTextbox ::  (Element a) => a -> Bool
     // returns `true` if the `elem`'s value is numeric and it's non-empty,
     // otherwise, returns `false`
-    const validateTextbox = (elem) => {
+    const validateTextbox = elem => {
         const val = elem.value;
         return (val.length > 0 && $.isNumeric(val)) ? true : false
     };
@@ -54,12 +52,12 @@ $(function () {
     // toggleWhile :: (jQuery a, Element b) =>  [a] -> b -> (b -> Bool) -> ()
     // disables `x`in xs if `p(y)` is true, otherwise enables `x`
     const toggleWhile = (xs, y, p) => {
-        xs.map((x) => p(y) ? x.prop("disabled", false) : x.prop("disabled", true));
+        xs.map($x => p(y) ? $x.prop("disabled", false) : $x.prop("disabled", true));
     };
     
     // displayConfirmation :: JSON -> ()
     // displays confirmation popup
-    const displayConfirmation = (res) => {
+    const displayConfirmation = res => {
         if (res.order_id) {
             var notice = PNotify.success({
                 title: `Thank you for placing your order! `,
@@ -143,7 +141,6 @@ $(function () {
                 }
             });
         }
-
     };
 
     // -----------------
@@ -194,19 +191,15 @@ $(function () {
             contentType: false,
             processData: false,
             data: JSON.stringify(payLoad),
-            beforeSend: () => {
-                freeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.LoaderImageUrl);
-            },
+            beforeSend: freeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.LoaderImageUrl),
             success: function (res, textStatus) {
                 displayConfirmation(res);
             },
             error: function (jqXHR, textStatus, errorMsg) {
-                const error = `Request ${textStatus}: ${errorMsg}`;
+                const error = `${errorMsg}`;
                 console.log(error);
             },
-            complete: () => {
-                unFreeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.SubmitButtonImageUrl);
-            }
+            complete: unFreeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.SubmitButtonImageUrl)
         });
     });
 });
