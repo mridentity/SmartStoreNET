@@ -49,6 +49,10 @@
             "LoaderImageUrl": "@Model.LoaderImageUrl"
         };
 
+        // tdSubTotal :: Td
+        // td containing subtotal
+        const tdSubTotal = $('div.offcanvas-cart-footer div.sub-total.price');
+
         // inputReadyTicket :: Input[text]
         // input text field containing the ready ticket
         const inputReadyTicket = $("#idReadyTicket");
@@ -128,6 +132,7 @@
         // update `RS.model`
         const updateModel = () => {
             const modelChanged = {
+                "CartSubTotal": parseSubTotal(tdSubTotal.text()),
                 "ReadyTicket": inputReadyTicket.val()
             };
             RS.model = Object.assign(RS.model, modelChanged);
@@ -154,14 +159,19 @@
                 data: JSON.stringify(RS.model),
                 beforeSend: freeze,
                 success: (res, textStatus, jqXHR) => {  // We use 200 here instead of success since the backend will return HTTP 204 (no content) in case of error.
-                    // console.log(`The status code returned from the server is: ${jqXHR.status}`);
-                    if (jqXHR.status !== "204") {
+                    console.log(`The data returned from the server is: ${res}`);
+                    console.log(`The status code returned from the server is: ${jqXHR.status}`);
+                    if (jqXHR.status === 200) {
                         window.location.href = "@Url.Action("Completed","Checkout", new { area = "" })";
-                        // console.log(`The data returned from the server is: ${res}`);
-                        }
+                    }
+                    else {
+                        console.log("// MiniCartReadyPayPosted() did not return HTTP status code 200.");
+                        displayNotification("Your payment authorization request has been declined or it cannot be processed at this time.", 'error');
+                    }
                 },
-                error: res => {
-                    console.log("//MiniCartReadyPayPosted() did not return HTTP 200.");
+                error: function (response) {
+                    console.log("// Call to MiniCartReadyPayPosted() failed.");
+                    displayNotification("Error occurred during payment authorization request.", 'error');
                 },
                 complete: unFreeze
             });

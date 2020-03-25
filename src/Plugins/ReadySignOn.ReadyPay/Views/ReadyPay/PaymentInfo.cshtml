@@ -164,11 +164,20 @@
                 processData: false,
                 data: JSON.stringify(RS.model),
                 beforeSend: freeze,
-                200: function (response) {  // We use 200 here instead of success since the backend will return HTTP 204 (no content) in case of error.
-                    window.location.href = "@Url.Action("Completed","Checkout", new { area = "" })";
+                success: (res, textStatus, jqXHR) => {  // We use 200 here instead of success since the backend will return HTTP 204 (no content) in case of error.
+                    console.log(`The data returned from the server is: ${res}`);
+                    console.log(`The status code returned from the server is: ${jqXHR.status}`);
+                    if (jqXHR.status === 200) {
+                        window.location.href = "@Url.Action("Completed","Checkout", new { area = "" })";
+                    }
+                    else {
+                        console.log("// MiniCartReadyPayPosted() did not return HTTP status code 200.");
+                        displayNotification("Your payment authorization request has been declined or it cannot be processed at this time.", 'error');
+                    }
                 },
                 error: function (response) {
-                    console.log("//MiniCartReadyPayPosted() did not return HTTP 200.");
+                    console.log("// Call to MiniCartReadyPayPosted() failed.");
+                    displayNotification("Error occurred during payment authorization request.", 'error');
                 },
                 complete: () => {
                     unFreeze();

@@ -331,37 +331,41 @@ namespace ReadySignOn.ReadyPay.Controllers
                     }
                     return new HttpStatusCodeResult(HttpStatusCode.NotFound, statusDescription);
                 }
-
-                //https://stackoverflow.com/questions/9777731/mvc-how-to-return-a-string-as-json
-                //https://exceptionshub.com/return-a-json-string-explicitly-from-asp-net-webapi-4.html
-                //https://stackoverflow.com/questions/2422983/returning-json-object-from-an-asp-net-page
-                //https://stackoverflow.com/questions/1428585/how-can-i-exclude-some-public-properties-from-being-serialized-into-a-jsonresult
-
-                // Build the json to return to front end script
-                var result = new
+                else
                 {
-                    tx_id = rpayment.transactionIdentifier,
-                    order_id = order_result.PlacedOrder.Id,
-                    charged_total = rpayment.grandTotalCharged,
-                    payment_method = rpayment.paymentMethod.displayName,
-                    shipping_method = rpayment.shippingMethod.detail,
-                    shipping_address = $"{rpayment.shippingContact.givenName} {rpayment.shippingContact.familyName}, {rpayment.shippingContact.street}, {rpayment.shippingContact.city}, {rpayment.shippingContact.state} {rpayment.shippingContact.postalCode}, {rpayment.shippingContact.country}",
-                    email_address = rpayment.shippingContact.emailAddress,
-                    phone_number = rpayment.shippingContact.phoneNumber
-                };
+                    //NotifySuccess($"Thank you for shopping with us! Your order number is {order_result.PlacedOrder.Id}.");
 
-                //Note: Json result returned from this.Json() may contain type name handling info described 
-                //here: https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_TypeNameHandling.htm
-                //This is because the JsonNetAttribute filter is applied on the SmartController base class.
-                //We therefore serialize the result to json string manually to avoid the $type inclusion. 
-                string json = JsonConvert.SerializeObject(result);
+                    //https://stackoverflow.com/questions/9777731/mvc-how-to-return-a-string-as-json
+                    //https://exceptionshub.com/return-a-json-string-explicitly-from-asp-net-webapi-4.html
+                    //https://stackoverflow.com/questions/2422983/returning-json-object-from-an-asp-net-page
+                    //https://stackoverflow.com/questions/1428585/how-can-i-exclude-some-public-properties-from-being-serialized-into-a-jsonresult
 
-                return new ContentResult
-                {
-                    Content = json,
-                    ContentType = "application/json",
-                    ContentEncoding = Encoding.UTF8
-                };
+                    // Build the json to return to front end script
+                    var result = new
+                    {
+                        tx_id = rpayment.transactionIdentifier,
+                        order_id = order_result.PlacedOrder.Id,
+                        charged_total = rpayment.grandTotalCharged,
+                        payment_method = rpayment.paymentMethod.displayName,
+                        shipping_method = rpayment.shippingMethod.detail,
+                        shipping_address = $"{rpayment.shippingContact.givenName} {rpayment.shippingContact.familyName}, {rpayment.shippingContact.street}, {rpayment.shippingContact.city}, {rpayment.shippingContact.state} {rpayment.shippingContact.postalCode}, {rpayment.shippingContact.country}",
+                        email_address = rpayment.shippingContact.emailAddress,
+                        phone_number = rpayment.shippingContact.phoneNumber
+                    };
+
+                    //Note: Json result returned from this.Json() may contain type name handling info described 
+                    //here: https://www.newtonsoft.com/json/help/html/T_Newtonsoft_Json_TypeNameHandling.htm
+                    //This is because the JsonNetAttribute filter is applied on the SmartController base class.
+                    //We therefore serialize the result to json string manually to avoid the $type inclusion. 
+                    string json = JsonConvert.SerializeObject(result);
+
+                    return new ContentResult
+                    {
+                        Content = json,
+                        ContentType = "application/json",
+                        ContentEncoding = Encoding.UTF8
+                    };
+                }
             }
             catch (WebException we)
             {
@@ -429,8 +433,11 @@ namespace ReadySignOn.ReadyPay.Controllers
                     NotifyError(statusDescription);
                     throw new WebException(statusDescription);
                 }
-
-                return RedirectToAction("Completed", "Checkout", new { area = "" });
+                else
+                {
+                    NotifySuccess($"Thank you for shopping with us! Your order number is {order_result.PlacedOrder.Id}.");
+                    return new HttpStatusCodeResult(HttpStatusCode.OK);
+                }
             }
             catch (Exception ex)
             {

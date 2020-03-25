@@ -191,15 +191,20 @@ $(function () {
             contentType: false,
             processData: false,
             data: JSON.stringify(payLoad),
-            beforeSend: freeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.LoaderImageUrl),
+            beforeSend: () => {
+                freeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.LoaderImageUrl);
+            },
             success: function (res, textStatus) {
                 displayConfirmation(res);
             },
             error: function (jqXHR, textStatus, errorMsg) {
                 const error = `${errorMsg}`;
                 console.log(error);
+                displayNotification(error, 'error');
             },
-            complete: unFreeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.SubmitButtonImageUrl)
+            complete: () => {
+                unFreeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.SubmitButtonImageUrl);
+            }
         });
     });
 });
