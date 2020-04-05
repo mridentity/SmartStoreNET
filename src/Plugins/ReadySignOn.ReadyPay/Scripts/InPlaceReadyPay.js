@@ -57,6 +57,44 @@ $(function () {
     
     // displayConfirmation :: JSON -> ()
     // displays confirmation popup
+    function displayReadyPayError() {
+        notice = PNotify.error({
+            title: `Payment failed.`,
+            text: `The payment was denied by the user or an error has occurred while processing the payment, please verify your payment information then try again.`,
+            textTrusted: true,
+            icon: 'fas fa-question-circle',
+            hide: true,
+            delay: 8000,
+            modules: {
+                Confirm: {
+                    confirm: true,
+                    focus: true,
+                    buttons: [
+                        {
+                            text: 'OK',
+                            textTrusted: false,
+                            addClass: '',
+                            primary: true,
+                            // Whether to trigger this button when the user hits enter in a single line
+                            // prompt. Also, focus the button if it is a modal prompt.
+                            promptTrigger: true,
+                            click: (notice, value) => {
+                                notice.close();
+                            }
+                        }
+                    ]
+                },
+                Buttons: {
+                    closer: true,
+                    sticker: false
+                },
+                History: {
+                    history: true
+                }
+            }
+        });
+    };
+
     const displayConfirmation = res => {
         if (res.order_id) {
             var notice = PNotify.success({
@@ -105,41 +143,7 @@ $(function () {
             });
         }
         else {
-            notice = PNotify.error({
-                title: `Payment failed.`,
-                text: `The payment was denied by the user or an error has occurred while processing the payment, please verify your payment information then try again.`,
-                textTrusted: true,
-                icon: 'fas fa-question-circle',
-                hide: true,
-                delay: 8000,
-                modules: {
-                    Confirm: {
-                        confirm: true,
-                        focus: true,
-                        buttons: [
-                            {
-                                text: 'OK',
-                                textTrusted: false,
-                                addClass: '',
-                                primary: true,
-                                // Whether to trigger this button when the user hits enter in a single line
-                                // prompt. Also, focus the button if it is a modal prompt.
-                                promptTrigger: true,
-                                click: (notice, value) => {
-                                    notice.close();
-                                }
-                            }
-                        ]
-                    },
-                    Buttons: {
-                        closer: true,
-                        sticker: false
-                    },
-                    History: {
-                        history: true
-                    }
-                }
-            });
+            displayReadyPayError();
         }
     };
 
@@ -200,7 +204,7 @@ $(function () {
             error: function (jqXHR, textStatus, errorMsg) {
                 const error = `${errorMsg}`;
                 console.log(error);
-                displayNotification(error, 'error');
+                displayReadyPayError();
             },
             complete: () => {
                 unFreeze([$inputReadyTicket, $inputReadyPay], [$inputReadyPay], payLoad.SubmitButtonImageUrl);

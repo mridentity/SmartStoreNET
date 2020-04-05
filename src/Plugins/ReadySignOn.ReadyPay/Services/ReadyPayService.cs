@@ -107,7 +107,7 @@ namespace ReadySignOn.ReadyPay.Services
                 // TO THEIR BUSINESS.
 
                 url_paymentupdate = rp_settings.UseSandbox  ? "https://readyconnectsvcqa.readysignon.com/PaymentUpdate/"
-                                                            : "https://readyconnectsvcqa.readysignon.com/PaymentUpdate/";
+                                                            : "https://readyconnectsvc.readysignon.com/PaymentUpdate/";
             }
 
             string payment_processing_country = rp_settings.PaymentProcessingCountryCode;
