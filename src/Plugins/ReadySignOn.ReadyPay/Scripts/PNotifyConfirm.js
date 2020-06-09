@@ -1,1 +1,790 @@
-!function(t,n){"object"==typeof exports&&"undefined"!=typeof module?n(exports):"function"==typeof define&&define.amd?define(["exports"],n):n((t=t||self).PNotifyConfirm={})}(this,(function(t){"use strict";function n(t){return(n="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}function e(t,n){if(!(t instanceof n))throw new TypeError("Cannot call a class as a function")}function o(t,n){for(var e=0;e<n.length;e++){var o=n[e];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(t,o.key,o)}}function r(t,n,e){return n&&o(t.prototype,n),e&&o(t,e),t}function i(t){return(i=Object.setPrototypeOf?Object.getPrototypeOf:function(t){return t.__proto__||Object.getPrototypeOf(t)})(t)}function c(t,n){return(c=Object.setPrototypeOf||function(t,n){return t.__proto__=n,t})(t,n)}function u(){if("undefined"==typeof Reflect||!Reflect.construct)return!1;if(Reflect.construct.sham)return!1;if("function"==typeof Proxy)return!0;try{return Date.prototype.toString.call(Reflect.construct(Date,[],(function(){}))),!0}catch(t){return!1}}function f(t){if(void 0===t)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return t}function a(t,n){return!n||"object"!=typeof n&&"function"!=typeof n?f(t):n}function l(t,n){return function(t){if(Array.isArray(t))return t}(t)||function(t,n){if("undefined"==typeof Symbol||!(Symbol.iterator in Object(t)))return;var e=[],o=!0,r=!1,i=void 0;try{for(var c,u=t[Symbol.iterator]();!(o=(c=u.next()).done)&&(e.push(c.value),!n||e.length!==n);o=!0);}catch(t){r=!0,i=t}finally{try{o||null==u.return||u.return()}finally{if(r)throw i}}return e}(t,n)||s(t,n)||function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function p(t){return function(t){if(Array.isArray(t))return y(t)}(t)||function(t){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(t))return Array.from(t)}(t)||s(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function s(t,n){if(t){if("string"==typeof t)return y(t,n);var e=Object.prototype.toString.call(t).slice(8,-1);return"Object"===e&&t.constructor&&(e=t.constructor.name),"Map"===e||"Set"===e?Array.from(e):"Arguments"===e||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(e)?y(t,n):void 0}}function y(t,n){(null==n||n>t.length)&&(n=t.length);for(var e=0,o=new Array(n);e<n;e++)o[e]=t[e];return o}function d(){}function m(t){return t()}function h(){return Object.create(null)}function v(t){t.forEach(m)}function g(t){return"function"==typeof t}function b(t,e){return t!=t?e==e:t!==e||t&&"object"===n(t)||"function"==typeof t}function S(t,n){t.appendChild(n)}function $(t,n,e){t.insertBefore(n,e||null)}function x(t){t.parentNode.removeChild(t)}function _(t){return document.createElement(t)}function k(t){return document.createTextNode(t)}function w(){return k(" ")}function j(t,n,e,o){return t.addEventListener(n,e,o),function(){return t.removeEventListener(n,e,o)}}function O(t,n,e){null==e?t.removeAttribute(n):t.getAttribute(n)!==e&&t.setAttribute(n,e)}function C(t){return Array.from(t.childNodes)}function A(t,n){(null!=n||t.value)&&(t.value=n)}var E,M=function(){function t(n){var o=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null;e(this,t),this.e=_("div"),this.a=o,this.u(n)}return r(t,[{key:"m",value:function(t){for(var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null,e=0;e<this.n.length;e+=1)$(t,this.n[e],n);this.t=t}},{key:"u",value:function(t){this.e.innerHTML=t,this.n=Array.from(this.e.childNodes)}},{key:"p",value:function(t){this.d(),this.u(t),this.m(this.t,this.a)}},{key:"d",value:function(){this.n.forEach(x)}}]),t}();function T(t){E=t}var L=[],P=[],N=[],R=[],V=Promise.resolve(),I=!1;function D(t){N.push(t)}var q=!1,B=new Set;function H(){if(!q){q=!0;do{for(var t=0;t<L.length;t+=1){var n=L[t];T(n),K(n.$$)}for(L.length=0;P.length;)P.pop()();for(var e=0;e<N.length;e+=1){var o=N[e];B.has(o)||(B.add(o),o())}N.length=0}while(L.length);for(;R.length;)R.pop()();I=!1,q=!1,B.clear()}}function K(t){if(null!==t.fragment){t.update(),v(t.before_update);var n=t.dirty;t.dirty=[-1],t.fragment&&t.fragment.p(t.ctx,n),t.after_update.forEach(D)}}var U=new Set;function z(t,n){t&&t.i&&(U.delete(t),t.i(n))}function F(t,n,e){var o=t.$$,r=o.fragment,i=o.on_mount,c=o.on_destroy,u=o.after_update;r&&r.m(n,e),D((function(){var n=i.map(m).filter(g);c?c.push.apply(c,p(n)):v(n),t.$$.on_mount=[]})),u.forEach(D)}function G(t,n){-1===t.$$.dirty[0]&&(L.push(t),I||(I=!0,V.then(H)),t.$$.dirty.fill(0)),t.$$.dirty[n/31|0]|=1<<n%31}function J(t,n,e){var o=t.slice();return o[21]=n[e],o}function Q(t){for(var n,e,o,r,i,c,u=t[3]&&W(t),f=t[7],a=[],l=0;l<f.length;l+=1)a[l]=nt(J(t,f,l));return{c:function(){n=_("div"),u&&u.c(),e=w(),o=_("div");for(var f=0;f<a.length;f+=1)a[f].c();O(o,"class",r="pnotify-action-bar ".concat(t[1].getStyle("action-bar"))),O(o,"style",i="justify-content: ".concat(t[6],";")),O(n,"class",c="pnotify-confirm ".concat(t[1].getStyle("text")," ").concat(t[1].getStyle("confirm")))},m:function(r,i){$(r,n,i),u&&u.m(n,null),S(n,e),S(n,o);for(var c=0;c<a.length;c+=1)a[c].m(o,null);t[20](o)},p:function(t,l){if(t[3]?u?u.p(t,l):((u=W(t)).c(),u.m(n,e)):u&&(u.d(1),u=null),2178&l){var p;for(f=t[7],p=0;p<f.length;p+=1){var s=J(t,f,p);a[p]?a[p].p(s,l):(a[p]=nt(s),a[p].c(),a[p].m(o,null))}for(;p<a.length;p+=1)a[p].d(1);a.length=f.length}2&l&&r!==(r="pnotify-action-bar ".concat(t[1].getStyle("action-bar")))&&O(o,"class",r),64&l&&i!==(i="justify-content: ".concat(t[6],";"))&&O(o,"style",i),2&l&&c!==(c="pnotify-confirm ".concat(t[1].getStyle("text")," ").concat(t[1].getStyle("confirm")))&&O(n,"class",c)},d:function(e){e&&x(n),u&&u.d(),function(t,n){for(var e=0;e<t.length;e+=1)t[e]&&t[e].d(n)}(a,e),t[20](null)}}}function W(t){var n,e;function o(t,n){return t[5]?Y:X}var r=o(t),i=r(t);return{c:function(){n=_("div"),i.c(),O(n,"class",e="pnotify-prompt-bar ".concat(t[1].getStyle("prompt-bar")))},m:function(t,e){$(t,n,e),i.m(n,null)},p:function(t,c){r===(r=o(t))&&i?i.p(t,c):(i.d(1),(i=r(t))&&(i.c(),i.m(n,null))),2&c&&e!==(e="pnotify-prompt-bar ".concat(t[1].getStyle("prompt-bar")))&&O(n,"class",e)},d:function(t){t&&x(n),i.d()}}}function X(t){var n,e,o;return{c:function(){O(n=_("input"),"type","text"),O(n,"class",e="pnotify-prompt-input ".concat(t[1].getStyle("input")," ").concat(t[4]))},m:function(e,r,i){$(e,n,r),t[17](n),A(n,t[0]),i&&v(o),o=[j(n,"keypress",t[12]),j(n,"input",t[18])]},p:function(t,o){18&o&&e!==(e="pnotify-prompt-input ".concat(t[1].getStyle("input")," ").concat(t[4]))&&O(n,"class",e),1&o&&n.value!==t[0]&&A(n,t[0])},d:function(e){e&&x(n),t[17](null),v(o)}}}function Y(t){var n,e,o;return{c:function(){O(n=_("textarea"),"rows","5"),O(n,"class",e="pnotify-prompt-input ".concat(t[1].getStyle("input")," ").concat(t[4]))},m:function(e,r,i){$(e,n,r),t[15](n),A(n,t[0]),i&&v(o),o=[j(n,"keypress",t[12]),j(n,"input",t[16])]},p:function(t,o){18&o&&e!==(e="pnotify-prompt-input ".concat(t[1].getStyle("input")," ").concat(t[4]))&&O(n,"class",e),1&o&&A(n,t[0])},d:function(e){e&&x(n),t[15](null),v(o)}}}function Z(t){var n,e=t[21].text+"";return{c:function(){n=k(e)},m:function(t,e){$(t,n,e)},p:function(t,o){128&o&&e!==(e=t[21].text+"")&&function(t,n){n=""+n,t.data!==n&&(t.data=n)}(n,e)},d:function(t){t&&x(n)}}}function tt(t){var n,e=t[21].text+"";return{c:function(){n=new M(e,null)},m:function(t,e){n.m(t,e)},p:function(t,o){128&o&&e!==(e=t[21].text+"")&&n.p(e)},d:function(t){t&&n.d()}}}function nt(t){var n,e,o,r;function i(t,n){return t[21].textTrusted?tt:Z}var c=i(t),u=c(t);function f(){for(var n,e=arguments.length,o=new Array(e),r=0;r<e;r++)o[r]=arguments[r];return(n=t)[19].apply(n,[t[21]].concat(o))}return{c:function(){n=_("button"),u.c(),e=w(),O(n,"type","button"),O(n,"class",o="pnotify-action-button ".concat(t[1].getStyle("btn")," ").concat(t[21].primary?t[1].getStyle("btn-primary"):t[1].getStyle("btn-secondary")," ").concat(t[21].addClass?t[21].addClass:""))},m:function(t,o,i){$(t,n,o),u.m(n,null),S(n,e),i&&r(),r=j(n,"click",f)},p:function(r,f){c===(c=i(t=r))&&u?u.p(t,f):(u.d(1),(u=c(t))&&(u.c(),u.m(n,e))),130&f&&o!==(o="pnotify-action-button ".concat(t[1].getStyle("btn")," ").concat(t[21].primary?t[1].getStyle("btn-primary"):t[1].getStyle("btn-secondary")," ").concat(t[21].addClass?t[21].addClass:""))&&O(n,"class",o)},d:function(t){t&&x(n),u.d(),r()}}}function et(t){var n,e=(t[2]||t[3])&&Q(t);return{c:function(){e&&e.c(),n=k("")},m:function(t,o){e&&e.m(t,o),$(t,n,o)},p:function(t,o){var r=l(o,1)[0];t[2]||t[3]?e?e.p(t,r):((e=Q(t)).c(),e.m(n.parentNode,n)):e&&(e.d(1),e=null)},i:d,o:d,d:function(t){e&&e.d(t),t&&x(n)}}}var ot={confirm:!1,prompt:!1,promptClass:"",promptValue:"",promptMultiLine:!1,focus:null,align:"flex-end",buttons:[{text:"Ok",primary:!0,promptTrigger:!0,click:function(t,n){t.close(),t.fire("pnotify:confirm",{notice:t,value:n})}},{text:"Cancel",click:function(t){t.close(),t.fire("pnotify:cancel",{notice:t})}}]};function rt(t,n,e){var o,r,i,c=n.self,u=void 0===c?null:c,f=n.confirm,a=void 0===f?ot.confirm:f,l=n.prompt,p=void 0===l?ot.prompt:l,s=n.promptClass,y=void 0===s?ot.promptClass:s,d=n.promptValue,m=void 0===d?ot.promptValue:d,h=n.promptMultiLine,v=void 0===h?ot.promptMultiLine:h,g=n.focus,b=void 0===g?ot.focus:g,S=n.align,$=void 0===S?ot.align:S,x=n.buttons,_=void 0===x?ot.buttons:x,k=!1;function w(t,n){t.click&&t.click(u,p?m:null,n)}u.on("pnotify:afterOpen",(function(){e(14,k=!0)}));return t.$set=function(t){"self"in t&&e(1,u=t.self),"confirm"in t&&e(2,a=t.confirm),"prompt"in t&&e(3,p=t.prompt),"promptClass"in t&&e(4,y=t.promptClass),"promptValue"in t&&e(0,m=t.promptValue),"promptMultiLine"in t&&e(5,v=t.promptMultiLine),"focus"in t&&e(13,b=t.focus),"align"in t&&e(6,$=t.align),"buttons"in t&&e(7,_=t.buttons)},t.$$.update=function(){if(26542&t.$$.dirty&&k)if(p&&!1!==b)v?o&&(o.focus(),e(14,k=!1)):r&&(r.focus(),e(14,k=!1));else if(a&&(!0===b||null===b&&!0===u.stack.modal)&&_.length&&i){for(var n=_.length-1;n>0&&!_[n].promptTrigger;)n--;i.children[n].focus(),e(14,k=!1)}},[m,u,a,p,y,v,$,_,o,r,i,w,function(t){if(13===t.keyCode&&!t.shiftKey){t.preventDefault();for(var n=this.get().buttons,e=0;e<n.length;e++)n[e].promptTrigger&&n[e].click&&n[e].click(u,p?m:null,t)}},b,k,function(t){P[t?"unshift":"push"]((function(){e(8,o=t)}))},function(){m=this.value,e(0,m)},function(t){P[t?"unshift":"push"]((function(){e(9,r=t)}))},function(){m=this.value,e(0,m)},function(t,n){return w(t,n)},function(t){P[t?"unshift":"push"]((function(){e(10,i=t)}))}]}var it=function(t){!function(t,n){if("function"!=typeof n&&null!==n)throw new TypeError("Super expression must either be null or a function");t.prototype=Object.create(n&&n.prototype,{constructor:{value:t,writable:!0,configurable:!0}}),n&&c(t,n)}(r,t);var n,o=(n=r,function(){var t,e=i(n);if(u()){var o=i(this).constructor;t=Reflect.construct(e,arguments,o)}else t=e.apply(this,arguments);return a(this,t)});function r(t){var n;return e(this,r),function(t,n,e,o,r,i){var c=arguments.length>6&&void 0!==arguments[6]?arguments[6]:[-1],u=E;T(t);var f=n.props||{},a=t.$$={fragment:null,ctx:null,props:i,update:d,not_equal:r,bound:h(),on_mount:[],on_destroy:[],before_update:[],after_update:[],context:new Map(u?u.$$.context:[]),callbacks:h(),dirty:c},l=!1;if(a.ctx=e?e(t,f,(function(n,e){var o=!(arguments.length<=2)&&arguments.length-2?arguments.length<=2?void 0:arguments[2]:e;return a.ctx&&r(a.ctx[n],a.ctx[n]=o)&&(a.bound[n]&&a.bound[n](o),l&&G(t,n)),e})):[],a.update(),l=!0,v(a.before_update),a.fragment=!!o&&o(a.ctx),n.target){if(n.hydrate){var p=C(n.target);a.fragment&&a.fragment.l(p),p.forEach(x)}else a.fragment&&a.fragment.c();n.intro&&z(t.$$.fragment),F(t,n.target,n.anchor),H()}T(u)}(f(n=o.call(this)),t,rt,et,b,{self:1,confirm:2,prompt:3,promptClass:4,promptValue:0,promptMultiLine:5,focus:13,align:6,buttons:7}),n}return r}(function(){function t(){e(this,t)}return r(t,[{key:"$destroy",value:function(){var t,n;t=1,null!==(n=this.$$).fragment&&(v(n.on_destroy),n.fragment&&n.fragment.d(t),n.on_destroy=n.fragment=null,n.ctx=[]),this.$destroy=d}},{key:"$on",value:function(t,n){var e=this.$$.callbacks[t]||(this.$$.callbacks[t]=[]);return e.push(n),function(){var t=e.indexOf(n);-1!==t&&e.splice(t,1)}}},{key:"$set",value:function(){}}]),t}());t.default=it,t.defaults=ot,t.position="AppendContent",Object.defineProperty(t,"__esModule",{value:!0})}));
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+/* src/PNotifyConfirm.html generated by Svelte v2.16.1 */
+var PNotifyConfirm = function (PNotify) {
+	"use strict";
+
+	PNotify = PNotify && PNotify.__esModule ? PNotify["default"] : PNotify;
+
+	function data() {
+		return _extends({
+			'_notice': null, // The PNotify notice.
+			'_options': {} // The options for the notice.
+		}, PNotify.modules.Confirm.defaults);
+	};
+
+	var methods = {
+		initModule: function initModule(options) {
+			this.set(options);
+		},
+		afterOpen: function afterOpen() {
+			if (this.get().prompt && this.get().focus !== false) {
+				if (this.get().promptMultiLine) {
+					this.refs.promptMulti.focus();
+				} else {
+					this.refs.promptSingle.focus();
+				}
+			} else if (this.get().confirm && (this.get().focus === true || this.get().focus === null && this.get()._options.stack.modal)) {
+				var buttons = this.get().buttons;
+				if (buttons.length) {
+					var i = buttons.length - 1;
+					while (i >= 0) {
+						if (buttons[i].promptTrigger) {
+							break;
+						}
+						i--;
+					}
+					this.refs.buttons.children[i].focus();
+				}
+			}
+		},
+		handleClick: function handleClick(button, event) {
+			if (button.click) {
+				button.click(this.get()._notice, this.get().prompt ? this.get().promptValue : null, event);
+			}
+		},
+		handleKeyPress: function handleKeyPress(event) {
+			if (event.keyCode === 13 && !event.shiftKey) {
+				event.preventDefault();
+
+				var _get = this.get(),
+					buttons = _get.buttons;
+
+				for (var i = 0; i < buttons.length; i++) {
+					if (buttons[i].promptTrigger && buttons[i].click) {
+						buttons[i].click(this.get()._notice, this.get().prompt ? this.get().promptValue : null, event);
+					}
+				}
+			}
+		}
+	};
+
+	function oncreate() {
+		this.fire('init', { module: this });
+	};
+
+	function setup(Component) {
+		Component.key = 'Confirm';
+
+		Component.defaults = {
+			// Make a confirmation box.
+			confirm: false,
+			// Make a prompt.
+			prompt: false,
+			// Classes to add to the input element of the prompt.
+			promptClass: '',
+			// The value of the prompt.
+			promptValue: '',
+			// Whether the prompt should accept multiple lines of text.
+			promptMultiLine: false,
+			// For confirmation boxes, true means the first button or the button with promptTrigger will be focused, and null means focus will change only for modal notices. For prompts, true or null means focus the prompt. When false, focus will not change.
+			focus: null,
+			// Where to align the buttons. (flex-start, center, flex-end, space-around, space-between)
+			align: 'flex-end',
+			// The buttons to display, and their callbacks.
+			buttons: [{
+				text: 'Ok',
+				textTrusted: false,
+				addClass: '',
+				primary: true,
+				// Whether to trigger this button when the user hits enter in a single line prompt. Also, focus the button if it is a modal prompt.
+				promptTrigger: true,
+				click: function click(notice, value) {
+					notice.close();
+					notice.fire('pnotify.confirm', { notice: notice, value: value });
+				}
+			}, {
+				text: 'Cancel',
+				textTrusted: false,
+				addClass: '',
+				click: function click(notice) {
+					notice.close();
+					notice.fire('pnotify.cancel', { notice: notice });
+				}
+			}]
+		};
+
+		// Register the module with PNotify.
+		PNotify.modules.Confirm = Component;
+		// Append this module to the container.
+		PNotify.modulesAppendContainer.push(Component);
+
+		// Add button styles to styling objects.
+		_extends(PNotify.styling.brighttheme, {
+			actionBar: '',
+			promptBar: '',
+			btn: '',
+			btnPrimary: 'brighttheme-primary',
+			input: ''
+		});
+		_extends(PNotify.styling.bootstrap3, {
+			actionBar: 'ui-pnotify-confirm-ml',
+			promptBar: 'ui-pnotify-confirm-ml',
+			btn: 'btn btn-default ui-pnotify-confirm-mx-1',
+			btnPrimary: 'btn btn-default ui-pnotify-confirm-mx-1 btn-primary',
+			input: 'form-control'
+		});
+		_extends(PNotify.styling.bootstrap4, {
+			actionBar: 'ui-pnotify-confirm-ml',
+			promptBar: 'ui-pnotify-confirm-ml',
+			btn: 'btn btn-secondary mx-1',
+			btnPrimary: 'btn btn-primary mx-1',
+			input: 'form-control'
+		});
+		if (!PNotify.styling.material) {
+			PNotify.styling.material = {};
+		}
+		_extends(PNotify.styling.material, {
+			actionBar: '',
+			promptBar: '',
+			btn: '',
+			btnPrimary: 'ui-pnotify-material-primary',
+			input: ''
+		});
+	};
+
+	function add_css() {
+		var style = createElement("style");
+		style.id = 'svelte-1y9suua-style';
+		style.textContent = ".ui-pnotify-action-bar.svelte-1y9suua,.ui-pnotify-prompt-bar.svelte-1y9suua{margin-top:5px;clear:both}.ui-pnotify-action-bar.svelte-1y9suua{display:flex;flex-wrap:wrap;justify-content:flex-end}.ui-pnotify-prompt-input.svelte-1y9suua{margin-bottom:5px;display:block;width:100%}.ui-pnotify-confirm-mx-1.svelte-1y9suua{margin:0 5px}.ui-pnotify.ui-pnotify-with-icon .ui-pnotify-confirm-ml.svelte-1y9suua{margin-left:24px}[dir=rtl] .ui-pnotify.ui-pnotify-with-icon .ui-pnotify-confirm-ml.svelte-1y9suua{margin-right:24px;margin-left:0}";
+		append(document.head, style);
+	}
+
+	function click_handler(event) {
+		var _svelte = this._svelte,
+			component = _svelte.component,
+			ctx = _svelte.ctx;
+
+
+		component.handleClick(ctx.button, event);
+	}
+
+	function get_each_context(ctx, list, i) {
+		var child_ctx = Object.create(ctx);
+		child_ctx.button = list[i];
+		return child_ctx;
+	}
+
+	function create_main_fragment(component, ctx) {
+		var if_block_anchor;
+
+		var if_block = (ctx.confirm || ctx.prompt) && create_if_block(component, ctx);
+
+		return {
+			c: function c() {
+				if (if_block) if_block.c();
+				if_block_anchor = createComment();
+			},
+			m: function m(target, anchor) {
+				if (if_block) if_block.m(target, anchor);
+				insert(target, if_block_anchor, anchor);
+			},
+			p: function p(changed, ctx) {
+				if (ctx.confirm || ctx.prompt) {
+					if (if_block) {
+						if_block.p(changed, ctx);
+					} else {
+						if_block = create_if_block(component, ctx);
+						if_block.c();
+						if_block.m(if_block_anchor.parentNode, if_block_anchor);
+					}
+				} else if (if_block) {
+					if_block.d(1);
+					if_block = null;
+				}
+			},
+			d: function d(detach) {
+				if (if_block) if_block.d(detach);
+				if (detach) {
+					detachNode(if_block_anchor);
+				}
+			}
+		};
+	}
+
+	// (1:0) {#if confirm || prompt}
+	function create_if_block(component, ctx) {
+		var div1, text, div0, div0_class_value;
+
+		var if_block = ctx.prompt && create_if_block_2(component, ctx);
+
+		var each_value = ctx.buttons;
+
+		var each_blocks = [];
+
+		for (var i = 0; i < each_value.length; i += 1) {
+			each_blocks[i] = create_each_block(component, get_each_context(ctx, each_value, i));
+		}
+
+		return {
+			c: function c() {
+				div1 = createElement("div");
+				if (if_block) if_block.c();
+				text = createText("\n    ");
+				div0 = createElement("div");
+
+				for (var i = 0; i < each_blocks.length; i += 1) {
+					each_blocks[i].c();
+				}
+				div0.className = div0_class_value = "\n          ui-pnotify-action-bar\n          " + (ctx._notice.get()._styles.actionBar ? ctx._notice.get()._styles.actionBar : '') + "\n          " + (ctx._notice.get()._styles.text ? ctx._notice.get()._styles.text : '') + "\n        " + " svelte-1y9suua";
+				setStyle(div0, "justify-content", ctx.align);
+				div1.className = "ui-pnotify-confirm";
+			},
+			m: function m(target, anchor) {
+				insert(target, div1, anchor);
+				if (if_block) if_block.m(div1, null);
+				append(div1, text);
+				append(div1, div0);
+
+				for (var i = 0; i < each_blocks.length; i += 1) {
+					each_blocks[i].m(div0, null);
+				}
+
+				component.refs.buttons = div0;
+			},
+			p: function p(changed, ctx) {
+				if (ctx.prompt) {
+					if (if_block) {
+						if_block.p(changed, ctx);
+					} else {
+						if_block = create_if_block_2(component, ctx);
+						if_block.c();
+						if_block.m(div1, text);
+					}
+				} else if (if_block) {
+					if_block.d(1);
+					if_block = null;
+				}
+
+				if (changed.buttons || changed._notice) {
+					each_value = ctx.buttons;
+
+					for (var i = 0; i < each_value.length; i += 1) {
+						var child_ctx = get_each_context(ctx, each_value, i);
+
+						if (each_blocks[i]) {
+							each_blocks[i].p(changed, child_ctx);
+						} else {
+							each_blocks[i] = create_each_block(component, child_ctx);
+							each_blocks[i].c();
+							each_blocks[i].m(div0, null);
+						}
+					}
+
+					for (; i < each_blocks.length; i += 1) {
+						each_blocks[i].d(1);
+					}
+					each_blocks.length = each_value.length;
+				}
+
+				if (changed._notice && div0_class_value !== (div0_class_value = "\n          ui-pnotify-action-bar\n          " + (ctx._notice.get()._styles.actionBar ? ctx._notice.get()._styles.actionBar : '') + "\n          " + (ctx._notice.get()._styles.text ? ctx._notice.get()._styles.text : '') + "\n        " + " svelte-1y9suua")) {
+					div0.className = div0_class_value;
+				}
+
+				if (changed.align) {
+					setStyle(div0, "justify-content", ctx.align);
+				}
+			},
+			d: function d(detach) {
+				if (detach) {
+					detachNode(div1);
+				}
+
+				if (if_block) if_block.d();
+
+				destroyEach(each_blocks, detach);
+
+				if (component.refs.buttons === div0) component.refs.buttons = null;
+			}
+		};
+	}
+
+	// (3:4) {#if prompt}
+	function create_if_block_2(component, ctx) {
+		var div, div_class_value;
+
+		function select_block_type(ctx) {
+			if (ctx.promptMultiLine) return create_if_block_3;
+			return create_else_block_1;
+		}
+
+		var current_block_type = select_block_type(ctx);
+		var if_block = current_block_type(component, ctx);
+
+		return {
+			c: function c() {
+				div = createElement("div");
+				if_block.c();
+				div.className = div_class_value = "\n            ui-pnotify-prompt-bar\n            " + (ctx._notice.get()._styles.promptBar ? ctx._notice.get()._styles.promptBar : '') + "\n            " + (ctx._notice.get()._styles.text ? ctx._notice.get()._styles.text : '') + "\n          " + " svelte-1y9suua";
+			},
+			m: function m(target, anchor) {
+				insert(target, div, anchor);
+				if_block.m(div, null);
+			},
+			p: function p(changed, ctx) {
+				if (current_block_type === (current_block_type = select_block_type(ctx)) && if_block) {
+					if_block.p(changed, ctx);
+				} else {
+					if_block.d(1);
+					if_block = current_block_type(component, ctx);
+					if_block.c();
+					if_block.m(div, null);
+				}
+
+				if (changed._notice && div_class_value !== (div_class_value = "\n            ui-pnotify-prompt-bar\n            " + (ctx._notice.get()._styles.promptBar ? ctx._notice.get()._styles.promptBar : '') + "\n            " + (ctx._notice.get()._styles.text ? ctx._notice.get()._styles.text : '') + "\n          " + " svelte-1y9suua")) {
+					div.className = div_class_value;
+				}
+			},
+			d: function d(detach) {
+				if (detach) {
+					detachNode(div);
+				}
+
+				if_block.d();
+			}
+		};
+	}
+
+	// (21:8) {:else}
+	function create_else_block_1(component, ctx) {
+		var input,
+			input_updating = false,
+			input_class_value;
+
+		function input_input_handler() {
+			input_updating = true;
+			component.set({ promptValue: input.value });
+			input_updating = false;
+		}
+
+		function keypress_handler(event) {
+			component.handleKeyPress(event);
+		}
+
+		return {
+			c: function c() {
+				input = createElement("input");
+				addListener(input, "input", input_input_handler);
+				addListener(input, "keypress", keypress_handler);
+				setAttribute(input, "type", "text");
+				input.className = input_class_value = "\n                ui-pnotify-prompt-input\n                " + (ctx._notice.get()._styles.input ? ctx._notice.get()._styles.input : '') + "\n                " + ctx.promptClass + "\n              " + " svelte-1y9suua";
+			},
+			m: function m(target, anchor) {
+				insert(target, input, anchor);
+				component.refs.promptSingle = input;
+
+				input.value = ctx.promptValue;
+			},
+			p: function p(changed, ctx) {
+				if (!input_updating && changed.promptValue) input.value = ctx.promptValue;
+				if ((changed._notice || changed.promptClass) && input_class_value !== (input_class_value = "\n                ui-pnotify-prompt-input\n                " + (ctx._notice.get()._styles.input ? ctx._notice.get()._styles.input : '') + "\n                " + ctx.promptClass + "\n              " + " svelte-1y9suua")) {
+					input.className = input_class_value;
+				}
+			},
+			d: function d(detach) {
+				if (detach) {
+					detachNode(input);
+				}
+
+				removeListener(input, "input", input_input_handler);
+				removeListener(input, "keypress", keypress_handler);
+				if (component.refs.promptSingle === input) component.refs.promptSingle = null;
+			}
+		};
+	}
+
+	// (10:8) {#if promptMultiLine}
+	function create_if_block_3(component, ctx) {
+		var textarea,
+			textarea_updating = false,
+			textarea_class_value;
+
+		function textarea_input_handler() {
+			textarea_updating = true;
+			component.set({ promptValue: textarea.value });
+			textarea_updating = false;
+		}
+
+		function keypress_handler(event) {
+			component.handleKeyPress(event);
+		}
+
+		return {
+			c: function c() {
+				textarea = createElement("textarea");
+				addListener(textarea, "input", textarea_input_handler);
+				addListener(textarea, "keypress", keypress_handler);
+				textarea.rows = "5";
+				textarea.className = textarea_class_value = "\n                ui-pnotify-prompt-input\n                " + (ctx._notice.get()._styles.input ? ctx._notice.get()._styles.input : '') + "\n                " + ctx.promptClass + "\n              " + " svelte-1y9suua";
+			},
+			m: function m(target, anchor) {
+				insert(target, textarea, anchor);
+				component.refs.promptMulti = textarea;
+
+				textarea.value = ctx.promptValue;
+			},
+			p: function p(changed, ctx) {
+				if (!textarea_updating && changed.promptValue) textarea.value = ctx.promptValue;
+				if ((changed._notice || changed.promptClass) && textarea_class_value !== (textarea_class_value = "\n                ui-pnotify-prompt-input\n                " + (ctx._notice.get()._styles.input ? ctx._notice.get()._styles.input : '') + "\n                " + ctx.promptClass + "\n              " + " svelte-1y9suua")) {
+					textarea.className = textarea_class_value;
+				}
+			},
+			d: function d(detach) {
+				if (detach) {
+					detachNode(textarea);
+				}
+
+				removeListener(textarea, "input", textarea_input_handler);
+				removeListener(textarea, "keypress", keypress_handler);
+				if (component.refs.promptMulti === textarea) component.refs.promptMulti = null;
+			}
+		};
+	}
+
+	// (51:57) {:else}
+	function create_else_block(component, ctx) {
+		var text_value = ctx.button.text,
+			text;
+
+		return {
+			c: function c() {
+				text = createText(text_value);
+			},
+			m: function m(target, anchor) {
+				insert(target, text, anchor);
+			},
+			p: function p(changed, ctx) {
+				if (changed.buttons && text_value !== (text_value = ctx.button.text)) {
+					setData(text, text_value);
+				}
+			},
+			d: function d(detach) {
+				if (detach) {
+					detachNode(text);
+				}
+			}
+		};
+	}
+
+	// (51:14) {#if button.textTrusted}
+	function create_if_block_1(component, ctx) {
+		var raw_value = ctx.button.text,
+			raw_before,
+			raw_after;
+
+		return {
+			c: function c() {
+				raw_before = createElement('noscript');
+				raw_after = createElement('noscript');
+			},
+			m: function m(target, anchor) {
+				insert(target, raw_before, anchor);
+				raw_before.insertAdjacentHTML("afterend", raw_value);
+				insert(target, raw_after, anchor);
+			},
+			p: function p(changed, ctx) {
+				if (changed.buttons && raw_value !== (raw_value = ctx.button.text)) {
+					detachBetween(raw_before, raw_after);
+					raw_before.insertAdjacentHTML("afterend", raw_value);
+				}
+			},
+			d: function d(detach) {
+				if (detach) {
+					detachBetween(raw_before, raw_after);
+					detachNode(raw_before);
+					detachNode(raw_after);
+				}
+			}
+		};
+	}
+
+	// (43:6) {#each buttons as button}
+	function create_each_block(component, ctx) {
+		var button, button_class_value;
+
+		function select_block_type_1(ctx) {
+			if (ctx.button.textTrusted) return create_if_block_1;
+			return create_else_block;
+		}
+
+		var current_block_type = select_block_type_1(ctx);
+		var if_block = current_block_type(component, ctx);
+
+		return {
+			c: function c() {
+				button = createElement("button");
+				if_block.c();
+				button._svelte = { component: component, ctx: ctx };
+
+				addListener(button, "click", click_handler);
+				button.type = "button";
+				button.className = button_class_value = "\n              ui-pnotify-action-button\n              " + (ctx.button.primary ? ctx._notice.get()._styles.btnPrimary ? ctx._notice.get()._styles.btnPrimary : '' : ctx._notice.get()._styles.btn ? ctx._notice.get()._styles.btn : '') + "\n              " + (ctx.button.addClass ? ctx.button.addClass : '') + "\n            " + " svelte-1y9suua";
+			},
+			m: function m(target, anchor) {
+				insert(target, button, anchor);
+				if_block.m(button, null);
+			},
+			p: function p(changed, _ctx) {
+				ctx = _ctx;
+				if (current_block_type === (current_block_type = select_block_type_1(ctx)) && if_block) {
+					if_block.p(changed, ctx);
+				} else {
+					if_block.d(1);
+					if_block = current_block_type(component, ctx);
+					if_block.c();
+					if_block.m(button, null);
+				}
+
+				button._svelte.ctx = ctx;
+				if ((changed.buttons || changed._notice) && button_class_value !== (button_class_value = "\n              ui-pnotify-action-button\n              " + (ctx.button.primary ? ctx._notice.get()._styles.btnPrimary ? ctx._notice.get()._styles.btnPrimary : '' : ctx._notice.get()._styles.btn ? ctx._notice.get()._styles.btn : '') + "\n              " + (ctx.button.addClass ? ctx.button.addClass : '') + "\n            " + " svelte-1y9suua")) {
+					button.className = button_class_value;
+				}
+			},
+			d: function d(detach) {
+				if (detach) {
+					detachNode(button);
+				}
+
+				if_block.d();
+				removeListener(button, "click", click_handler);
+			}
+		};
+	}
+
+	function PNotifyConfirm(options) {
+		var _this = this;
+
+		init(this, options);
+		this.refs = {};
+		this._state = assign(data(), options.data);
+		this._intro = true;
+
+		if (!document.getElementById("svelte-1y9suua-style")) add_css();
+
+		this._fragment = create_main_fragment(this, this._state);
+
+		this.root._oncreate.push(function () {
+			oncreate.call(_this);
+			_this.fire("update", { changed: assignTrue({}, _this._state), current: _this._state });
+		});
+
+		if (options.target) {
+			this._fragment.c();
+			this._mount(options.target, options.anchor);
+
+			flush(this);
+		}
+	}
+
+	assign(PNotifyConfirm.prototype, {
+		destroy: destroy,
+		get: get,
+		fire: fire,
+		on: on,
+		set: set,
+		_set: _set,
+		_stage: _stage,
+		_mount: _mount,
+		_differs: _differs
+	});
+	assign(PNotifyConfirm.prototype, methods);
+
+	PNotifyConfirm.prototype._recompute = noop;
+
+	setup(PNotifyConfirm);
+
+	function createElement(name) {
+		return document.createElement(name);
+	}
+
+	function append(target, node) {
+		target.appendChild(node);
+	}
+
+	function createComment() {
+		return document.createComment('');
+	}
+
+	function insert(target, node, anchor) {
+		target.insertBefore(node, anchor);
+	}
+
+	function detachNode(node) {
+		node.parentNode.removeChild(node);
+	}
+
+	function createText(data) {
+		return document.createTextNode(data);
+	}
+
+	function setStyle(node, key, value) {
+		node.style.setProperty(key, value);
+	}
+
+	function destroyEach(iterations, detach) {
+		for (var i = 0; i < iterations.length; i += 1) {
+			if (iterations[i]) iterations[i].d(detach);
+		}
+	}
+
+	function addListener(node, event, handler, options) {
+		node.addEventListener(event, handler, options);
+	}
+
+	function setAttribute(node, attribute, value) {
+		if (value == null) node.removeAttribute(attribute); else node.setAttribute(attribute, value);
+	}
+
+	function removeListener(node, event, handler, options) {
+		node.removeEventListener(event, handler, options);
+	}
+
+	function setData(text, data) {
+		text.data = '' + data;
+	}
+
+	function detachBetween(before, after) {
+		while (before.nextSibling && before.nextSibling !== after) {
+			before.parentNode.removeChild(before.nextSibling);
+		}
+	}
+
+	function init(component, options) {
+		component._handlers = blankObject();
+		component._slots = blankObject();
+		component._bind = options._bind;
+		component._staged = {};
+
+		component.options = options;
+		component.root = options.root || component;
+		component.store = options.store || component.root.store;
+
+		if (!options.root) {
+			component._beforecreate = [];
+			component._oncreate = [];
+			component._aftercreate = [];
+		}
+	}
+
+	function assign(tar, src) {
+		for (var k in src) {
+			tar[k] = src[k];
+		} return tar;
+	}
+
+	function assignTrue(tar, src) {
+		for (var k in src) {
+			tar[k] = 1;
+		} return tar;
+	}
+
+	function flush(component) {
+		component._lock = true;
+		callAll(component._beforecreate);
+		callAll(component._oncreate);
+		callAll(component._aftercreate);
+		component._lock = false;
+	}
+
+	function destroy(detach) {
+		this.destroy = noop;
+		this.fire('destroy');
+		this.set = noop;
+
+		this._fragment.d(detach !== false);
+		this._fragment = null;
+		this._state = {};
+	}
+
+	function get() {
+		return this._state;
+	}
+
+	function fire(eventName, data) {
+		var handlers = eventName in this._handlers && this._handlers[eventName].slice();
+		if (!handlers) return;
+
+		for (var i = 0; i < handlers.length; i += 1) {
+			var handler = handlers[i];
+
+			if (!handler.__calling) {
+				try {
+					handler.__calling = true;
+					handler.call(this, data);
+				} finally {
+					handler.__calling = false;
+				}
+			}
+		}
+	}
+
+	function on(eventName, handler) {
+		var handlers = this._handlers[eventName] || (this._handlers[eventName] = []);
+		handlers.push(handler);
+
+		return {
+			cancel: function cancel() {
+				var index = handlers.indexOf(handler);
+				if (~index) handlers.splice(index, 1);
+			}
+		};
+	}
+
+	function set(newState) {
+		this._set(assign({}, newState));
+		if (this.root._lock) return;
+		flush(this.root);
+	}
+
+	function _set(newState) {
+		var oldState = this._state,
+			changed = {},
+			dirty = false;
+
+		newState = assign(this._staged, newState);
+		this._staged = {};
+
+		for (var key in newState) {
+			if (this._differs(newState[key], oldState[key])) changed[key] = dirty = true;
+		}
+		if (!dirty) return;
+
+		this._state = assign(assign({}, oldState), newState);
+		this._recompute(changed, this._state);
+		if (this._bind) this._bind(changed, this._state);
+
+		if (this._fragment) {
+			this.fire("state", { changed: changed, current: this._state, previous: oldState });
+			this._fragment.p(changed, this._state);
+			this.fire("update", { changed: changed, current: this._state, previous: oldState });
+		}
+	}
+
+	function _stage(newState) {
+		assign(this._staged, newState);
+	}
+
+	function _mount(target, anchor) {
+		this._fragment[this._fragment.i ? 'i' : 'm'](target, anchor || null);
+	}
+
+	function _differs(a, b) {
+		return a != a ? b == b : a !== b || a && (typeof a === "undefined" ? "undefined" : _typeof(a)) === 'object' || typeof a === 'function';
+	}
+
+	function noop() { }
+
+	function blankObject() {
+		return Object.create(null);
+	}
+
+	function callAll(fns) {
+		while (fns && fns.length) {
+			fns.shift()();
+		}
+	}
+	return PNotifyConfirm;
+}(PNotify);
+//# sourceMappingURL=PNotifyConfirm.js.map
