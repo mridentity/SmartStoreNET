@@ -3,13 +3,15 @@
 
 @{
     Html.AddCssFileParts(ResourceLocation.Foot, true, Url.Content("~/Plugins/ReadySignOn.ReadyPay/Content/InPlaceReadyPay.css"));
-    Html.AddCssFileParts(ResourceLocation.Foot, true, Url.Content("~/Plugins/ReadySignOn.ReadyPay/Content/PNotifyBrightTheme.css"));
     Html.AddCssFileParts(ResourceLocation.Foot, true, Url.Content("~/Content/vendors/pnotify/css/pnotify.css"));
     Html.AddCssFileParts(ResourceLocation.Foot, true, Url.Content("~/Content/vendors/pnotify/css/pnotify.buttons.css"));
+    Html.AddCssFileParts(ResourceLocation.Foot, true, Url.Content("~/Plugins/ReadySignOn.ReadyPay/Content/PNotifyBrightTheme.css"));
     Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("~/Plugins/ReadySignOn.ReadyPay/Scripts/InPlaceReadyPay.js"));
-    Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("~/Plugins/ReadySignOn.ReadyPay/Scripts/PNotify.js"));
+    //Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("~/Plugins/ReadySignOn.ReadyPay/Scripts/PNotify.js"));
     Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("~/Plugins/ReadySignOn.ReadyPay/Scripts/PNotifyConfirm.js"));
-    //Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("https://sciactive.com/pnotify/lib/iife/PNotifyButtons.js"));
+    Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("~/Content/vendors/pnotify/js/pnotify.animate.js"));
+    Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("~/Content/vendors/pnotify/js/pnotify.js"));
+    Html.AddScriptParts(ResourceLocation.Foot, true, Url.Content("~/Content/vendors/pnotify/js/pnotify.buttons.js"));
 }
 
 <div class="art-ready-pay" data-readypayload='{"AppData": "@Model.AppData", "CartSubTotal": "@Model.CartSubTotal", "TaxTotal": "@Model.TaxTotal", "Sentinel": "@Model.Sentinel", "SubmitButtonImageUrl": "@Model.SubmitButtonImageUrl", "LoaderImageUrl": "@Model.LoaderImageUrl"}'>
