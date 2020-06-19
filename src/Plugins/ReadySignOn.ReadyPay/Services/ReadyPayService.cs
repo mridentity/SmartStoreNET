@@ -222,9 +222,59 @@ namespace ReadySignOn.ReadyPay.Services
                     using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                     {
                         string json_result = streamReader.ReadToEnd();
-                        ReadyPayment pk_payment = JsonConvert.DeserializeObject<ReadyPayment>(json_result);
+                        if (string.IsNullOrWhiteSpace(json_result)) {
+                            throw new InvalidDataException("Missing payment information.");
+                        }
 
-                        return pk_payment;
+                        if (JObject.Parse(json_result).ContainsKey("transactionIdentifier"))    // Apple payment
+                        {
+                            ReadyPayment pk_payment = JsonConvert.DeserializeObject<ReadyPayment>(json_result);
+                            return pk_payment;
+                        }
+                        else if (JObject.Parse(json_result).ContainsKey("paymentMethodData"))   // Google payment
+                        {
+                            //TODO: Generate a ReadyPayment object based on Google payment information below:
+                            //{
+                            //  "apiVersionMinor": 0,
+                            //  "apiVersion": 2,
+                            //  "paymentMethodData": {
+                            //    "description": "Visa •••• 6229",
+                            //    "tokenizationData": {
+                            //      "type": "PAYMENT_GATEWAY",
+                            //      "token": "examplePaymentMethodToken"
+                            //    },
+                            //    "type": "CARD",
+                            //    "info": {
+                            //      "cardNetwork": "VISA",
+                            //      "cardDetails": "6229",
+                            //      "billingAddress": {
+                            //        "address3": "",
+                            //        "sortingCode": "",
+                            //        "address2": "",
+                            //        "countryCode": "US",
+                            //        "address1": "111 South Highland Street",
+                            //        "postalCode": "12345",
+                            //        "name": "Dev Sweech",
+                            //        "locality": "New York",
+                            //        "administrativeArea": "NY"
+                            //      }
+                            //    }
+                            //  },
+                            //  "shippingAddress": {
+                            //    "address3": "",
+                            //    "sortingCode": "",
+                            //    "address2": "",
+                            //    "countryCode": "US",
+                            //    "address1": "111 Broadway",
+                            //    "postalCode": "10006",
+                            //    "name": "Devsweech",
+                            //    "locality": "New York",
+                            //    "administrativeArea": "NY"
+                            //  }
+                            //}
+
+                            //return the readyPayment object.
+                        }
                     }
                 }
             }
