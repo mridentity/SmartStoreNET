@@ -226,7 +226,7 @@ namespace ReadySignOn.ReadyPay.Services
                             throw new InvalidDataException("Missing payment information.");
                         }
 
-                        if (JObject.Parse(json_result).ContainsKey("transactionIdentifier"))    // Apple payment
+                        if (JObject.Parse(json_result).ContainsKey("paymentData"))    // Apple payment
                         {
                             ReadyPayment pk_payment = JsonConvert.DeserializeObject<ReadyPayment>(json_result);
                             return pk_payment;
@@ -240,10 +240,6 @@ namespace ReadySignOn.ReadyPay.Services
                             //  "apiVersion": 2,
                             //  "paymentMethodData": {
                             //    "description": "Visa •••• 6229",
-                            //    "tokenizationData": {
-                            //      "type": "PAYMENT_GATEWAY",
-                            //      "token": "examplePaymentMethodToken"
-                            //    },
                             //    "type": "CARD",
                             //    "info": {
                             //      "cardNetwork": "VISA",
@@ -262,16 +258,19 @@ namespace ReadySignOn.ReadyPay.Services
                             //    }
                             //  },
                             //  "shippingAddress": {
+                            //    "phoneNumber": "+1 804-555-5555",
                             //    "address3": "",
                             //    "sortingCode": "",
                             //    "address2": "",
                             //    "countryCode": "US",
-                            //    "address1": "111 Broadway",
-                            //    "postalCode": "10006",
-                            //    "name": "Devsweech",
+                            //    "address1": "111 South Highland Street",
+                            //    "postalCode": "12345",
+                            //    "name": "Dev Sweech",
                             //    "locality": "New York",
                             //    "administrativeArea": "NY"
-                            //  }
+                            //  },
+                            //  "email": "devsweech@gmail.com",
+                            //  "transactionIdentifier": "TX_ID_RETURNED_FROM_PSP"
                             //}
 
                             if (android_payment_jobj != null)
