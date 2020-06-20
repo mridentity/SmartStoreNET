@@ -233,6 +233,7 @@ namespace ReadySignOn.ReadyPay.Services
                         }
                         else if (JObject.Parse(json_result).ContainsKey("paymentMethodData"))   // Google payment
                         {
+                            dynamic android_payment_jobj = JsonConvert.DeserializeObject<dynamic>(json_result);
                             //TODO: Generate a ReadyPayment object based on Google payment information below:
                             //{
                             //  "apiVersionMinor": 0,
@@ -273,7 +274,31 @@ namespace ReadySignOn.ReadyPay.Services
                             //  }
                             //}
 
-                            //return the readyPayment object.
+                            if (android_payment_jobj != null)
+                            {
+                                ReadyPayment pk_payment = new ReadyPayment();
+                                pk_payment.transactionIdentifier = android_payment_jobj.transactionIdentifier;
+
+                                PaymentMethod paymentMethod = new PaymentMethod();
+                                paymentMethod.network = android_payment_jobj.paymentMethodData.info.cardNetwork;
+                                paymentMethod.type = android_payment_jobj.paymentMethodData.type;
+                                paymentMethod.displayName = android_payment_jobj.paymentMethodData.description;
+
+                                pk_payment.paymentMethod = paymentMethod;
+
+                                PaymentData paymentData = new PaymentData();
+                                paymentData.version = android_payment_jobj.apiVersion;
+
+                                pk_payment.paymentData = paymentData;
+
+                                Models.ShippingMethod shippingMethod = new Models.ShippingMethod();
+                                shippingMethod.amount = 1.23m; //TODO: need to pass the shipping amount from android to RP via ReadyConnectSvc
+
+                                pk_payment.shippingMethod = shippingMethod;
+
+
+                                return pk_payment;
+                            }
                         }
                     }
                 }
