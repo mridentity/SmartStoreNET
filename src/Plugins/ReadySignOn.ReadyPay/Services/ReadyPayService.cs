@@ -270,13 +270,15 @@ namespace ReadySignOn.ReadyPay.Services
                             //    "administrativeArea": "NY"
                             //  },
                             //  "email": "devsweech@gmail.com",
-                            //  "transactionIdentifier": "TX_ID_RETURNED_FROM_PSP"
+                            //  "transactionIdentifier": "TX_ID_RETURNED_FROM_PSP",
+                            //  "grandTotalCharged": 1.23
                             //}
 
                             if (android_payment_jobj != null)
                             {
                                 ReadyPayment pk_payment = new ReadyPayment();
                                 pk_payment.transactionIdentifier = android_payment_jobj.transactionIdentifier;
+                                pk_payment.grandTotalCharged = android_payment_jobj.grandTotalCharged;
 
                                 PaymentMethod paymentMethod = new PaymentMethod();
                                 paymentMethod.network = android_payment_jobj.paymentMethodData.info.cardNetwork;
@@ -291,10 +293,39 @@ namespace ReadySignOn.ReadyPay.Services
                                 pk_payment.paymentData = paymentData;
 
                                 Models.ShippingMethod shippingMethod = new Models.ShippingMethod();
-                                shippingMethod.amount = 1.23m; //TODO: need to pass the shipping amount from android to RP via ReadyConnectSvc
+                                shippingMethod.amount = android_payment_jobj.shippingFee; //TODO: need to pass the shipping amount from android to RP via ReadyConnectSvc
 
                                 pk_payment.shippingMethod = shippingMethod;
 
+                                RPContact billingContact = new RPContact();
+                                billingContact.emailAddress = android_payment_jobj.email;
+
+                                IEnumerable<string> name_parts = android_payment_jobj.paymentMethodData.info.billingAddress.name.ToString().Split();
+                                billingContact.givenName = name_parts.FirstOrDefault();
+                                billingContact.familyName = name_parts.LastOrDefault();
+                                billingContact.street = android_payment_jobj.paymentMethodData.info.billingAddress.address1;
+                                billingContact.city = android_payment_jobj.paymentMethodData.info.billingAddress.locality;
+                                billingContact.postalCode = android_payment_jobj.paymentMethodData.info.billingAddress.postalCode;
+                                billingContact.isoCountryCode = android_payment_jobj.paymentMethodData.info.billingAddress.countryCode;
+                                billingContact.state = android_payment_jobj.paymentMethodData.info.billingAddress.administrativeArea;
+                                billingContact.country = android_payment_jobj.paymentMethodData.info.billingAddress.countryCode;
+
+                                pk_payment.billingContact = billingContact;
+
+                                RPContact shippingContact = new RPContact();
+                                shippingContact.emailAddress = android_payment_jobj.email;
+
+                                name_parts = android_payment_jobj.shippingAddress.name.ToString().Split();
+                                shippingContact.givenName = name_parts.FirstOrDefault();
+                                shippingContact.familyName = name_parts.LastOrDefault();
+                                shippingContact.street = android_payment_jobj.shippingAddress.address1;
+                                shippingContact.city = android_payment_jobj.shippingAddress.locality;
+                                shippingContact.postalCode = android_payment_jobj.shippingAddress.postalCode;
+                                shippingContact.isoCountryCode = android_payment_jobj.shippingAddress.countryCode;
+                                shippingContact.state = android_payment_jobj.shippingAddress.administrativeArea;
+                                shippingContact.country = android_payment_jobj.shippingAddress.countryCode;
+
+                                pk_payment.shippingContact = shippingContact;
 
                                 return pk_payment;
                             }
