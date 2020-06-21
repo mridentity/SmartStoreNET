@@ -270,8 +270,9 @@ namespace ReadySignOn.ReadyPay.Services
                             //    "administrativeArea": "NY"
                             //  },
                             //  "email": "devsweech@gmail.com",
-                            //  "transactionIdentifier": "TX_ID_RETURNED_FROM_PSP",
-                            //  "grandTotalCharged": 1.23
+                            //  "shippingFee": 1.23,
+                            //  "grandTotalCharged": 270.23,
+                            //  "transactionIdentifier": "TX_ID_RETURNED_FROM_PSP"
                             //}
 
                             if (android_payment_jobj != null)
