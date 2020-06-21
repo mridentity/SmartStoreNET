@@ -409,6 +409,7 @@ namespace ReadySignOn.ReadyPay.Controllers
             rp_info_model.TaxTotal = _orderTotalCalculationService.GetTaxTotal(cart);
             rp_info_model.ShippingTotal = _orderTotalCalculationService.GetShoppingCartShippingTotal(cart) ?? 0;
             rp_info_model.ShippingTax = _taxService.GetShippingPrice(rp_info_model.ShippingTotal.Value, true, customer) - _taxService.GetShippingPrice(rp_info_model.ShippingTotal.Value, false, customer);
+            rp_info_model.CartSubTotal = _orderTotalCalculationService.GetShoppingCartTotal(cart).TotalAmount ?? 0;
 
             try
             {
