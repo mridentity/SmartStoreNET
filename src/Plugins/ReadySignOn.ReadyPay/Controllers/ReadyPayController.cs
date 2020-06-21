@@ -316,6 +316,11 @@ namespace ReadySignOn.ReadyPay.Controllers
                 // be used to create an order in the SmartStore and/or tracking info to
                 // be sent to the end user.
 
+                if (rpayment.grandTotalCharged < rp_info_model.CartSubTotal)
+                {
+                    // ANTIHACK: Under any circumstances the grand total charged to the credit card shouldn't be less than the shopping card sub total
+                    throw new ApplicationException("// Grand total amount charged cannot be less than cart total.");
+                }
                 ReadyOrderRequest order_request = PrepareOrderRequest(rp_info_model, rpayment);
 
                 order_request.IsInPlaceReadyPayOrder = true;
