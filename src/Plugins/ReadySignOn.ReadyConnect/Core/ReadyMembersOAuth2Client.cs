@@ -80,7 +80,11 @@ namespace ReadySignOn.ReadyConnect.Core
             string code = context.Request.QueryString["code"];
             if (string.IsNullOrEmpty(code))
             {
-                return AuthenticationResult.Failed;
+                // The redirected Uri will look something like: https://localhost:44300/Plugins/ReadySignOn.ReadyConnect/logincallback?error=access_denied&error_description=The%20authorization%20was%20denied%20by%20the%20resource%20owner.
+
+                AuthenticationResult err_result = new AuthenticationResult(new Exception(context.Request.QueryString["error_description"]));
+
+                return err_result;
             }
 
             string accessToken = this.QueryAccessToken(returnPageUrl, code);
