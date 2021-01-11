@@ -193,7 +193,7 @@ namespace ReadySignOn.ReadyPay.Services
 
                 {
                     JObject j_summary_item = new JObject();
-                    j_summary_item["Lbl"] = "Total";
+                    j_summary_item["Lbl"] = "Total";    // This suppose to be the merchant name. Apple Pay payment sheet will show PAY XXXXX where XXXXX is whatever string we assign here converted to ALL CAPS.
                     j_summary_item["Amt"] = (rp_info_model.CartSubTotal + rp_info_model.TaxTotal).RoundIfEnabledFor(_workContext.WorkingCurrency);
                     j_summary_item["Final"] = true;
 
